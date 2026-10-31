@@ -118,6 +118,7 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 /* ---- Accouplements ---- */
 .accBtn{display:block;margin:18px auto 6px;width:min(100%,360px);border:0;background:none;padding:0;cursor:pointer}
 .accBtn:active{transform:scale(.95)}
+.accBtn img{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
 .accBtn .plate{aspect-ratio:3/1;border-radius:22px;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(#ffd45c,var(--gold2));border:4px solid #3a2208;
   box-shadow:inset 0 3px 0 rgba(255,255,255,.55),inset 0 -5px 0 rgba(0,0,0,.18),0 8px 14px rgba(0,0,0,.45)}
@@ -208,7 +209,7 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 <section id="acc" class="page">
   <div class="top"><button class="back" data-go="accouplements" aria-label="Retour">←</button><h2 id="accTitle">Parc</h2></div>
   <div id="accStats"></div>
-  <button class="accBtn" id="accGo" aria-label="Accoupler"><div class="plate"><span>💞 ACCOUPLER</span></div></button>
+  <button class="accBtn" id="accGo" aria-label="Accoupler"><img src="btn_accoupler.webp" alt="Accoupler"></button>
   <h4 class="sec">Accouplements en cours</h4>
   <div id="accList"></div>
   <button class="btn ghost" id="accResetParc" style="margin-top:12px" hidden>♻️ Réinitialiser les accouplements de ce parc</button>
@@ -234,6 +235,7 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:10,d:"31/10/2026",t:["Nouveau visuel pour le bouton « Accoupler » dans la page d'un parc."]},
   {v:9,d:"31/10/2026",t:["Accouplements : choix d'un parc, puis bouton « Accoupler » qui propose les mâles et femelles reproducteurs du parc.","Chaque accouplement en cours affiche la date de naissance prévue (d'après le temps de gestation de la femelle) et un compte à rebours.","Un accouplement peut être modifié (✏️) ou annulé (🗑) ; réinitialisation possible par parc ou pour tous, toujours avec confirmation."]},
   {v:8,d:"31/10/2026",t:["Chaque dragodinde d'un parc peut être modifiée (✏️) ou supprimée (🗑) ligne par ligne.","Nouveaux boutons : réinitialiser un parc, supprimer un parc, réinitialiser tous les parcs.","Chaque modification, réinitialisation ou suppression demande une confirmation avec le récapitulatif de ce qui va se passer."]},
   {v:7,d:"31/10/2026",t:["Gestion des parcs : bouton « Créer un parc » avec le formulaire (guilde, dragodinde, type, sexe, reproductrice, caméléone, nombre, objet à la vente, gestation).","Chaque parc apparaît avec le nom de sa guilde ; en l'ouvrant, on voit ses dragodindes, une par ligne.","Même arrière-plan sur toutes les pages."]},
