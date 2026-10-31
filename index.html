@@ -47,7 +47,7 @@ body{
   transition:transform .12s ease,filter .12s ease}
 .tile:active{transform:scale(.95);filter:brightness(1.12)}
 .tile img{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
-.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end}
 
 /* bouton provisoire en attendant les visuels */
 .plate{
@@ -80,10 +80,10 @@ body{
   </button>
   <div class="row">
     <button class="tile" data-go="accouplements" aria-label="Accouplements">
-      <div class="plate"><span>Accouplements</span></div>
+      <img src="btn_accouplement.webp" alt="Accouplements">
     </button>
     <button class="tile" data-go="accouchements" aria-label="Accouchements">
-      <div class="plate"><span>Accouchements</span></div>
+      <img src="btn_accouchement.webp" alt="Accouchements">
     </button>
   </div>
 </section>
@@ -124,6 +124,7 @@ body{
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:4,d:"31/10/2026",t:["Nouveaux visuels pour les boutons Accouplements et Accouchements sur l'accueil."]},
   {v:3,d:"31/10/2026",t:["Ajout de cet onglet « Mises à jour » en haut à droite de l'accueil."]},
   {v:2,d:"31/10/2026",t:["Retrait du titre sur l'accueil.","Ajout du bouton ⟳ en haut à gauche pour charger la dernière version de l'appli."]},
   {v:1,d:"31/10/2026",t:["Création de Drago Gestion : accueil avec les boutons Gestion des parcs, Accouplements et Accouchements.","Icône du certificat pour l'installation sur le téléphone."]}
