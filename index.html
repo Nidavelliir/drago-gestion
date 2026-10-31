@@ -117,6 +117,13 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .dragos td{padding:7px 8px;text-align:center;border-bottom:1px solid rgba(233,178,58,.35);font-weight:700;color:#fff3d6}
 .dragos tbody tr:nth-child(odd) td{background:rgba(0,0,0,.18)}
 .dragos td b{color:#fff3d6}
+.numB.qte{border-radius:12px;min-width:38px;font-size:14px;background:radial-gradient(circle at 40% 35%,#2e7a2a,#0f3a12)}
+.dragos tr.gRow td{background:rgba(255,200,60,.08)!important;border-bottom:2px solid rgba(233,178,58,.55)}
+.dragos tr.subRow td{background:rgba(0,0,0,.28)!important;font-size:13px;padding:5px 8px}
+.dragos tr.subRow .numB{min-width:24px;height:24px;font-size:11px}
+.ico.tog{font-size:18px;color:#ffd96a;width:32px;height:32px;border-radius:9px;border:2px solid #e9b23a;background:rgba(0,0,0,.35)}
+.typeG{color:#ffd96a!important}
+.tag.mix{background:linear-gradient(#e0a43a,#9a5a10);color:#fff}
 .numB{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 4px;border-radius:50%;font-weight:900;font-size:13px;color:#fff3c0;
   background:radial-gradient(circle at 40% 35%,#7a4a14,#3a1e06);border:2px solid #f0bf3a;box-shadow:0 0 0 2px #6a3c0a,0 0 8px rgba(255,200,60,.5);text-shadow:0 1px 0 #000}
 .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:800;font-size:12.5px;border:2px solid rgba(255,255,255,.5);text-shadow:0 1px 0 rgba(0,0,0,.4)}
@@ -465,6 +472,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:29,d:"31/10/2026",t:["Gestion des parcs : les dragodindes d'un même type sont regroupées sur une seule ligne, une pour les mâles et une pour les femelles, avec leur quantité (×14…).","Sur chaque ligne : ▸ pour voir le détail une par une (et les modifier ou supprimer individuellement), ✏️ pour modifier tout le groupe d'un coup, 🗑 pour en retirer le nombre voulu."]},
   {v:28,d:"31/10/2026",t:["Stérilisation : nouvelle fenêtre au style illustré (pastilles mâles/femelles, lignes dorées quand elles sont cochées, boutons Tout cocher / Tout décocher, Annuler / Valider).","Bouton « ⇅ Trier » dans la fenêtre de stérilisation : par numéro, nom, mâles ou femelles d'abord, reproductrices ou non d'abord, caméléones d'abord. Les cases cochées sont gardées pendant le tri."]},
   {v:27,d:"31/10/2026",t:["Nouveaux boutons illustrés « Terminé », « Suivant » et « Parc suivant » dans les fenêtres d'accouplement et de stérilisation."]},
   {v:26,d:"31/10/2026",t:["Nouvelle fenêtre « Parc terminé ! » illustrée (plaque de titre, œuf doré, pastille verte, sac d'or et bouton Terminé)."]},
@@ -558,6 +566,14 @@ function trier(L){
   const cle=d=>k==="gest"?(gestHeures(d.gest)??Infinity):k==="sexe"?(d.sexe==="M"?"Mâle":"Femelle"):k==="repro"||k==="cam"?(d[k]==="oui"?0:1):String(d[k]||"").toLowerCase();
   return A.sort((a,b)=>{const x=cle(a.d),y=cle(b.d);return (x<y?-1:x>y?1:a.i-b.i)*dir;});
 }
+// ---- Regroupement : une ligne par type et par sexe ----
+const groupesOuverts=new Set(); let groupesCache=[];
+function groupes(p){
+  const G=new Map();
+  trier(p.dragos).forEach(x=>{const t=(x.d.type||"").trim()||"Sans type", k=t.toLowerCase()+"|"+x.d.sexe;
+    if(!G.has(k))G.set(k,{key:k,type:t,sexe:x.d.sexe,items:[]}); G.get(k).items.push(x);});
+  return groupesCache=[...G.values()];
+}
 function renderParc(id){
   const p=getParcs().find(x=>x.id===id); if(!p) return false;
   const t=getTri(), nomTri=TRIS.find(x=>x[0]===t.k)?.[1];
@@ -567,12 +583,22 @@ function renderParc(id){
   const oui=v=>`<span class="tag ${v}">${v==="oui"?"✔ Oui":"✖ Non"}</span>`;
   const nM=p.dragos.filter(d=>d.sexe==="M").length;
   document.getElementById("parcBody").innerHTML=`<div class="cadre"><div class="cadreTitre">${pl(p.dragos.length,"# dragodinde","# dragodindes")} · ♂ ${nM} · ♀ ${p.dragos.length-nM}</div><div class="tableWrap"><table class="dragos">
-    <thead><tr><th>#</th><th>Actions</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
-    <tbody>${trier(p.dragos).map(({d,i})=>`<tr><td><span class="numB">${i+1}</span></td>
+    <thead><tr><th>Qté</th><th>Actions</th><th>Type</th><th>Sexe</th><th>Nom</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
+    <tbody>${groupes(p).map((g,gi)=>{
+      const c=k=>{const v=[...new Set(g.items.map(x=>x.d[k]||""))];return v.length===1?v[0]:null;};
+      const ouiG=k=>{const v=c(k);return v===null?`<span class="tag mix">Mixte</span>`:oui(v);};
+      const ouvert=groupesOuverts.has(g.key);
+      return `<tr class="gRow"><td><span class="numB qte">×${g.items.length}</span></td>
+      <td><div class="act"><button class="ico tog" data-gtog="${gi}" aria-label="Voir le détail">${ouvert?"▾":"▸"}</button><button class="ico" data-ggedit="${gi}" aria-label="Modifier le groupe"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-ggdel="${gi}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></td>
+      <td><b class="typeG">${esc(g.type)}</b></td>
+      <td><span class="tag ${g.sexe==="M"?"m":"f"}">${g.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td><td>${c("nom")===null?"<i class='muted'>Plusieurs noms</i>":esc(c("nom"))}</td>
+      <td>${ouiG("repro")}</td><td>${ouiG("cam")}</td><td>${c("objet")===null?"<i class='muted'>Variable</i>":esc(c("objet"))||"—"}</td><td>${c("gest")===null?"<i class='muted'>Variable</i>":esc(c("gest"))||"—"}</td></tr>`
+      +(ouvert?g.items.map(({d,i})=>`<tr class="subRow"><td><span class="numB">${i+1}</span></td>
       <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-del="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></td>
-      <td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
-      <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td>
-      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table>${p.dragos.length?"":`<p class="muted" style="text-align:center;padding:20px 0">Ce parc est vide.</p>`}</div></div>`
+      <td>${esc(d.type)}</td>
+      <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td><td><b>${esc(d.nom)}</b></td>
+      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join(""):"");
+    }).join("")}</tbody></table>${p.dragos.length?"":`<p class="muted" style="text-align:center;padding:20px 0">Ce parc est vide.</p>`}</div></div>`
   ;
   return true;
 }
@@ -744,9 +770,60 @@ document.getElementById("sortBtn").onclick=()=>{
   };
 };
 document.getElementById("parcBody").addEventListener("click",e=>{
+  const tg=e.target.closest("[data-gtog]"), ge=e.target.closest("[data-ggedit]"), gd=e.target.closest("[data-ggdel]");
+  if(tg){const g=groupesCache[+tg.dataset.gtog]; groupesOuverts.has(g.key)?groupesOuverts.delete(g.key):groupesOuverts.add(g.key); renderParc(curParc); return;}
+  if(ge){editGroupe(groupesCache[+ge.dataset.ggedit]);return;}
+  if(gd){delGroupe(groupesCache[+gd.dataset.ggdel]);return;}
   const ed=e.target.closest("[data-edit]"), de=e.target.closest("[data-del]");
   if(ed)editDrago(+ed.dataset.edit); if(de)delDrago(+de.dataset.del);
 });
+// Modifier tout un groupe (même type, même sexe)
+function editGroupe(g){
+  const root=document.getElementById("modalRoot"), ids=g.items.map(x=>x.d.id);
+  const c=k=>{const v=[...new Set(g.items.map(x=>x.d[k]||""))];return v.length===1?v[0]:null;};
+  const lab=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
+  const txt=(k,t)=>`<div class="f">${lab(t)}<input type="text" id="g_${k}" data-dl="${k}" value="${esc(c(k)??"")}" placeholder="${c(k)===null?"Variable – laisser vide pour ne pas changer":""}"></div>`;
+  const radio=(n,a,b,la,lb)=>`<div class="f">${lab(n==="sexe"?"Sexe":n==="repro"?"Reproductrice":"Caméléone")}<div class="choice"><label><input type="radio" name="g_${n}" value="${a}" ${c(n)===a?"checked":""}> ${la}</label><label><input type="radio" name="g_${n}" value="${b}" ${c(n)===b?"checked":""}> ${lb}</label></div></div>`;
+  root.innerHTML=`<div class="modal"><div class="box"><h3>✏️ Modifier ${pl(ids.length,"# dragodinde","les # dragodindes")} ${esc(g.type)} ${g.sexe==="M"?"♂":"♀"}</h3><form id="gForm" autocomplete="off">
+    ${txt("nom","Nom")}${txt("type","Type")}${radio("sexe","M","F","Mâle","Femelle")}${radio("repro","oui","non","Oui","Non")}${radio("cam","oui","non","Oui","Non")}${txt("objet","Objet obtenu à la vente")}${txt("gest","Temps de gestation")}
+    <div class="formBtns"><button type="button" class="btn ghost" id="g_cancel">Annuler</button><button type="submit" class="btn">Enregistrer</button></div></form></div></div>`;
+  menus(root);
+  document.getElementById("g_cancel").onclick=()=>root.innerHTML="";
+  document.getElementById("gForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.target, ch={};
+    ["nom","type","objet","gest"].forEach(k=>{const v=f.querySelector("#g_"+k).value.trim(); if(c(k)===null?v!=="":v!==(c(k)||""))ch[k]=v;});
+    ["sexe","repro","cam"].forEach(k=>{const r=f.querySelector(`[name=g_${k}]:checked`); if(r&&r.value!==c(k))ch[k]=r.value;});
+    const noms={nom:"Nom",type:"Type",sexe:"Sexe",repro:"Reproductrice",cam:"Caméléone",objet:"Objet à la vente",gest:"Gestation"};
+    const lignes=Object.entries(ch).map(([k,v])=>`<b>${noms[k]}</b> : ${c(k)===null?"<i>variable</i>":esc(val(k,c(k)))} → ${esc(val(k,v))}`);
+    if(!lignes.length){root.innerHTML="";return;}
+    if(await confirmBox({titre:"Confirmer la modification",ok:"Enregistrer",lignes:[`${pl(ids.length,"La dragodinde","Les # dragodindes")} <b>${esc(g.type)}</b> ${g.sexe==="M"?"mâle":"femelle"}${ids.length>1?"s":""} du parc <b>${esc(parcCourant().guilde)}</b> ${pl(ids.length,"sera modifiée","seront modifiées")} :`,...lignes]})){
+      const q=parcCourant(); q.dragos.forEach(d=>{if(ids.includes(d.id))Object.assign(d,ch);}); saveParc(q); renderParc(q.id);
+    } else editGroupe(g);
+  };
+}
+// Supprimer tout ou partie d'un groupe
+function delGroupe(g){
+  const root=document.getElementById("modalRoot"), n=g.items.length;
+  root.innerHTML=`<div class="modal"><div class="box"><h3>🗑 Retirer des ${esc(g.type)} ${g.sexe==="M"?"♂ mâles":"♀ femelles"}</h3><form id="gdForm">
+    <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Combien en retirer ? <span class="muted">(1 à ${n})</span></span>
+    <div class="stepper"><button type="button" class="btn ghost" id="gd_m">−</button><input type="number" id="gd_n" min="1" max="${n}" value="${n}" inputmode="numeric"><button type="button" class="btn ghost" id="gd_p">＋</button></div></div>
+    <div class="formBtns"><button type="button" class="btn ghost" id="gd_c">Annuler</button><button type="submit" class="btn danger">Retirer</button></div></form></div></div>`;
+  const nb=document.getElementById("gd_n");
+  document.getElementById("gd_m").onclick=()=>nb.value=Math.max(1,(+nb.value||1)-1);
+  document.getElementById("gd_p").onclick=()=>nb.value=Math.min(n,(+nb.value||0)+1);
+  document.getElementById("gd_c").onclick=()=>root.innerHTML="";
+  document.getElementById("gdForm").onsubmit=async e=>{
+    e.preventDefault();
+    const q=Math.max(1,Math.min(n,parseInt(nb.value)||1)), cibles=[...g.items].sort((a,b)=>b.i-a.i).slice(0,q), ids=cibles.map(x=>x.d.id), p=parcCourant();
+    const lies=getAccs().filter(a=>ids.includes(a.maleId)||ids.includes(a.femId)).length;
+    if(await confirmBox({titre:"Confirmer la suppression",danger:true,ok:"Supprimer",avert:"Cette action est définitive.",lignes:[
+      `${pl(q,"# dragodinde","# dragodindes")} <b>${esc(g.type)}</b> ${g.sexe==="M"?"mâle":"femelle"}${q>1?"s":""} ${pl(q,"sera retirée","seront retirées")} du parc <b>${esc(p.guilde)}</b> (n° ${cibles.map(x=>x.i+1).sort((a,b)=>a-b).join(", ")}).`,
+      `Il en restera ${n-q}.`,...noteAccs(lies)]})){
+      p.dragos=p.dragos.filter(d=>!ids.includes(d.id)); saveParc(p); setAccs(getAccs().filter(a=>!ids.includes(a.maleId)&&!ids.includes(a.femId))); renderParc(p.id);
+    } else delGroupe(g);
+  };
+}
 // Réinitialiser un parc (le vider)
 document.getElementById("resetParc").onclick=async()=>{
   const p=parcCourant();
