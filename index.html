@@ -18,11 +18,13 @@
 html,body{margin:0;height:100%}
 body{
   font-family:"Trebuchet MS",system-ui,-apple-system,sans-serif;color:var(--txt);
-  background:radial-gradient(ellipse at 50% 25%,#3b6b3f 0%,var(--bg) 45%,var(--bg2) 100%) fixed;
+  background:var(--bg) url("fond.webp") center top/cover no-repeat fixed;
   min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
 .page{display:none;min-height:100dvh;padding:20px 16px 32px;max-width:640px;margin:0 auto}
 .page.on{display:flex;flex-direction:column}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:rgba(10,20,8,.5);opacity:0;transition:opacity .2s}
+body.inner::before{opacity:1}
 
 /* ---- Accueil ---- */
 #home{justify-content:center;gap:10px}
@@ -63,8 +65,8 @@ body{
 .back{border:3px solid #3a2208;border-radius:14px;background:linear-gradient(#ffd45c,var(--gold2));
   color:var(--ink);font-weight:800;font-size:22px;width:48px;height:48px;cursor:pointer;flex:none}
 .back:active{transform:scale(.92)}
-.top h2{margin:0;color:var(--gold);font-size:26px;text-shadow:0 2px 0 #7a3d06}
-.card{background:rgba(251,238,203,.1);border:2px solid rgba(255,194,58,.45);border-radius:18px;padding:18px;line-height:1.45}
+.top h2{margin:0;color:var(--gold);font-size:26px;text-shadow:0 2px 0 #7a3d06,0 0 10px rgba(0,0,0,.9),0 0 3px #000}
+.card{background:rgba(22,30,14,.82);border:2px solid rgba(255,194,58,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);border-radius:18px;padding:18px;line-height:1.45}
 .card b{color:var(--gold)}
 .muted{opacity:.75;font-size:14px}
 </style>
@@ -124,6 +126,7 @@ body{
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:6,d:"31/10/2026",t:["Nouvel arrière-plan illustré (le parc et l'écurie) sur toute l'appli."]},
   {v:5,d:"31/10/2026",t:["Nouvelle version, plus nette, du bouton Gestion des parcs."]},
   {v:4,d:"31/10/2026",t:["Nouveaux visuels pour les boutons Accouplements et Accouchements sur l'accueil."]},
   {v:3,d:"31/10/2026",t:["Ajout de cet onglet « Mises à jour » en haut à droite de l'accueil."]},
@@ -146,6 +149,7 @@ function show(){
   const id=location.hash.slice(1);
   const p=PAGES.includes(id)?id:"home";
   document.querySelectorAll(".page").forEach(s=>s.classList.toggle("on",s.id===p));
+  document.body.classList.toggle("inner",p!=="home");
   scrollTo(0,0);
 }
 document.addEventListener("click",e=>{
