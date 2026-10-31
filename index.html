@@ -140,7 +140,23 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 .opt small{display:block;opacity:.75;font-size:12px}
 .opt:has(input:checked){background:rgba(255,194,58,.3);border-color:var(--gold)}
 .opt.off{opacity:.4;cursor:not-allowed}
-.f select.combo+input{margin-top:8px}
+button.combo{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;cursor:pointer;
+  padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.6);background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
+button.combo::after{content:"▾";color:#8a5a12;font-size:18px}
+button.combo.vide{color:#7a6a50}
+.combo+input{margin-top:8px}
+input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none;margin:0;padding:0;border:0}
+#pickRoot .modal{z-index:70}
+.pickList{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.pickList .opt{font-size:16px;padding:12px 14px;color:var(--txt);font-family:inherit;text-align:left;width:100%}
+.pickList .opt b{color:var(--txt)}
+.pickList .opt small{margin-top:3px}
+.pickList .opt.cur{background:rgba(255,194,58,.3);border-color:var(--gold)}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:48px;height:48px;flex:none;font-size:24px;padding:0}
+.stepper input{text-align:center;font-size:20px;font-weight:800}
+.dispo{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+.done{text-align:center;font-size:18px;margin:6px 0 14px}
 .f input[type=datetime-local],.f select{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.5);background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
 </style>
 </head>
@@ -237,10 +253,12 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 </section>
 
 <div id="modalRoot"></div>
+<div id="pickRoot"></div>
 
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:14,d:"31/10/2026",t:["Les menus déroulants s'ouvrent maintenant dans une fenêtre au même style que le reste de l'appli (coins arrondis, bordure dorée).","Accoupler : on choisit d'abord un type de dragodinde du parc (avec le nombre de mâles et femelles disponibles), puis le nombre d'accouplements (de 1 au nombre de couples possibles).","Après validation : « Suivant » pour accoupler un autre type, ou « Terminé » pour fermer.","Un mâle en cours d'accouplement n'est plus proposé pour un autre couple."]},
   {v:13,d:"31/10/2026",t:["Les champs Nom, Type, Objet obtenu et Temps de gestation sont maintenant de vrais menus déroulants avec les valeurs déjà enregistrées, plus « ➕ Nouveau… » pour en écrire une autre."]},
   {v:12,d:"31/10/2026",t:["Suggestions des valeurs déjà saisies pendant la frappe (remplacées par des menus déroulants en version 13)."]},
   {v:11,d:"31/10/2026",t:["Dans un parc : bouton « ＋ Ajouter » en haut pour ajouter des dragodindes à un parc déjà créé (avec confirmation).","Bouton « ⇅ Trier » : tri par nom, type, sexe, reproductrice, caméléone, objet à la vente, gestation ou ordre d'ajout, en croissant ou décroissant. Le n° de chaque dragodinde ne change pas."]},
@@ -356,18 +374,40 @@ function valeursConnues(k){
   const L=getParcs().flatMap(p=>p.dragos);
   return [...new Set(L.map(d=>(d[k]||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"fr"));
 }
+// Liste de choix dans une fenêtre (même style que les autres fenêtres de l'appli)
+function pickList({titre,options,current}){
+  return new Promise(res=>{
+    const r=document.getElementById("pickRoot");
+    r.innerHTML=`<div class="modal"><div class="box"><h3>${titre}</h3><div class="pickList">${options.map((o,i)=>
+      `<button type="button" class="opt ${o.disabled?"off":""} ${o.value===current?"cur":""}" data-i="${i}" ${o.disabled?"disabled":""}><b>${o.label}</b>${o.sub?`<small>${o.sub}</small>`:""}</button>`).join("")}</div>
+      <button type="button" class="btn ghost" data-x>Fermer</button></div></div>`;
+    r.querySelector(".modal").onclick=e=>{
+      const b=e.target.closest("[data-i]");
+      if(b){r.innerHTML="";res(options[+b.dataset.i].value);}
+      else if(e.target.closest("[data-x]")||e.target.classList.contains("modal")){r.innerHTML="";res(null);}
+    };
+  });
+}
 function menus(root){
   root.querySelectorAll("input[data-dl]").forEach(inp=>{
     if(inp.dataset.req===undefined)inp.dataset.req=inp.required?"1":"";
     if(inp.previousElementSibling?.classList.contains("combo"))inp.previousElementSibling.remove();
-    const vals=valeursConnues(inp.dataset.dl), cur=inp.value.trim(), req=inp.dataset.req==="1";
-    if(!vals.length){inp.hidden=false;inp.required=req;return;}           // rien d'enregistré : saisie libre
-    const sel=document.createElement("select"); sel.className="combo";
-    sel.innerHTML=`<option value="">— Choisir —</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("")+`<option value="__new">➕ Nouveau…</option>`;
-    inp.before(sel);
-    const mode=nouveau=>{inp.hidden=!nouveau;inp.required=nouveau&&req;sel.required=!nouveau&&req;};
-    if(cur&&!vals.includes(cur)){sel.value="__new";mode(true);} else {sel.value=cur;mode(false);}
-    sel.onchange=()=>{ if(sel.value==="__new"){inp.value="";mode(true);inp.focus();} else {inp.value=sel.value;mode(false);} };
+    const vals=valeursConnues(inp.dataset.dl), req=inp.dataset.req==="1";
+    inp.required=req; inp.classList.remove("cache");
+    if(!vals.length)return;                                   // rien d'enregistré : saisie libre
+    const titre=inp.closest(".f")?.querySelector("span,label")?.textContent||"Choisir";
+    const btn=document.createElement("button"); btn.type="button"; btn.className="combo";
+    inp.before(btn);
+    const mode=nouveau=>{inp.classList.toggle("cache",!nouveau);};
+    const affiche=()=>{const v=inp.value.trim();btn.textContent=nouveau?"➕ Nouveau…":(v||"— Choisir —");btn.classList.toggle("vide",!v&&!nouveau);};
+    let nouveau=!!inp.value.trim()&&!vals.includes(inp.value.trim());
+    mode(nouveau); affiche();
+    btn.onclick=async()=>{
+      const v=await pickList({titre,current:nouveau?"__new":inp.value.trim(),options:[...vals.map(x=>({value:x,label:esc(x)})),{value:"__new",label:"➕ Nouveau…"}]});
+      if(v===null)return;
+      if(v==="__new"){nouveau=true;inp.value="";mode(true);affiche();inp.focus();}
+      else{nouveau=false;inp.value=v;mode(false);affiche();}
+    };
   });
 }
 
@@ -530,8 +570,8 @@ function renderAccParcs(){
 }
 // état de chaque dragodinde du parc pour l'accouplement
 function etat(p){
-  const A=getAccs().filter(a=>a.parcId===p.id), occ=new Set(A.map(a=>a.femId));
-  return p.dragos.map((d,i)=>({d,n:i+1,raison:d.repro!=="oui"?"non reproductrice":(d.sexe==="F"&&occ.has(d.id)?"déjà accouplée":"")}));
+  const A=getAccs().filter(a=>a.parcId===p.id), occ=new Set(A.flatMap(a=>[a.femId,a.maleId]));
+  return p.dragos.map((d,i)=>({d,n:i+1,raison:d.repro!=="oui"?"non reproductrice":(occ.has(d.id)?(d.sexe==="F"?"déjà accouplée":"déjà accouplé"):"")}));
 }
 function renderAcc(id){
   const p=getParcs().find(x=>x.id===id); if(!p) return false;
@@ -560,7 +600,7 @@ const toLocalInput=ms=>{const d=new Date(ms-new Date(ms).getTimezoneOffset()*600
 function accWindow(edit){
   const p=accParc(), root=document.getElementById("modalRoot"), E=etat(p);
   // en modification, la femelle déjà liée reste sélectionnable
-  if(edit)E.forEach(e=>{if(e.d.id===edit.femId)e.raison="";});
+  if(edit)E.forEach(e=>{if(e.d.id===edit.femId||e.d.id===edit.maleId)e.raison="";});
   const M=E.filter(e=>e.d.sexe==="M"), F=E.filter(e=>e.d.sexe==="F");
   if(!edit&&(!M.some(e=>!e.raison)||!F.some(e=>!e.raison))){
     root.innerHTML=`<div class="modal"><div class="box"><h3>Accouplement impossible</h3><p>Il faut au moins un <b>mâle</b> et une <b>femelle</b> reproducteurs et disponibles dans le parc <b>${esc(p.guilde)}</b>.</p>
@@ -592,7 +632,7 @@ function accWindow(edit){
       lignes.unshift(`L'accouplement du parc <b>${esc(p.guilde)}</b> sera modifié :`);
     } else lignes.push(`Date : ${fmtDate(debut)}.`);
     lignes.push(fin?`Naissance prévue le ${fmtDate(fin)} (gestation de ${esc(fe.gest)}).`:`Temps de gestation de ${esc(fe.nom)} non reconnu${fe.gest?" (« "+esc(fe.gest)+" »)":""} : pas de date de naissance calculée.`);
-    if(!edit)lignes.push(`${esc(fe.nom)} ne sera plus proposée pour un autre accouplement tant que celui-ci est en cours.`);
+
     if(await confirmBox({titre:edit?"Confirmer la modification":"Confirmer l'accouplement",lignes,ok:edit?"Enregistrer":"Accoupler"})){
       const A=getAccs(), rec={id:edit?edit.id:uid(),parcId:p.id,maleId:mi,femId:fi,debut,gestH,gestTxt:fe.gest};
       if(edit)A[A.findIndex(a=>a.id===edit.id)]=rec; else A.push(rec);
@@ -601,14 +641,85 @@ function accWindow(edit){
   };
 }
 function alertBox(t){const root=document.createElement("div");root.innerHTML=`<div class="modal" style="z-index:60"><div class="box"><p>${t}</p><button class="btn">OK</button></div></div>`;document.body.appendChild(root);root.querySelector(".btn").onclick=()=>root.remove();}
-document.getElementById("accGo").onclick=()=>accWindow(null);
+// Assistant : accouplement par type, avec quantité, puis « Suivant » ou « Terminé »
+function typesDispo(p){
+  const E=etat(p), T={};
+  E.forEach(e=>{const t=(e.d.type||"").trim()||"Sans type";T[t]??={type:t,M:[],F:[]};if(!e.raison)T[t][e.d.sexe==="M"?"M":"F"].push(e.d);});
+  return Object.values(T).map(t=>({...t,max:Math.min(t.M.length,t.F.length)})).sort((a,b)=>a.type.localeCompare(b.type,"fr"));
+}
+function accWizard(faits=[],dernier=null){
+  const p=accParc(), root=document.getElementById("modalRoot"), T=typesDispo(p);
+  const possibles=T.filter(t=>t.max>0), reste=possibles.filter(t=>!faits.includes(t.type));
+  const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# accouplement","# accouplements")} de type <b>${esc(dernier.type)}</b> ${pl(dernier.n,"enregistré","enregistrés")}.</p>`:"";
+  if(!reste.length){
+    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>${fin}
+      <p>${dernier?"Il n'y a plus d'autre type à accoupler dans ce parc.":"Aucun type ne peut être accouplé : il faut au moins un <b>mâle</b> et une <b>femelle</b> reproducteurs et disponibles du même type."}</p>
+      <button class="btn" id="w_end">${dernier?"Terminé":"Compris"}</button></div></div>`;
+    document.getElementById("w_end").onclick=()=>root.innerHTML=""; return;
+  }
+  if(dernier){
+    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>${fin}
+      <p class="muted" style="text-align:center">Encore ${pl(reste.length,"# type disponible","# types disponibles")} : ${reste.map(t=>esc(t.type)).join(", ")}</p>
+      <div class="formBtns"><button class="btn ghost" id="w_end">Terminé</button><button class="btn" id="w_next">Suivant ➜</button></div></div></div>`;
+    document.getElementById("w_end").onclick=()=>root.innerHTML="";
+    document.getElementById("w_next").onclick=()=>formType(reste[0].type);
+    return;
+  }
+  formType(reste[0].type);
+  function formType(typeChoisi){
+    let t=T.find(x=>x.type===typeChoisi);
+    const dispoHtml=t=>`<div class="dispo"><span class="tag m">♂ ${t.M.length} ${pl(t.M.length,"mâle dispo","mâles dispo")}</span><span class="tag f">♀ ${t.F.length} ${pl(t.F.length,"femelle dispo","femelles dispo")}</span></div>`;
+    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3><form id="wForm">
+      <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Type de dragodinde</span>
+        <button type="button" class="combo" id="w_type"></button><div id="w_dispo"></div></div>
+      <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Nombre d'accouplements <span class="muted" id="w_max"></span></span>
+        <div class="stepper"><button type="button" class="btn ghost" id="w_moins">−</button><input type="number" id="w_nb" min="1" inputmode="numeric" required><button type="button" class="btn ghost" id="w_plus">＋</button></div></div>
+      <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Date et heure de l'accouplement</span><input type="datetime-local" id="w_date" value="${toLocalInput(Date.now())}" required></div>
+      <div class="formBtns"><button type="button" class="btn ghost" id="w_cancel">${faits.length?"Terminé":"Annuler"}</button><button type="submit" class="btn">Accoupler</button></div></form></div></div>`;
+    const nb=document.getElementById("w_nb");
+    const maj=()=>{
+      const b=document.getElementById("w_type"); b.textContent=`${t.type} — ${pl(t.max,"# couple possible","# couples possibles")}`;
+      document.getElementById("w_dispo").innerHTML=dispoHtml(t);
+      document.getElementById("w_max").textContent=`(1 à ${t.max})`;
+      nb.max=t.max; nb.value=t.max;
+    };
+    maj();
+    document.getElementById("w_type").onclick=async()=>{
+      const v=await pickList({titre:"Type de dragodinde",current:t.type,options:T.map(x=>({value:x.type,label:esc(x.type)+(faits.includes(x.type)?" ✅":""),
+        sub:`♂ ${x.M.length} ${pl(x.M.length,"mâle dispo","mâles dispo")} · ♀ ${x.F.length} ${pl(x.F.length,"femelle dispo","femelles dispo")} · ${x.max?pl(x.max,"# couple possible","# couples possibles"):"aucun couple possible"}`,disabled:!x.max}))});
+      if(v){t=T.find(x=>x.type===v);maj();}
+    };
+    document.getElementById("w_moins").onclick=()=>{nb.value=Math.max(1,(+nb.value||1)-1);};
+    document.getElementById("w_plus").onclick=()=>{nb.value=Math.min(t.max,(+nb.value||0)+1);};
+    document.getElementById("w_cancel").onclick=()=>root.innerHTML="";
+    document.getElementById("wForm").onsubmit=async e=>{
+      e.preventDefault();
+      const n=Math.max(1,Math.min(t.max,parseInt(nb.value)||1)), debut=new Date(document.getElementById("w_date").value).getTime()||Date.now();
+      const males=t.M.slice(0,n), fems=t.F.slice(0,n);
+      const gests=[...new Set(fems.map(f=>f.gest||""))], g0=gestHeures(fems[0].gest);
+      const lignes=[`${pl(n,"# couple","# couples")} de dragodindes <b>${esc(t.type)}</b> ${pl(n,"sera formé","seront formés")} dans le parc <b>${esc(p.guilde)}</b>.`,
+        `Mâles : ${males.map(d=>esc(d.nom)).join(", ")}`,`Femelles : ${fems.map(d=>esc(d.nom)).join(", ")}`,
+        `Date : ${fmtDate(debut)}.`,
+        gests.length===1&&g0?`Naissance prévue le ${fmtDate(debut+g0*3600000)} (gestation de ${esc(gests[0])}).`:gests.length>1?"Naissances calculées selon le temps de gestation de chaque femelle.":"Temps de gestation non reconnu : pas de date de naissance calculée.",
+        `Il restera ${pl(t.M.length-n,"# mâle","# mâles")} et ${pl(t.F.length-n,"# femelle","# femelles")} ${esc(t.type)} ${pl(Math.max(t.M.length-n,t.F.length-n),"disponible","disponibles")}.`];
+      const html=root.innerHTML;
+      if(await confirmBox({titre:"Confirmer l'accouplement",lignes,ok:"Accoupler"})){
+        const A=getAccs();
+        for(let i=0;i<n;i++)A.push({id:uid(),parcId:p.id,maleId:males[i].id,femId:fems[i].id,debut,gestH:gestHeures(fems[i].gest),gestTxt:fems[i].gest});
+        setAccs(A); renderAcc(p.id);
+        accWizard([...faits,t.type],{type:t.type,n});
+      } else formType(t.type);
+    };
+  }
+}
+document.getElementById("accGo").onclick=()=>accWizard();
 document.getElementById("accList").addEventListener("click",async e=>{
   const ed=e.target.closest("[data-aedit]"), de=e.target.closest("[data-adel]");
   if(ed)accWindow(getAccs().find(a=>a.id===ed.dataset.aedit));
   if(de){
     const a=getAccs().find(x=>x.id===de.dataset.adel), p=accParc(), byId=Object.fromEntries(p.dragos.map(d=>[d.id,d]));
     if(await confirmBox({titre:"Annuler cet accouplement ?",danger:true,ok:"Annuler l'accouplement",
-      lignes:[`L'accouplement entre <b>${esc(byId[a.maleId]?.nom)}</b> et <b>${esc(byId[a.femId]?.nom)}</b> (parc <b>${esc(p.guilde)}</b>) sera supprimé.`,`${esc(byId[a.femId]?.nom)} redeviendra disponible pour un nouvel accouplement.`],
+      lignes:[`L'accouplement entre <b>${esc(byId[a.maleId]?.nom)}</b> et <b>${esc(byId[a.femId]?.nom)}</b> (parc <b>${esc(p.guilde)}</b>) sera supprimé.`,`${esc(byId[a.maleId]?.nom)} et ${esc(byId[a.femId]?.nom)} redeviendront disponibles pour un nouvel accouplement.`],
       avert:"Cette action est définitive."})){
       setAccs(getAccs().filter(x=>x.id!==a.id)); renderAcc(p.id);
     }
@@ -617,7 +728,7 @@ document.getElementById("accList").addEventListener("click",async e=>{
 document.getElementById("accResetParc").onclick=async()=>{
   const p=accParc(), n=getAccs().filter(a=>a.parcId===p.id).length;
   if(await confirmBox({titre:"Réinitialiser les accouplements de ce parc ?",danger:true,ok:"Réinitialiser",
-    lignes:[`${pl(n,"L'accouplement en cours","Les # accouplements en cours")} du parc <b>${esc(p.guilde)}</b> ${pl(n,"sera supprimé","seront supprimés")}.`,"Toutes les femelles du parc redeviendront disponibles.","Les dragodindes du parc ne sont pas touchées."],
+    lignes:[`${pl(n,"L'accouplement en cours","Les # accouplements en cours")} du parc <b>${esc(p.guilde)}</b> ${pl(n,"sera supprimé","seront supprimés")}.`,"Tous les mâles et femelles du parc redeviendront disponibles.","Les dragodindes du parc ne sont pas touchées."],
     avert:"Cette action est définitive."})){
     setAccs(getAccs().filter(a=>a.parcId!==p.id)); renderAcc(p.id);
   }
@@ -625,7 +736,7 @@ document.getElementById("accResetParc").onclick=async()=>{
 document.getElementById("accResetAll").onclick=async()=>{
   const A=getAccs(), L=getParcs(), parcs=[...new Set(A.map(a=>a.parcId))].map(id=>L.find(p=>p.id===id)?.guilde).filter(Boolean);
   if(await confirmBox({titre:"Réinitialiser tous les accouplements ?",danger:true,ok:"Tout réinitialiser",
-    lignes:[`${pl(A.length,"L'accouplement en cours sera supprimé","Les # accouplements en cours seront supprimés")} (${parcs.map(g=>"<b>"+esc(g)+"</b>").join(", ")}).`,"Toutes les femelles redeviendront disponibles.","Les parcs et leurs dragodindes ne sont pas touchés."],
+    lignes:[`${pl(A.length,"L'accouplement en cours sera supprimé","Les # accouplements en cours seront supprimés")} (${parcs.map(g=>"<b>"+esc(g)+"</b>").join(", ")}).`,"Tous les mâles et femelles redeviendront disponibles.","Les parcs et leurs dragodindes ne sont pas touchés."],
     avert:"Cette action est définitive."})){
     setAccs([]); renderAccParcs();
   }
