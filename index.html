@@ -102,14 +102,28 @@ form.card{display:flex;flex-direction:column;gap:12px;margin-top:16px}
 .choice label:has(input:checked){background:rgba(255,194,58,.28);border-color:var(--gold)}
 .formBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
 .empty{text-align:center}
-.tableWrap{overflow-x:auto;border-radius:16px;border:2px solid rgba(255,194,58,.6);background:rgba(22,30,14,.88)}
-table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowrap}
-.dragos th{background:#1a1208;color:var(--gold);text-align:left;padding:10px;position:sticky;top:0}
-.dragos td{padding:10px;border-top:1px solid rgba(255,194,58,.25)}
-.dragos tr:nth-child(even) td{background:rgba(255,255,255,.04)}
-.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px}
-.tag.m{background:#2f6fd6;color:#fff}.tag.f{background:#e0479e;color:#fff}
-.tag.oui{background:#3d9a4a;color:#fff}.tag.non{background:rgba(255,255,255,.15)}
+/* cadre illustré (haut / milieu étiré / bas) */
+#parcBody{container-type:inline-size}
+.cadre{position:relative;min-height:60cqw;padding:6.8cqw 4.6cqw 21cqw;
+  background:url("cadre_haut.webp") top/100% auto no-repeat,url("cadre_bas.webp") bottom/100% auto no-repeat,url("cadre_milieu.webp") top 10cqw left 0/100% calc(100% - 20cqw) no-repeat;
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.cadreTitre{height:6cqw;margin-bottom:3cqw;padding:0 6%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:clamp(12px,3.7vw,18px);color:#ffe9a8;text-shadow:0 2px 0 #3a1a04,1px 1px 0 #2a1204,-1px -1px 0 #2a1204;white-space:nowrap}
+.tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px;white-space:nowrap}
+.dragos th{background:linear-gradient(#4a2a0c,#2a1604);color:#ffd96a;text-align:center;padding:9px 10px;border-top:2px solid #e9b23a;border-bottom:2px solid #e9b23a;
+  font-weight:800;text-shadow:0 2px 0 #1a0a00}
+.dragos th:first-child{border-left:2px solid #e9b23a;border-radius:10px 0 0 10px}.dragos th:last-child{border-right:2px solid #e9b23a;border-radius:0 10px 10px 0}
+.dragos td{padding:7px 8px;text-align:center;border-bottom:1px solid rgba(233,178,58,.35);font-weight:700;color:#fff3d6}
+.dragos tbody tr:nth-child(odd) td{background:rgba(0,0,0,.18)}
+.dragos td b{color:#fff3d6}
+.numB{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 4px;border-radius:50%;font-weight:900;font-size:13px;color:#fff3c0;
+  background:radial-gradient(circle at 40% 35%,#7a4a14,#3a1e06);border:2px solid #f0bf3a;box-shadow:0 0 0 2px #6a3c0a,0 0 8px rgba(255,200,60,.5);text-shadow:0 1px 0 #000}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:800;font-size:12.5px;border:2px solid rgba(255,255,255,.5);text-shadow:0 1px 0 rgba(0,0,0,.4)}
+.tag.m{background:linear-gradient(#5aa2ff,#1e5fd6);color:#fff;box-shadow:0 0 6px rgba(70,140,255,.6)}
+.tag.f{background:linear-gradient(#ff7cc8,#d42d8e);color:#fff;box-shadow:0 0 6px rgba(255,90,180,.6)}
+.tag.oui{background:linear-gradient(#7fe05a,#2e9a22);color:#fff;box-shadow:0 0 6px rgba(120,230,80,.55)}
+.tag.non{background:linear-gradient(#8a8a8a,#4a4a4a);color:#eee}
 .act{display:flex;gap:6px}
 .ico{width:36px;height:36px;border-radius:10px;border:2px solid rgba(255,194,58,.6);background:rgba(255,255,255,.08);
   font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
@@ -132,6 +146,21 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 .modal .warn{background:rgba(226,59,46,.18);border:1px solid rgba(226,59,46,.6);border-radius:10px;padding:8px 10px;font-size:14px}
 .modal .box form{display:flex;flex-direction:column;gap:12px}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+/* ===== Brillance + scintillement des boutons ===== */
+.shine{position:relative;isolation:isolate}
+.shine>img:not(.plume){animation:glow 2.8s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 5px 8px rgba(0,0,0,.45)) drop-shadow(0 0 2px rgba(255,214,90,.35))}
+  50%{filter:drop-shadow(0 5px 8px rgba(0,0,0,.45)) drop-shadow(0 0 10px rgba(255,226,120,.95))}}
+.parcBtn.shine{animation:glowB 2.8s ease-in-out infinite}
+@keyframes glowB{0%,100%{filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}50%{filter:drop-shadow(0 6px 10px rgba(0,0,0,.45)) drop-shadow(0 0 9px rgba(255,226,120,.85))}}
+.shine .sweep{position:absolute;inset:0;pointer-events:none;z-index:2;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  background:linear-gradient(105deg,transparent 42%,rgba(255,255,240,.6) 50%,transparent 58%) no-repeat;background-size:260% 100%;background-position:160% 0;
+  animation:sweep 4.2s ease-in-out infinite;mix-blend-mode:screen}
+@keyframes sweep{0%{background-position:160% 0}45%,100%{background-position:-60% 0}}
+.shine .spk{position:absolute;z-index:3;width:13px;height:13px;pointer-events:none;background:#fffbe0;opacity:0;
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);filter:drop-shadow(0 0 4px #ffe680);animation:twinkle 2.6s ease-in-out infinite}
+.shine .spk.s1{top:2%;left:10%}.shine .spk.s2{bottom:6%;right:8%;width:10px;height:10px}.shine .spk.s3{top:22%;right:3%;width:16px;height:16px}
+@keyframes twinkle{0%,70%,100%{opacity:0;transform:scale(.2) rotate(0)}80%{opacity:1;transform:scale(1.1) rotate(45deg)}90%{opacity:.6;transform:scale(.7) rotate(90deg)}}
 /* en-tête : bouton retour + plaque de titre */
 .topImg{display:flex;align-items:center;gap:6px;margin:0 0 12px}
 .back.arrowBack{width:19%;max-width:84px;height:auto;flex:none;border:0;background:none;padding:0;border-radius:0}
@@ -247,16 +276,16 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCUEIL ============ -->
 <section id="home" class="page">
-  <button id="refresh" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour"><img src="btn_refresh.webp" alt="⟳"></button>
-  <button id="newsBtn" data-go="news" aria-label="Mises à jour"><img id="newsImg" src="btn_maj.webp" alt="Mises à jour"><i id="newsDot" hidden></i></button>
-  <button class="tile" data-go="parcs" aria-label="Gestion des parcs">
+  <button id="refresh" class="shine" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour"><img src="btn_refresh.webp" alt="⟳"></button>
+  <button id="newsBtn" class="shine" data-go="news" aria-label="Mises à jour"><img id="newsImg" src="btn_maj.webp" alt="Mises à jour"><i id="newsDot" hidden></i></button>
+  <button class="tile shine" data-go="parcs" aria-label="Gestion des parcs">
     <img src="btn_parcs.webp?v=5" alt="Gestion des parcs">
   </button>
   <div class="row">
-    <button class="tile" data-go="accouplements" aria-label="Accouplements">
+    <button class="tile shine" data-go="accouplements" aria-label="Accouplements">
       <img src="btn_accouplement.webp" alt="Accouplements">
     </button>
-    <button class="tile" data-go="accouchements" aria-label="Accouchements">
+    <button class="tile shine" data-go="accouchements" aria-label="Accouchements">
       <img src="btn_accouchement.webp" alt="Accouchements">
     </button>
   </div>
@@ -264,10 +293,10 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ GESTION DES PARCS ============ -->
 <section id="parcs" class="page">
-  <button class="back imgBack" data-go="home" aria-label="Retour – Gestion des parcs"><img src="hdr_parcs.webp" alt="← Gestion des parcs"></button>
+  <button class="back imgBack shine" data-go="home" aria-label="Retour – Gestion des parcs"><img src="hdr_parcs.webp" alt="← Gestion des parcs"></button>
   <div class="duo" id="parcActions">
-    <button class="imgBtn" id="newParcBtn" aria-label="Créer un parc"><img src="btn_creer_parc.webp" alt="Créer un parc"></button>
-    <button class="imgBtn" data-go="steril" aria-label="Stérilisation"><img src="btn_sterilisation.webp" alt="Stérilisation"></button>
+    <button class="imgBtn shine" id="newParcBtn" aria-label="Créer un parc"><img src="btn_creer_parc.webp" alt="Créer un parc"></button>
+    <button class="imgBtn shine" data-go="steril" aria-label="Stérilisation"><img src="btn_sterilisation.webp" alt="Stérilisation"></button>
   </div>
 
   <form id="parcForm" class="card" hidden autocomplete="off">
@@ -287,15 +316,15 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
   </form>
 
   <div class="parcList" id="parcList"></div>
-  <button class="imgBtn" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs"><img src="btn_reset_parcs.webp" alt="Réinitialiser tous les parcs"></button>
+  <button class="imgBtn shine" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs"><img src="btn_reset_parcs.webp" alt="Réinitialiser tous les parcs"></button>
 </section>
 
 <!-- ============ DÉTAIL D'UN PARC ============ -->
 <section id="parc" class="page">
-  <button class="back hdrG" data-go="parcs" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="parcTitle">Parc</span></button>
-  <div class="tools" style="margin:0 0 14px">
-    <button class="btn" id="addDrago">＋ Ajouter</button>
-    <button class="btn ghost" id="sortBtn">⇅ Trier</button>
+  <button class="back hdrG shine" data-go="parcs" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="parcTitle">Parc</span></button>
+  <div class="tools" style="margin:0 0 14px;gap:8px;align-items:center">
+    <button class="imgBtn shine" id="addDrago" aria-label="Ajouter"><img src="btn_ajouter.webp" alt="＋ Ajouter"></button>
+    <button class="imgBtn shine" id="sortBtn" aria-label="Trier"><img src="btn_trier.webp" alt="⇅ Trier"></button>
   </div>
   <div id="sortInfo" style="margin:-4px 0 10px;display:inline-block;align-self:flex-start;background:rgba(22,30,14,.88);border:1px solid rgba(255,194,58,.5);border-radius:10px;padding:5px 10px;font-size:14px"></div>
   <div id="parcBody"></div>
@@ -307,7 +336,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCOUPLEMENTS ============ -->
 <section id="accouplements" class="page">
-  <div class="topImg"><button class="back arrowBack" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Accouplements</span></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Accouplements</span></div></div>
   <h4 class="sec">Choisis un parc</h4>
   <div class="parcList" id="accParcList" style="margin-top:0"></div>
   <button class="btn ghost" id="accResetAll" style="margin-top:22px" hidden>♻️ Réinitialiser tous les accouplements</button>
@@ -315,9 +344,9 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCOUPLEMENTS D'UN PARC ============ -->
 <section id="acc" class="page">
-  <button class="back hdrG" data-go="accouplements" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="accTitle">Parc</span></button>
+  <button class="back hdrG shine" data-go="accouplements" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="accTitle">Parc</span></button>
   <div id="accStats"></div>
-  <button class="accBtn" id="accGo" aria-label="Accoupler"><img src="btn_accoupler.webp" alt="Accoupler"></button>
+  <button class="accBtn shine" id="accGo" aria-label="Accoupler"><img src="btn_accoupler.webp" alt="Accoupler"></button>
   <h4 class="sec">Accouplements en cours</h4>
   <div id="accList"></div>
   <button class="btn ghost" id="accResetParc" style="margin-top:12px" hidden>♻️ Réinitialiser les accouplements de ce parc</button>
@@ -325,14 +354,14 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCOUCHEMENTS ============ -->
 <section id="accouchements" class="page">
-  <div class="topImg"><button class="back arrowBack" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_accouchements.webp" alt="Accouchements"></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_accouchements.webp" alt="Accouchements"></div></div>
   <div id="gestList"></div>
   <button class="btn ghost" id="gestReset" style="margin-top:12px" hidden>♻️ Réinitialiser toutes les gestations</button>
 </section>
 
 <!-- ============ STÉRILISATION ============ -->
 <section id="steril" class="page">
-  <div class="topImg"><button class="back arrowBack" data-go="parcs" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Stérilisation</span></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="parcs" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Stérilisation</span></div></div>
   <h4 class="sec" style="margin-top:0">Choisis un parc</h4>
   <div class="parcList" id="sterParcList" style="margin-top:0"></div>
   <h4 class="sec">Registre des stériles</h4>
@@ -342,7 +371,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ MISES À JOUR ============ -->
 <section id="news" class="page">
-  <div class="topImg"><button class="back arrowBack" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Mises à jour</span></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Mises à jour</span></div></div>
   <div id="newsList"></div>
 </section>
 
@@ -352,6 +381,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:22,d:"31/10/2026",t:["La liste des dragodindes d'un parc s'affiche dans un cadre doré illustré, avec médaillons numérotés et pastilles colorées (Mâle, Femelle, ✔ Oui, ✖ Non).","Nouveaux boutons « Ajouter » et « Trier ».","Effet de brillance et de scintillement sur tous les boutons illustrés."]},
   {v:21,d:"31/10/2026",t:["Accouchements : bouton vert ✔ sur chaque gestation pour la valider comme terminée, sans confirmation. Il clignote quand la gestation est prête."]},
   {v:20,d:"31/10/2026",t:["Nouveau bouton retour (flèche dorée) et nouvelles plaques de titre en haut des pages Accouplements, Accouchements, Stérilisation et Mises à jour.","Nouvelle plaque (maison et œuf) pour le nom de chaque parc dans Accouchements et dans le registre des stériles."]},
   {v:19,d:"31/10/2026",t:["Nouveau logo de l'appli : le certificat de dragodinde dans son cadre doré."]},
@@ -422,7 +452,7 @@ const getAccs=()=>Store.get("accs",[]);
 const setAccs=a=>Store.set("accs",a);
 const form=document.getElementById("parcForm");
 let curParc=null;
-const plaque=(go,nom,info)=>`<button class="btn parcBtn" data-go="${go}"><span class="nomG">${esc(nom)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${info}</span></button>`;
+const plaque=(go,nom,info)=>`<button class="btn parcBtn shine" data-go="${go}"><span class="nomG">${esc(nom)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${info}</span></button>`;
 function renderParcs(){
   const L=getParcs(), el=document.getElementById("parcList");
   document.getElementById("resetAll").hidden=!L.length;
@@ -444,15 +474,16 @@ function renderParc(id){
   const si=document.getElementById("sortInfo"); si.hidden=!(t.k||t.dir<0); si.textContent=(t.k||t.dir<0)?`Trié par : ${nomTri} (${t.k==="repro"||t.k==="cam"?(t.dir>0?"Oui d'abord":"Non d'abord"):t.dir>0?"croissant":"décroissant"})`:"";
   curParc=id;
   document.getElementById("parcTitle").textContent=p.guilde;
-  const oui=v=>`<span class="tag ${v}">${v==="oui"?"Oui":"Non"}</span>`;
-  document.getElementById("parcBody").innerHTML=`<div class="tableWrap"><table class="dragos">
+  const oui=v=>`<span class="tag ${v}">${v==="oui"?"✔ Oui":"✖ Non"}</span>`;
+  const nM=p.dragos.filter(d=>d.sexe==="M").length;
+  document.getElementById("parcBody").innerHTML=`<div class="cadre"><div class="cadreTitre">${pl(p.dragos.length,"# dragodinde","# dragodindes")} · ♂ ${nM} · ♀ ${p.dragos.length-nM}</div><div class="tableWrap"><table class="dragos">
     <thead><tr><th>#</th><th>Actions</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
-    <tbody>${trier(p.dragos).map(({d,i})=>`<tr><td>${i+1}</td>
+    <tbody>${trier(p.dragos).map(({d,i})=>`<tr><td><span class="numB">${i+1}</span></td>
       <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-del="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></td>
       <td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
       <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td>
-      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table></div>`
-    +(p.dragos.length?"":`<div class="card empty muted">Ce parc est vide.</div>`);
+      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table>${p.dragos.length?"":`<p class="muted" style="text-align:center;padding:20px 0">Ce parc est vide.</p>`}</div></div>`
+  ;
   return true;
 }
 document.getElementById("newParcBtn").onclick=()=>{form.reset();menus(form);form.hidden=false;document.getElementById("parcActions").hidden=true;renderParcs();document.getElementById("fGuilde").focus();};
@@ -917,7 +948,7 @@ document.getElementById("gestReset").onclick=async()=>{
 const getSter=()=>Store.get("steriles",[]), setSter=v=>Store.set("steriles",v);
 function renderSteril(){
   const L=getParcs(), S=getSter();
-  document.getElementById("sterParcList").innerHTML=L.length?L.map(p=>`<button class="btn parcBtn" data-ster="${p.id}"><span class="nomG">${esc(p.guilde)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${pl(p.dragos.length,"# dragodinde","# dragodindes")}</span></button>`).join("")
+  document.getElementById("sterParcList").innerHTML=L.length?L.map(p=>`<button class="btn parcBtn shine" data-ster="${p.id}"><span class="nomG">${esc(p.guilde)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${pl(p.dragos.length,"# dragodinde","# dragodindes")}</span></button>`).join("")
     :`<div class="card empty muted">Aucun parc pour l'instant.</div>`;
   document.getElementById("sterReset").hidden=!S.length;
   const el=document.getElementById("sterList");
@@ -1022,6 +1053,20 @@ document.getElementById("refresh").addEventListener("click",function(){
     window.caches?caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith("drago-")).map(x=>caches.delete(x)))).catch(()=>{}):0
   ]).then(()=>{clearTimeout(t);go()});
 });
+
+// Ajoute le reflet et les étincelles sur les boutons illustrés
+function briller(root=document){
+  root.querySelectorAll(".shine").forEach(b=>{
+    if(b.dataset.sh)return; b.dataset.sh=1;
+    const img=b.classList.contains("parcBtn")?null:b.querySelector(":scope>img"); let src=img?.getAttribute("src");
+    if(!src&&b.classList.contains("parcBtn"))src="plaque_parc.webp";
+    if(src){const sw=document.createElement("i");sw.className="sweep";sw.style.webkitMaskImage=sw.style.maskImage=`url("${src}")`;
+      sw.style.animationDelay=(-Math.random()*4).toFixed(2)+"s";b.appendChild(sw);}
+    ["s1","s2","s3"].forEach(k=>{const e=document.createElement("i");e.className="spk "+k;e.style.animationDelay=(Math.random()*2.6).toFixed(2)+"s";e.style.animationDuration=(2.2+Math.random()*1.4).toFixed(2)+"s";b.appendChild(e);});
+  });
+}
+new MutationObserver(()=>briller()).observe(document.body,{childList:true,subtree:true});
+briller();
 
 show(); // affichage de la page de départ, une fois tout le reste prêt
 </script>
