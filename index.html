@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Drago Gestion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1f3d24">
+<meta name="theme-color" content="#f5f4f0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Drago Gestion">
 <link rel="manifest" href="manifest.webmanifest">
@@ -410,33 +410,176 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 .finFin{width:100%}
 .bravo{text-align:center;line-height:1.5;font-size:16px;margin:4px 0 16px}
 .f input[type=datetime-local],.f select{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.5);background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
+
+/* =====================================================================
+   THÈME ÉPURÉ — remplace tout le style illustré
+   ===================================================================== */
+:root{--bg:#f5f4f0;--card:#ffffff;--line:#e4e1da;--ink:#1f2421;--mut:#7a7f7b;--acc:#2f6b4f;--acc2:#e7f0eb;--dan:#b8392e;--m:#3b6fd6;--f:#d24b8f}
+html,body{background:var(--bg)!important;color:var(--ink)!important}
+body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;-webkit-font-smoothing:antialiased}
+*{text-shadow:none!important}
+.page{padding:16px 16px 40px!important;gap:0}
+img{filter:none!important}
+.muted,.muted *{color:var(--mut)!important;opacity:1!important}
+/* boutons */
+.btn,.stB,button.combo,.imgBtn,.accBtn,.vueBtn,.grandFermer,.agrandir,.back,.stDetailBtn{font-family:inherit!important;animation:none!important}
+.btn,.imgBtn,.accBtn,.stB{display:flex!important;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px 14px!important;border-radius:10px!important;
+  border:1px solid var(--line)!important;background:var(--card)!important;color:var(--ink)!important;font-size:15px!important;font-weight:600!important;box-shadow:none!important;
+  min-height:46px;height:auto;cursor:pointer;aspect-ratio:auto!important;text-align:center}
+#newParcBtn,#addDrago,.accBtn,.btn:not(.ghost):not(.danger):not(.parcBtn),.stB.valider,#w_suiv,#s_next,#w_next{background:var(--acc)!important;color:#fff!important;border-color:var(--acc)!important}
+.btn.danger,.stB.rouge,#delParc{background:#fff!important;color:var(--dan)!important;border-color:#e8c4bf!important}
+.btn:active,.imgBtn:active,.stB:active,.accBtn:active{transform:none!important;opacity:.7}
+.stB i{display:none!important}
+.formBtns,.tools,.duo,.stBas,.stOutils{gap:8px!important;align-items:stretch!important}
+/* en-têtes */
+.top,.topImg{display:flex!important;align-items:center;gap:10px;margin:0 0 18px!important}
+.back,.back.arrowBack,.back.imgBack,.back.hdrG{width:auto!important;max-width:none!important;height:auto!important;flex:none;padding:0!important;border:0!important;background:none!important;
+  display:flex!important;align-items:center;gap:10px;font-size:22px!important;color:var(--ink)!important;box-shadow:none!important;margin:0 0 18px!important}
+.topImg .back{margin:0!important}
+.back .arr,.arrowBack{font-size:22px;line-height:1;color:var(--ink)}
+.hdrG .hdrTxt,.imgBack .hdrTxt,.titrePl span,.top h2{position:static!important;display:block!important;height:auto!important;font-size:22px!important;font-weight:700!important;color:var(--ink)!important;
+  text-align:left!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
+.titrePl{flex:1;min-width:0}
+.vueBtn{width:40px!important;height:40px;aspect-ratio:auto!important;border-radius:10px!important;border:1px solid var(--line)!important;background:var(--card)!important;color:var(--ink)!important;font-size:18px!important;box-shadow:none!important}
+h4.sec{color:var(--mut)!important;font-size:12px!important;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin:22px 0 8px!important}
+/* accueil */
+#home{justify-content:flex-start!important;padding-top:84px!important;gap:10px!important}
+#home::before{content:"Drago Gestion";font-size:28px;font-weight:700;letter-spacing:-.4px;margin:0 0 14px}
+.tile,.row .tile{width:100%;display:flex!important;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding:18px!important;border-radius:14px!important;
+  background:var(--card)!important;border:1px solid var(--line)!important;text-align:left;min-height:84px}
+.tile .tileT{font-size:18px;font-weight:700;color:var(--ink)}
+.tile .tileS{font-size:13px;color:var(--mut)}
+.row{grid-template-columns:1fr 1fr!important;gap:10px!important;align-items:stretch!important}
+#refresh,#newsBtn{position:fixed!important;top:calc(16px + env(safe-area-inset-top))!important;width:auto!important;height:38px;padding:0 14px!important;border-radius:999px!important;
+  border:1px solid var(--line)!important;background:var(--card)!important;color:var(--ink)!important;font-size:14px!important;font-weight:600;display:flex!important;align-items:center;gap:6px}
+#refresh{left:16px!important;font-size:18px!important;padding:0 12px!important}
+#newsBtn{right:16px!important}
+#newsDot{display:inline-block!important;position:static!important;width:8px;height:8px;border-radius:50%;background:var(--dan);border:0!important}
+#newsDot[hidden]{display:none!important}
+#refresh.spin{animation:spin .8s linear infinite!important}
+/* cartes et listes */
+.card,.card.gest,.card.pair,.card.ster,.card.sterG,.card.stat{background:var(--card)!important;border:1px solid var(--line)!important;border-radius:12px!important;box-shadow:none!important;
+  backdrop-filter:none!important;color:var(--ink)!important}
+.card b,.gest .who b,.dragos td b{color:var(--ink)!important}
+.btn.parcBtn{aspect-ratio:auto!important;justify-content:space-between!important;padding:14px 16px!important;background:var(--card)!important;color:var(--ink)!important;border:1px solid var(--line)!important;filter:none!important}
+.parcBtn .nomG{font-size:16px!important;font-weight:600!important;color:var(--ink)!important;-webkit-line-clamp:1}
+.parcBtn .nbG{font-size:13px!important;font-weight:500!important;color:var(--mut)!important}
+.parcBtn .sep,.parcBtn .plume{display:none!important}
+.parcList{gap:8px!important}
+/* tableau */
+.cadre,.cadre.grand{background:var(--card)!important;border:1px solid var(--line);border-radius:12px;padding:12px!important;min-height:0!important;filter:none!important}
+.cadreTitre{position:static!important;height:auto!important;margin:0 0 10px!important;padding:0!important;justify-content:flex-start!important;font-size:13px!important;font-weight:600!important;color:var(--mut)!important}
+.agrandir{top:8px!important;right:8px!important;background:var(--bg)!important;border:1px solid var(--line)!important;color:var(--ink)!important;border-radius:8px!important}
+table.dragos{font-size:14px}
+.dragos th{background:none!important;color:var(--mut)!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0!important;font-weight:600!important;font-size:12px!important}
+.dragos td{color:var(--ink)!important;border-bottom:1px solid var(--line)!important;background:none!important;font-weight:500!important}
+.dragos tbody tr:nth-child(odd) td{background:none!important}
+.dragos.synth .tType{color:var(--ink)!important;font-weight:700!important}
+.dragos.synth .tTot{color:var(--acc)!important}
+.tEtat{color:var(--f)!important}
+.tAide{color:var(--mut)}
+.zero{opacity:.3}
+#grandRoot .grandVue{background:var(--bg)!important}
+.grandTop{color:var(--ink)!important}
+.grandFermer{background:var(--card)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+/* pastilles et tags */
+.tag,.pil{border:0!important;box-shadow:none!important;border-radius:6px!important;font-weight:600!important;font-size:12px!important;padding:2px 8px!important}
+.tag.m,.pil.m{background:#e6edfb!important;color:var(--m)!important}
+.tag.f,.pil.f{background:#fbe8f1!important;color:var(--f)!important}
+.tag.oui{background:var(--acc2)!important;color:var(--acc)!important}
+.tag.non{background:#efefec!important;color:var(--mut)!important}
+.tag.mix{background:#fdf1dc!important;color:#a06a10!important}
+.numB{background:var(--bg)!important;border:1px solid var(--line)!important;box-shadow:none!important;color:var(--ink)!important;font-weight:600!important}
+/* icônes */
+.ico,.ico:has(img),.ico.ok,.ico.tog{width:34px!important;height:34px!important;border-radius:8px!important;border:1px solid var(--line)!important;background:var(--card)!important;color:var(--ink)!important;
+  font-size:15px!important;box-shadow:none!important;animation:none!important}
+.ico.del{color:var(--dan)!important}
+.ico.ok{color:var(--acc)!important;border-color:#bcd6c8!important}
+.ico.ok.pret{background:var(--acc)!important;color:#fff!important}
+/* stats accouplement */
+.statImg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.statImg .sv{position:static!important;height:auto!important;align-items:flex-start!important}
+.statImg .sv b{font-size:26px!important;text-shadow:none!important}
+.statImg.m .sv b{color:var(--m)!important}.statImg.f .sv b{color:var(--f)!important}
+.statImg .sv span{color:var(--mut)!important;font-size:12px!important;font-weight:500!important;text-align:left!important}
+/* gestations */
+.gestGrid .card.gest,.card.gest{padding:12px!important}
+.timer,.timer.pret,.timer.inconnu,.gestGrid .timer{background:var(--bg)!important;border:0!important;box-shadow:none!important;animation:none!important;border-radius:10px!important;padding:10px!important;margin:10px 0 8px!important}
+.timer .t{color:var(--ink)!important;font-weight:700!important;font-family:ui-monospace,Menlo,monospace}
+.timer.pret{background:var(--acc2)!important}.timer.pret .t{color:var(--acc)!important;font-family:inherit}
+.timer .l{color:var(--mut)!important;letter-spacing:.5px!important;font-weight:600!important}
+.barre{height:6px!important;border:0!important;background:#ebe9e3!important;box-shadow:none!important}
+.barre i{background:var(--acc)!important;box-shadow:none!important}
+.gest .dates span{border:0!important;background:none!important;padding:0!important;color:var(--mut)!important;justify-content:flex-start!important}
+.gest .who>span{border-bottom:0!important}
+.grpPl{margin:20px 0 8px!important}
+.grpPl span{position:static!important;height:auto!important;justify-content:flex-start!important;color:var(--mut)!important;font-size:12px!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.8px}
+.grpParc{background:none!important;border:0!important;box-shadow:none!important;color:var(--mut)!important;text-align:left!important;font-size:12px!important;padding:0!important}
+/* fenêtres */
+.modal{background:rgba(20,24,22,.35)!important}
+.modal .box,.modal .box.stBox,.modal .box.finBox{background:var(--card)!important;border:0!important;border-radius:16px!important;box-shadow:0 10px 40px rgba(0,0,0,.18)!important;color:var(--ink)!important;padding:18px!important}
+.modal h3{color:var(--ink)!important;font-size:18px!important;font-weight:700}
+.modal .warn{background:#fbecea!important;border:0!important;color:var(--dan)}
+.stTitre,.finTitre span{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;color:var(--ink)!important;font-size:18px!important;font-weight:700!important;text-align:left!important}
+.finTitre{width:auto!important;margin:0 0 6px!important}
+.stLab,.f label.t,.f span[style]{color:var(--mut)!important;font-size:12px!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.6px}
+.f input[type=text],.f input[type=number],.f input[type=datetime-local],.f select,button.combo,.combo.stCombo,.stepper.stStep input{background:var(--card)!important;border:1px solid var(--line)!important;border-radius:10px!important;
+  color:var(--ink)!important;font-weight:500!important;box-shadow:none!important}
+button.combo::after{color:var(--mut)!important}
+.choice label,.opt,.chk,.stRow,.stGrp{background:var(--card)!important;border:1px solid var(--line)!important;box-shadow:none!important;color:var(--ink)!important}
+.choice label:has(input:checked),.opt:has(input:checked),.pickList .opt.cur,.stRow:has(input:checked),.stGrp.on,.chk:has(input:checked){background:var(--acc2)!important;border-color:var(--acc)!important}
+.pickList .opt b,.stNom b{color:var(--ink)!important}
+.stNom small,.opt small{color:var(--mut)!important}
+.stSec{background:none!important;border:0!important;padding:0!important;margin-top:8px!important}
+.stPlank{position:static!important;background:none!important;border:0!important;padding:0!important;color:var(--mut)!important;font-size:12px!important;text-transform:uppercase;letter-spacing:.6px;margin:6px 0}
+.stList{border:0!important;background:none!important;padding:0!important}
+.stCase{background:#fff!important;border:1px solid var(--line)!important}
+.stRow:has(input:checked) .stCase{background:var(--acc)!important;border-color:var(--acc)!important;color:#fff}
+.stSexe{border:0!important;width:28px!important;height:28px!important;font-size:15px!important}
+.stSexe.m{background:#e6edfb!important;color:var(--m)!important}.stSexe.f{background:#fbe8f1!important;color:var(--f)!important}
+.stepper.stStep button,.stepper button{background:var(--card)!important;border:1px solid var(--line)!important;color:var(--ink)!important}
+.stDetailBtn{color:var(--acc)!important;font-weight:600!important}
+.finPill{background:var(--acc2)!important;border:0!important;box-shadow:none!important;justify-content:flex-start!important;border-radius:10px!important}
+.finPill span:last-child{color:var(--acc)!important;font-style:normal!important;font-weight:600!important;text-align:left}
+.finPill em{color:var(--acc)!important;font-style:normal}
+.finTxt{color:var(--ink)!important;font-weight:400!important;text-align:left}
+.finTxt b{color:var(--ink)!important}
+.finSep{display:none!important}
+.finBox{text-align:left!important}
+.dtSec{background:none!important;border:1px solid var(--line)!important}
+.dtHead{color:var(--ink)!important}
+.spk{display:none!important}
+.ready{color:var(--acc)!important}
+.pair .when{color:var(--mut)}
+.maj h3{color:var(--ink)!important}
+#sortInfo{background:var(--card)!important;border:1px solid var(--line)!important;color:var(--mut)}
 </style>
 </head>
 <body>
 
 <!-- ============ ACCUEIL ============ -->
 <section id="home" class="page">
-  <button id="refresh" class="shine" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour"><img src="btn_refresh.webp" alt="⟳"></button>
-  <button id="newsBtn" class="shine" data-go="news" aria-label="Mises à jour"><img id="newsImg" src="btn_maj.webp" alt="Mises à jour"><i id="newsDot" hidden></i></button>
+  <button id="refresh" class="shine" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour">⟳</button>
+  <button id="newsBtn" class="shine" data-go="news" aria-label="Mises à jour">Mises à jour<i id="newsDot" hidden></i></button>
   <button class="tile shine" data-go="parcs" aria-label="Gestion des parcs">
-    <img src="btn_parcs.webp?v=5" alt="Gestion des parcs">
+    <span class="tileT">Gestion des parcs</span><span class="tileS">Parcs, dragodindes, stérilisation</span>
   </button>
   <div class="row">
     <button class="tile shine" data-go="accouplements" aria-label="Accouplements">
-      <img src="btn_accouplement.webp" alt="Accouplements">
+      <span class="tileT">Accouplements</span>
     </button>
     <button class="tile shine" data-go="accouchements" aria-label="Accouchements">
-      <img src="btn_accouchement.webp" alt="Accouchements">
+      <span class="tileT">Accouchements</span>
     </button>
   </div>
 </section>
 
 <!-- ============ GESTION DES PARCS ============ -->
 <section id="parcs" class="page">
-  <button class="back imgBack shine" data-go="home" aria-label="Retour – Gestion des parcs"><img src="hdr_parcs.webp" alt="← Gestion des parcs"></button>
+  <button class="back imgBack shine" data-go="home" aria-label="Retour – Gestion des parcs"><span class="arr">←</span><span class="hdrTxt">Gestion des parcs</span></button>
   <div class="duo" id="parcActions">
-    <button class="imgBtn shine" id="newParcBtn" aria-label="Créer un parc"><img src="btn_creer_parc.webp" alt="Créer un parc"></button>
-    <button class="imgBtn shine" data-go="steril" aria-label="Stérilisation"><img src="btn_sterilisation.webp" alt="Stérilisation"></button>
+    <button class="imgBtn shine" id="newParcBtn" aria-label="Créer un parc">＋ Créer un parc</button>
+    <button class="imgBtn shine" data-go="steril" aria-label="Stérilisation">Stérilisation</button>
   </div>
 
   <form id="parcForm" class="card" hidden autocomplete="off">
@@ -456,62 +599,62 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
   </form>
 
   <div class="parcList" id="parcList"></div>
-  <button class="imgBtn shine" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs"><img src="btn_reset_parcs.webp" alt="Réinitialiser tous les parcs"></button>
+  <button class="imgBtn shine" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs">Réinitialiser tous les parcs</button>
 </section>
 
 <!-- ============ DÉTAIL D'UN PARC ============ -->
 <section id="parc" class="page">
-  <button class="back hdrG shine" data-go="parcs" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="parcTitle">Parc</span></button>
+  <button class="back hdrG shine" data-go="parcs" aria-label="Retour"><span class="arr">←</span><span class="hdrTxt" id="parcTitle">Parc</span></button>
   <div class="tools" style="margin:0 0 14px;gap:8px;align-items:center">
-    <button class="imgBtn shine" id="addDrago" aria-label="Ajouter"><img src="btn_ajouter.webp" alt="＋ Ajouter"></button>
-    <button class="imgBtn shine" id="sortBtn" aria-label="Trier"><img src="btn_trier.webp" alt="⇅ Trier"></button>
+    <button class="imgBtn shine" id="addDrago" aria-label="Ajouter">＋ Ajouter</button>
+    <button class="imgBtn shine" id="sortBtn" aria-label="Trier">Trier</button>
   </div>
   <div id="sortInfo" style="margin:-4px 0 10px;display:inline-block;align-self:flex-start;background:rgba(22,30,14,.88);border:1px solid rgba(255,194,58,.5);border-radius:10px;padding:5px 10px;font-size:14px"></div>
   <div id="parcBody"></div>
   <div class="tools">
-    <button class="btn ghost" id="resetParc">♻️ Réinitialiser le parc</button>
-    <button class="btn danger" id="delParc">🗑 Supprimer le parc</button>
+    <button class="btn ghost" id="resetParc">Réinitialiser le parc</button>
+    <button class="btn danger" id="delParc">Supprimer le parc</button>
   </div>
 </section>
 
 <!-- ============ ACCOUPLEMENTS ============ -->
 <section id="accouplements" class="page">
-  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Accouplements</span></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour">←</button><div class="titrePl"><span>Accouplements</span></div></div>
   <h4 class="sec">Choisis un parc</h4>
   <div class="parcList" id="accParcList" style="margin-top:0"></div>
-  <button class="btn ghost" id="accResetAll" style="margin-top:22px" hidden>♻️ Réinitialiser tous les accouplements</button>
+  <button class="btn ghost" id="accResetAll" style="margin-top:22px" hidden>Réinitialiser tous les accouplements</button>
 </section>
 
 <!-- ============ ACCOUPLEMENTS D'UN PARC ============ -->
 <section id="acc" class="page">
-  <button class="back hdrG shine" data-go="accouplements" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="accTitle">Parc</span></button>
+  <button class="back hdrG shine" data-go="accouplements" aria-label="Retour"><span class="arr">←</span><span class="hdrTxt" id="accTitle">Parc</span></button>
   <div id="accStats"></div>
-  <button class="accBtn shine" id="accGo" aria-label="Accoupler"><img src="btn_accoupler.webp" alt="Accoupler"></button>
+  <button class="accBtn shine" id="accGo" aria-label="Accoupler">Accoupler</button>
   <h4 class="sec">Accouplements en cours</h4>
   <div id="accList"></div>
-  <button class="btn ghost" id="accResetParc" style="margin-top:12px" hidden>♻️ Réinitialiser les accouplements de ce parc</button>
+  <button class="btn ghost" id="accResetParc" style="margin-top:12px" hidden>Réinitialiser les accouplements de ce parc</button>
 </section>
 
 <!-- ============ ACCOUCHEMENTS ============ -->
 <section id="accouchements" class="page">
-  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_accouchements.webp" alt="Accouchements"></div><button class="vueBtn" id="vueBtn" aria-label="Changer l'affichage"></button></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour">←</button><div class="titrePl"><span>Accouchements</span></div><button class="vueBtn" id="vueBtn" aria-label="Changer l'affichage"></button></div>
   <div id="gestList"></div>
-  <button class="btn ghost" id="gestReset" style="margin-top:12px" hidden>♻️ Réinitialiser toutes les gestations</button>
+  <button class="btn ghost" id="gestReset" style="margin-top:12px" hidden>Réinitialiser toutes les gestations</button>
 </section>
 
 <!-- ============ STÉRILISATION ============ -->
 <section id="steril" class="page">
-  <div class="topImg"><button class="back arrowBack shine" data-go="parcs" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Stérilisation</span></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="parcs" aria-label="Retour">←</button><div class="titrePl"><span>Stérilisation</span></div></div>
   <h4 class="sec" style="margin-top:0">Choisis un parc</h4>
   <div class="parcList" id="sterParcList" style="margin-top:0"></div>
   <h4 class="sec">Registre des stériles</h4>
   <div id="sterList"></div>
-  <button class="btn ghost" id="sterReset" style="margin-top:12px" hidden>♻️ Vider le registre des stériles</button>
+  <button class="btn ghost" id="sterReset" style="margin-top:12px" hidden>Vider le registre des stériles</button>
 </section>
 
 <!-- ============ MISES À JOUR ============ -->
 <section id="news" class="page">
-  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Mises à jour</span></div></div>
+  <div class="topImg"><button class="back arrowBack shine" data-go="home" aria-label="Retour">←</button><div class="titrePl"><span>Mises à jour</span></div></div>
   <div id="newsList"></div>
 </section>
 
@@ -522,12 +665,13 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:34,d:"31/10/2026",t:["Nouveau look entièrement épuré : fond clair, cartes blanches, boutons texte simples, plus d'illustrations ni d'effets."]},
   {v:33,d:"31/10/2026",t:["Toucher le tableau d'un parc l'ouvre en plein écran et en mode paysage, pour lire chaque ligne en entier sans faire défiler."]},
   {v:32,d:"31/10/2026",t:["Gestion des parcs : plus de liste numérotée. Toucher une ligne ouvre la fiche du type où tout se règle par des nombres (mâles, femelles, reproductrices, caméléones) et par nom, objet, gestation. Possibilité de retirer tout le type."]},
   {v:31,d:"31/10/2026",t:["Gestion des parcs : nouveau tableau, une ligne par type avec, dans l'ordre : type, mâles, femelles, reproductrices, caméléones, total, nom, état (accouplements en cours), stériles mâles, stériles femelles.","Touche le tableau (ou ⤢) pour l'agrandir en plein écran et tout voir d'un coup ; touche une ligne pour voir, modifier ou supprimer les dragodindes de ce type."]},
   {v:30,d:"31/10/2026",t:["Stérilisation : dans la fenêtre, les dragodindes sont rassemblées en deux lignes (mâles / femelles) avec un compteur − / ＋ pour choisir combien stériliser. « ▸ Choisir une par une » affiche toujours le détail.","Registre des stériles : regroupé par type et par sexe (×n), avec ▸ pour voir le détail."]},
-  {v:29,d:"31/10/2026",t:["Gestion des parcs : les dragodindes d'un même type sont regroupées sur une seule ligne, une pour les mâles et une pour les femelles, avec leur quantité (×14…).","Sur chaque ligne : ▸ pour voir le détail une par une (et les modifier ou supprimer individuellement), ✏️ pour modifier tout le groupe d'un coup, 🗑 pour en retirer le nombre voulu."]},
-  {v:28,d:"31/10/2026",t:["Stérilisation : nouvelle fenêtre au style illustré (pastilles mâles/femelles, lignes dorées quand elles sont cochées, boutons Tout cocher / Tout décocher, Annuler / Valider).","Bouton « ⇅ Trier » dans la fenêtre de stérilisation : par numéro, nom, mâles ou femelles d'abord, reproductrices ou non d'abord, caméléones d'abord. Les cases cochées sont gardées pendant le tri."]},
+  {v:29,d:"31/10/2026",t:["Gestion des parcs : les dragodindes d'un même type sont regroupées sur une seule ligne, une pour les mâles et une pour les femelles, avec leur quantité (×14…).","Sur chaque ligne : ▸ pour voir le détail une par une (et les modifier ou supprimer individuellement), pour modifier tout le groupe d'un coup, pour en retirer le nombre voulu."]},
+  {v:28,d:"31/10/2026",t:["Stérilisation : nouvelle fenêtre au style illustré (pastilles mâles/femelles, lignes dorées quand elles sont cochées, boutons Tout cocher / Tout décocher, Annuler / Valider).","Bouton « Trier » dans la fenêtre de stérilisation : par numéro, nom, mâles ou femelles d'abord, reproductrices ou non d'abord, caméléones d'abord. Les cases cochées sont gardées pendant le tri."]},
   {v:27,d:"31/10/2026",t:["Nouveaux boutons illustrés « Terminé », « Suivant » et « Parc suivant » dans les fenêtres d'accouplement et de stérilisation."]},
   {v:26,d:"31/10/2026",t:["Nouvelle fenêtre « Parc terminé ! » illustrée (plaque de titre, œuf doré, pastille verte, sac d'or et bouton Terminé)."]},
   {v:25,d:"31/10/2026",t:["Accoupler : quand tous les types d'un parc ont été accouplés, un message de fin s'affiche avec un bouton « Parc suivant ➜ » pour enchaîner directement sur le parc suivant."]},
@@ -544,7 +688,7 @@ const MAJ=[
   {v:14,d:"31/10/2026",t:["Les menus déroulants s'ouvrent maintenant dans une fenêtre au même style que le reste de l'appli (coins arrondis, bordure dorée).","Accoupler : on choisit d'abord un type de dragodinde du parc (avec le nombre de mâles et femelles disponibles), puis le nombre d'accouplements (de 1 au nombre de couples possibles).","Après validation : « Suivant » pour accoupler un autre type, ou « Terminé » pour fermer.","Un mâle en cours d'accouplement n'est plus proposé pour un autre couple."]},
   {v:13,d:"31/10/2026",t:["Les champs Nom, Type, Objet obtenu et Temps de gestation sont maintenant de vrais menus déroulants avec les valeurs déjà enregistrées, plus « ➕ Nouveau… » pour en écrire une autre."]},
   {v:12,d:"31/10/2026",t:["Suggestions des valeurs déjà saisies pendant la frappe (remplacées par des menus déroulants en version 13)."]},
-  {v:11,d:"31/10/2026",t:["Dans un parc : bouton « ＋ Ajouter » en haut pour ajouter des dragodindes à un parc déjà créé (avec confirmation).","Bouton « ⇅ Trier » : tri par nom, type, sexe, reproductrice, caméléone, objet à la vente, gestation ou ordre d'ajout, en croissant ou décroissant. Le n° de chaque dragodinde ne change pas."]},
+  {v:11,d:"31/10/2026",t:["Dans un parc : bouton « ＋ Ajouter » en haut pour ajouter des dragodindes à un parc déjà créé (avec confirmation).","Bouton « Trier » : tri par nom, type, sexe, reproductrice, caméléone, objet à la vente, gestation ou ordre d'ajout, en croissant ou décroissant. Le n° de chaque dragodinde ne change pas."]},
   {v:10,d:"31/10/2026",t:["Nouveau visuel pour le bouton « Accoupler » dans la page d'un parc."]},
   {v:9,d:"31/10/2026",t:["Accouplements : choix d'un parc, puis bouton « Accoupler » qui propose les mâles et femelles reproducteurs du parc.","Chaque accouplement en cours affiche la date de naissance prévue (d'après le temps de gestation de la femelle) et un compte à rebours.","Un accouplement peut être modifié (✏️) ou annulé (🗑) ; réinitialisation possible par parc ou pour tous, toujours avec confirmation."]},
   {v:8,d:"31/10/2026",t:["Chaque dragodinde d'un parc peut être modifiée (✏️) ou supprimée (🗑) ligne par ligne.","Nouveaux boutons : réinitialiser un parc, supprimer un parc, réinitialiser tous les parcs.","Chaque modification, réinitialisation ou suppression demande une confirmation avec le récapitulatif de ce qui va se passer."]},
@@ -604,7 +748,7 @@ const getAccs=()=>Store.get("accs",[]);
 const setAccs=a=>Store.set("accs",a);
 const form=document.getElementById("parcForm");
 let curParc=null;
-const plaque=(go,nom,info)=>`<button class="btn parcBtn shine" data-go="${go}"><span class="nomG">${esc(nom)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${info}</span></button>`;
+const plaque=(go,nom,info)=>`<button class="btn parcBtn shine" data-go="${go}"><span class="nomG">${esc(nom)}</span><span class="nbG">${info}</span></button>`;
 function renderParcs(){
   const L=getParcs(), el=document.getElementById("parcList");
   document.getElementById("resetAll").hidden=!L.length;
@@ -647,7 +791,7 @@ function tableauParc(p,grand){
     const noms=[...new Set(D.map(d=>d.nom||""))];
     return `<tr class="tRow" data-trow="${gi}"><td class="tType">${esc(g.type)}</td><td>${z(M)}</td><td>${z(F)}</td><td>${z(D.filter(d=>d.repro==="oui").length)}</td><td>${z(D.filter(d=>d.cam==="oui").length)}</td>
       <td class="tTot">${z(D.length)}</td><td class="tNom">${noms.length>1?"<i class='muted'>Plusieurs</i>":esc(noms[0])||"—"}</td>
-      <td>${g.etat?(grand?`<b class="tEtat">${g.etat} 💞</b>`:`<span class="tag oui">${pl(g.etat,"# accouplé","# accouplés")}</span>`):`<span class="zero">—</span>`}</td><td>${z(g.sM)}</td><td>${z(g.sF)}</td></tr>`;}).join("");
+      <td>${g.etat?(grand?`<b class="tEtat">${g.etat}</b>`:`<span class="tag oui">${pl(g.etat,"# accouplé","# accouplés")}</span>`):`<span class="zero">—</span>`}</td><td>${z(g.sM)}</td><td>${z(g.sF)}</td></tr>`;}).join("");
   return `<div class="cadre ${grand?"grand":""}"><div class="cadreTitre">${pl(p.dragos.length,"# dragodinde","# dragodindes")} · ♂ ${nM} · ♀ ${p.dragos.length-nM}</div>
     ${grand?"":`<button class="agrandir" id="agrandir" aria-label="Agrandir le tableau">⤢</button>`}
     <div class="tableWrap"><table class="dragos synth">
@@ -692,7 +836,7 @@ function editType(g){
     <div class="stTitre">${esc(g.type)} – ${esc(p.guilde)}</div>
     <div class="tyGrid">${num("M","♂ Mâles")}${num("F","♀ Femelles")}${num("repro","Reproductrices")}${num("cam","Caméléones")}</div>
     ${txt("type","Type")}${txt("nom","Nom")}${txt("objet","Objet obtenu à la vente")}${txt("gest","Temps de gestation")}
-    <button type="button" class="btn danger" id="t_del">🗑 Retirer tout ce type du parc</button>
+    <button type="button" class="btn danger" id="t_del">Retirer tout ce type du parc</button>
     <div class="stBas"><button type="button" class="stB annuler" id="t_cancel"><i>↩</i>Annuler</button><button type="submit" class="stB valider"><i>✔</i>Valider</button></div>
   </form></div></div>`;
   menus(root);
@@ -833,7 +977,7 @@ function editDrago(i){
   const p=parcCourant(), d=p.dragos[i], root=document.getElementById("modalRoot");
   const radio=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name="e_${n}" value="${a}" ${d[n]===a?"checked":""}> ${la}</label><label><input type="radio" name="e_${n}" value="${b}" ${d[n]===b?"checked":""}> ${lb}</label></div>`;
   const lab=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
-  root.innerHTML=`<div class="modal"><div class="box"><h3>✏️ Modifier la ligne ${i+1}</h3><form id="editForm" class="f" autocomplete="off">
+  root.innerHTML=`<div class="modal"><div class="box"><h3>Modifier la ligne ${i+1}</h3><form id="editForm" class="f" autocomplete="off">
     <div class="f">${lab("Nom de la dragodinde")}<input type="text" id="e_nom" data-dl="nom" value="${esc(d.nom)}" required></div>
     <div class="f">${lab("Type de la dragodinde")}<input type="text" id="e_type" data-dl="type" value="${esc(d.type)}" required></div>
     <div class="f">${lab("Sexe")}${radio("sexe","M","F","Mâle","Femelle")}</div>
@@ -903,7 +1047,7 @@ document.getElementById("addDrago").onclick=()=>{
 // ---- Trier ----
 document.getElementById("sortBtn").onclick=()=>{
   const t=getTri(), root=document.getElementById("modalRoot");
-  root.innerHTML=`<div class="modal"><div class="box"><h3>⇅ Trier les dragodindes</h3><form id="sortForm">
+  root.innerHTML=`<div class="modal"><div class="box"><h3>Trier les dragodindes</h3><form id="sortForm">
     <div class="f">${labT("Trier par")}<div class="col" style="display:flex;flex-direction:column;gap:6px">${TRIS.map(([k,l])=>`<label class="opt"><input type="radio" name="tk" value="${k}" ${t.k===k?"checked":""}><b>${l}</b></label>`).join("")}</div></div>
     <div class="f">${labT("Ordre")}<div class="choice"><label><input type="radio" name="td" value="1" ${t.dir>0?"checked":""}> Croissant</label><label><input type="radio" name="td" value="-1" ${t.dir<0?"checked":""}> Décroissant</label></div></div>
     <div class="formBtns"><button type="button" class="btn ghost" id="t_cancel">Annuler</button><button type="submit" class="btn">Appliquer</button></div>
@@ -932,7 +1076,7 @@ function editGroupe(g){
   const lab=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
   const txt=(k,t)=>`<div class="f">${lab(t)}<input type="text" id="g_${k}" data-dl="${k}" value="${esc(c(k)??"")}" placeholder="${c(k)===null?"Variable – laisser vide pour ne pas changer":""}"></div>`;
   const radio=(n,a,b,la,lb)=>`<div class="f">${lab(n==="sexe"?"Sexe":n==="repro"?"Reproductrice":"Caméléone")}<div class="choice"><label><input type="radio" name="g_${n}" value="${a}" ${c(n)===a?"checked":""}> ${la}</label><label><input type="radio" name="g_${n}" value="${b}" ${c(n)===b?"checked":""}> ${lb}</label></div></div>`;
-  root.innerHTML=`<div class="modal"><div class="box"><h3>✏️ Modifier ${pl(ids.length,"# dragodinde","les # dragodindes")} ${esc(g.type)} ${g.sexe==="M"?"♂":"♀"}</h3><form id="gForm" autocomplete="off">
+  root.innerHTML=`<div class="modal"><div class="box"><h3>Modifier ${pl(ids.length,"# dragodinde","les # dragodindes")} ${esc(g.type)} ${g.sexe==="M"?"♂":"♀"}</h3><form id="gForm" autocomplete="off">
     ${txt("nom","Nom")}${txt("type","Type")}${radio("sexe","M","F","Mâle","Femelle")}${radio("repro","oui","non","Oui","Non")}${radio("cam","oui","non","Oui","Non")}${txt("objet","Objet obtenu à la vente")}${txt("gest","Temps de gestation")}
     <div class="formBtns"><button type="button" class="btn ghost" id="g_cancel">Annuler</button><button type="submit" class="btn">Enregistrer</button></div></form></div></div>`;
   menus(root);
@@ -953,7 +1097,7 @@ function editGroupe(g){
 // Supprimer tout ou partie d'un groupe
 function delGroupe(g){
   const root=document.getElementById("modalRoot"), n=g.items.length;
-  root.innerHTML=`<div class="modal"><div class="box"><h3>🗑 Retirer des ${esc(g.type)} ${g.sexe==="M"?"♂ mâles":"♀ femelles"}</h3><form id="gdForm">
+  root.innerHTML=`<div class="modal"><div class="box"><h3>Retirer des ${esc(g.type)} ${g.sexe==="M"?"♂ mâles":"♀ femelles"}</h3><form id="gdForm">
     <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Combien en retirer ? <span class="muted">(1 à ${n})</span></span>
     <div class="stepper"><button type="button" class="btn ghost" id="gd_m">−</button><input type="number" id="gd_n" min="1" max="${n}" value="${n}" inputmode="numeric"><button type="button" class="btn ghost" id="gd_p">＋</button></div></div>
     <div class="formBtns"><button type="button" class="btn ghost" id="gd_c">Annuler</button><button type="submit" class="btn danger">Retirer</button></div></form></div></div>`;
@@ -1031,8 +1175,8 @@ function renderAcc(id){
   document.getElementById("accTitle").textContent=p.guilde;
   const E=etat(p), mDisp=E.filter(e=>e.d.sexe==="M"&&!e.raison).length, fDisp=E.filter(e=>e.d.sexe==="F"&&!e.raison).length;
   document.getElementById("accStats").innerHTML=`<div class="stats">
-    <div class="statImg m"><img src="stat_m.webp" alt=""><div class="sv"><b>♂ ${mDisp}</b><span>${pl(mDisp,"mâle disponible","mâles disponibles")}</span></div></div>
-    <div class="statImg f"><img src="stat_f.webp" alt=""><div class="sv"><b>♀ ${fDisp}</b><span>${pl(fDisp,"femelle disponible","femelles disponibles")}</span></div></div></div>`;
+    <div class="statImg m"><div class="sv"><b>♂ ${mDisp}</b><span>${pl(mDisp,"mâle disponible","mâles disponibles")}</span></div></div>
+    <div class="statImg f"><div class="sv"><b>♀ ${fDisp}</b><span>${pl(fDisp,"femelle disponible","femelles disponibles")}</span></div></div></div>`;
   const byId=Object.fromEntries(p.dragos.map((d,i)=>[d.id,{...d,n:i+1}]));
   const A=getAccs().filter(a=>a.parcId===p.id).sort((a,b)=>a.debut-b.debut);
   document.getElementById("accResetParc").hidden=!A.length;
@@ -1042,7 +1186,7 @@ function renderAcc(id){
       <div><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></div>
       <div style="margin-top:4px"><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></div>
       <div class="when">Accouplés le ${fmtDate(a.debut)}<br>${fin?(r?`Naissance prévue le ${fmtDate(fin)} · encore ${r}`:`<span class="ready">Prête à accoucher !</span>`):`Gestation : ${esc(a.gestTxt)||"non renseignée"}`}</div></div>
-      <div class="act" style="flex-direction:column"><button class="ico" data-aedit="${a.id}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-adel="${a.id}" aria-label="Annuler"><img src="ico_del.webp" alt="🗑"></button></div></div>`}).join("")
+      <div class="act" style="flex-direction:column"><button class="ico" data-aedit="${a.id}" aria-label="Modifier">✎</button><button class="ico del" data-adel="${a.id}" aria-label="Annuler">✕</button></div></div>`}).join("")
     :`<div class="card empty muted">Aucun accouplement en cours dans ce parc.</div>`;
   return true;
 }
@@ -1061,7 +1205,7 @@ function accWindow(edit){
       <p class="muted">Mâles disponibles : ${M.filter(e=>!e.raison).length} · Femelles disponibles : ${F.filter(e=>!e.raison).length}</p><button class="btn" id="x_ok">Compris</button></div></div>`;
     document.getElementById("x_ok").onclick=()=>root.innerHTML=""; return;
   }
-  root.innerHTML=`<div class="modal"><div class="box"><h3>${edit?"✏️ Modifier l'accouplement":"💞 Accouplement"} – ${esc(p.guilde)}</h3>
+  root.innerHTML=`<div class="modal"><div class="box"><h3>${edit?"Modifier l'accouplement":"Accouplement"} – ${esc(p.guilde)}</h3>
     <form id="accForm"><div class="pick">
       <div class="col"><h5 style="color:#6ea8ff">♂ Mâles</h5>${M.map(e=>optHtml(e,"am",edit?e.d.id===edit.maleId:false)).join("")||'<span class="muted">Aucun</span>'}</div>
       <div class="col"><h5 style="color:#ff7cc4">♀ Femelles</h5>${F.map(e=>optHtml(e,"af",edit?e.d.id===edit.femId:false)).join("")||'<span class="muted">Aucune</span>'}</div>
@@ -1113,31 +1257,31 @@ function accWizard(faits=[],dernier=null){
     const allerSuivant=()=>{root.innerHTML=""; location.replace("#acc-"+suiv.id);};
     if(dernier){
       root.innerHTML=`<div class="modal"><div class="box finBox">
-        <div class="titrePl finTitre"><img src="titre_plaque.webp" alt=""><span>🎉 Parc terminé !</span></div>
-        <img class="finOeuf" src="nid_oeuf.webp" alt="">
-        <div class="finPill"><span class="finCoche">✔</span><span>${pl(dernier.n,"# accouplement","# accouplements")} de type <em>${esc(dernier.type)}</em> ${pl(dernier.n,"enregistré","enregistrés")}.</span></div>
+        <div class="titrePl finTitre"><span>Parc terminé</span></div>
+        
+        <div class="finPill"><span>${pl(dernier.n,"# accouplement","# accouplements")} de type <em>${esc(dernier.type)}</em> ${pl(dernier.n,"enregistré","enregistrés")}.</span></div>
         <p class="finTxt">Toutes les dragodindes du parc <b>« ${esc(p.guilde)} »</b> ont été accouplées !</p>
-        <div class="finSep"><i></i><img src="plume.webp" alt=""><i></i></div>
+        <div class="finSep"><i></i><i></i></div>
         <p class="finTxt">Tu as sûrement les pieds qui collent, mais passe au suivant : l'argent ne tombe pas du ciel !</p>
-        <img class="finSac" src="sac_or.webp" alt="">
-        ${suiv?`<button class="imgBtn finSuiv" id="w_suiv" aria-label="Parc suivant"><img src="btn_parc_suivant.webp" alt="Parc suivant »"></button><p class="finProchain">Prochain parc : <b>${esc(suiv.guilde)}</b></p>`:""}
-        <button class="imgBtn finFin" id="w_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button>
+        
+        ${suiv?`<button class="imgBtn finSuiv" id="w_suiv" aria-label="Parc suivant">Parc suivant →</button><p class="finProchain">Prochain parc : <b>${esc(suiv.guilde)}</b></p>`:""}
+        <button class="imgBtn finFin" id="w_end" aria-label="Terminé">Terminé</button>
       </div></div>`;
       document.getElementById("w_end").onclick=()=>root.innerHTML="";
       if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
       return;
     }
-    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>
+    root.innerHTML=`<div class="modal"><div class="box"><h3>Accouplement – ${esc(p.guilde)}</h3>
       <p>Aucun type ne peut être accouplé : il faut au moins un <b>mâle</b> et une <b>femelle</b> reproducteurs et disponibles du même type.</p>
-      <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Compris</button>${suiv?`<button class="imgBtn" id="w_suiv" aria-label="Parc suivant"><img src="btn_parc_suivant.webp" alt="Parc suivant »"></button>`:""}</div></div></div>`;
+      <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Compris</button>${suiv?`<button class="imgBtn" id="w_suiv" aria-label="Parc suivant">Parc suivant →</button>`:""}</div></div></div>`;
     document.getElementById("w_end").onclick=()=>root.innerHTML="";
     if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
     return;
   }
   if(dernier){
-    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>${fin}
+    root.innerHTML=`<div class="modal"><div class="box"><h3>Accouplement – ${esc(p.guilde)}</h3>${fin}
       <p class="muted" style="text-align:center">Encore ${pl(reste.length,"# type disponible","# types disponibles")} : ${reste.map(t=>esc(t.type)).join(", ")}</p>
-      <div class="formBtns imgDuo"><button class="imgBtn" id="w_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button><button class="imgBtn" id="w_next" aria-label="Suivant"><img src="btn_suivant.webp" alt="Suivant »"></button></div></div></div>`;
+      <div class="formBtns imgDuo"><button class="imgBtn" id="w_end" aria-label="Terminé">Terminé</button><button class="imgBtn" id="w_next" aria-label="Suivant">Suivant →</button></div></div></div>`;
     document.getElementById("w_end").onclick=()=>root.innerHTML="";
     document.getElementById("w_next").onclick=()=>formType(reste[0].type);
     return;
@@ -1146,7 +1290,7 @@ function accWizard(faits=[],dernier=null){
   function formType(typeChoisi){
     let t=T.find(x=>x.type===typeChoisi);
     const dispoHtml=t=>`<div class="dispo"><span class="tag m">♂ ${t.M.length} ${pl(t.M.length,"mâle dispo","mâles dispo")}</span><span class="tag f">♀ ${t.F.length} ${pl(t.F.length,"femelle dispo","femelles dispo")}</span></div>`;
-    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3><form id="wForm">
+    root.innerHTML=`<div class="modal"><div class="box"><h3>Accouplement – ${esc(p.guilde)}</h3><form id="wForm">
       <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Type de dragodinde</span>
         <button type="button" class="combo" id="w_type"></button><div id="w_dispo"></div></div>
       <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Nombre d'accouplements <span class="muted" id="w_max"></span></span>
@@ -1241,18 +1385,18 @@ function renderGest(){
   L.forEach(p=>{
     const G=A.filter(a=>a.parcId===p.id).sort((a,b)=>fin(a)-fin(b)); if(!G.length)return;
     const byId=Object.fromEntries(p.dragos.map((d,i)=>[d.id,{...d,n:i+1}]));
-    html+=`<div class="grpPl"><img src="grp_plaque.webp" alt=""><span><em class="gn">${esc(p.guilde)}</em>· ${pl(G.length,"# gestation","# gestations")}</span></div>`;
+    html+=`<div class="grpPl"><span><em class="gn">${esc(p.guilde)}</em>· ${pl(G.length,"# gestation","# gestations")}</span></div>`;
     html+=`<div class="${getVue()==="liste"?"gestListe":"gestGrid"}">`+G.map(a=>{
       const m=byId[a.maleId], f=byId[a.femId], fi=fin(a), reste=fi-now, pct=a.gestH?Math.min(100,Math.max(0,(now-a.debut)/(a.gestH*3600000)*100)):0;
       const tm=!a.gestH?`<div class="timer inconnu"><div class="txt"><div class="t">Temps de gestation non renseigné</div></div></div>`
-        :reste<=0?`<div class="timer pret"><img class="oeuf" src="oeuf_dore.webp" alt=""><div class="txt"><div class="t">Prête à accoucher !</div></div></div>`
-        :`<div class="timer"><img class="oeuf" src="oeuf_violet.webp" alt=""><div class="txt"><div class="l">✦ Temps restant ✦</div><div class="t" data-fin="${fi}">${minuteur(reste)}</div></div></div>`;
+        :reste<=0?`<div class="timer pret"><div class="txt"><div class="t">Prête à accoucher !</div></div></div>`
+        :`<div class="timer"><div class="txt"><div class="l">Temps restant</div><div class="t" data-fin="${fi}">${minuteur(reste)}</div></div></div>`;
       return `<div class="card gest"><div class="head"><div class="who">
           <span><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></span>
           <span><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></span></div>
-          <div class="act"><button class="ico ok ${reste<=0&&a.gestH?"pret":""}" data-gok="${a.id}" aria-label="Valider la gestation terminée">✔</button><button class="ico" data-gedit="${a.id}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler"><img src="ico_del.webp" alt="🗑"></button></div></div>
+          <div class="act"><button class="ico ok ${reste<=0&&a.gestH?"pret":""}" data-gok="${a.id}" aria-label="Valider la gestation terminée">✔</button><button class="ico" data-gedit="${a.id}" aria-label="Modifier">✎</button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler">✕</button></div></div>
         ${tm}${a.gestH?`<div class="barre"><i style="width:${pct.toFixed(1)}%"></i></div>`:""}
-        <div class="dates"><span>📅 Début : ${fmtDate(a.debut)}</span><span>🏁 ${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
+        <div class="dates"><span>Début : ${fmtDate(a.debut)}</span><span>${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
     }).join("")+`</div>`;
   });
   el.innerHTML=html;
@@ -1291,7 +1435,7 @@ const sterOuverts=new Set();
 const getSter=()=>Store.get("steriles",[]), setSter=v=>Store.set("steriles",v);
 function renderSteril(){
   const L=getParcs(), S=getSter();
-  document.getElementById("sterParcList").innerHTML=L.length?L.map(p=>`<button class="btn parcBtn shine" data-ster="${p.id}"><span class="nomG">${esc(p.guilde)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${pl(p.dragos.length,"# dragodinde","# dragodindes")}</span></button>`).join("")
+  document.getElementById("sterParcList").innerHTML=L.length?L.map(p=>`<button class="btn parcBtn shine" data-ster="${p.id}"><span class="nomG">${esc(p.guilde)}</span><span class="nbG">${pl(p.dragos.length,"# dragodinde","# dragodindes")}</span></button>`).join("")
     :`<div class="card empty muted">Aucun parc pour l'instant.</div>`;
   document.getElementById("sterReset").hidden=!S.length;
   const el=document.getElementById("sterList");
@@ -1299,13 +1443,13 @@ function renderSteril(){
   const grp={}; S.forEach((d,i)=>{(grp[d.guilde]??=[]).push({d,i});});
   el.innerHTML=Object.entries(grp).map(([g,arr])=>{
     const sous=new Map(); arr.forEach(x=>{const k=((x.d.type||"").trim()||"Sans type")+"|"+x.d.sexe;(sous.get(k)||sous.set(k,[]).get(k)).push(x);});
-    return `<div class="grpPl"><img src="grp_plaque.webp" alt=""><span><em class="gn">${esc(g)}</em>· ${pl(arr.length,"# stérile","# stériles")}</span></div>`+[...sous.entries()].map(([k,L])=>{
+    return `<div class="grpPl"><span><em class="gn">${esc(g)}</em>· ${pl(arr.length,"# stérile","# stériles")}</span></div>`+[...sous.entries()].map(([k,L])=>{
       const [t,sx]=k.split("|"), key=g+"|"+k, ouvert=sterOuverts.has(key);
       return `<div class="card sterG"><span class="numB qte">×${L.length}</span><div class="who"><div><span class="tag ${sx==="M"?"m":"f"}">${sx==="M"?"♂ Mâle":"♀ Femelle"}</span> <b>${esc(t)}</b></div></div>
         <button class="ico tog" data-stog="${esc(key)}" aria-label="Voir le détail">${ouvert?"▾":"▸"}</button></div>`
       +(ouvert?`<div class="sterSub">`+L.map(({d,i})=>`<div class="card ster"><div class="who"><div><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span> <b>${esc(d.nom)}</b></div>
       <div class="muted" style="font-size:12.5px;margin-top:3px">Stérile depuis le ${fmtDate(d.date)}${d.cam==="oui"?" · caméléone":""}${d.objet?" · objet : "+esc(d.objet):""}</div></div>
-      <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></div>`).join("")+`</div>`:"");
+      <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer">✕</button></div></div>`).join("")+`</div>`:"");
     }).join("");
   }).join("");
 }
@@ -1316,12 +1460,12 @@ function sterWizard(parcId,dernier=null){
   const types=Object.keys(T).sort((a,b)=>a.localeCompare(b,"fr"));
   const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# dragodinde classée stérile","# dragodindes classées stériles")} (${esc(dernier.type)}).</p>`:"";
   if(!types.length){
-    root.innerHTML=`<div class="modal"><div class="box"><h3>✂️ Stérilisation – ${esc(p.guilde)}</h3>${fin}<p>${dernier?"Le parc est maintenant vide.":"Ce parc ne contient aucune dragodinde."}</p>${dernier?`<button class="imgBtn" id="s_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button>`:`<button class="btn" id="s_end">Compris</button>`}</div></div>`;
+    root.innerHTML=`<div class="modal"><div class="box"><h3>Stérilisation – ${esc(p.guilde)}</h3>${fin}<p>${dernier?"Le parc est maintenant vide.":"Ce parc ne contient aucune dragodinde."}</p>${dernier?`<button class="imgBtn" id="s_end" aria-label="Terminé">Terminé</button>`:`<button class="btn" id="s_end">Compris</button>`}</div></div>`;
     document.getElementById("s_end").onclick=()=>{root.innerHTML="";renderSteril();}; return;
   }
   if(dernier){
-    root.innerHTML=`<div class="modal"><div class="box"><h3>✂️ Stérilisation – ${esc(p.guilde)}</h3>${fin}
-      <div class="formBtns imgDuo"><button class="imgBtn" id="s_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button><button class="imgBtn" id="s_next" aria-label="Suivant"><img src="btn_suivant.webp" alt="Suivant »"></button></div></div></div>`;
+    root.innerHTML=`<div class="modal"><div class="box"><h3>Stérilisation – ${esc(p.guilde)}</h3>${fin}
+      <div class="formBtns imgDuo"><button class="imgBtn" id="s_end" aria-label="Terminé">Terminé</button><button class="imgBtn" id="s_next" aria-label="Suivant">Suivant →</button></div></div></div>`;
     document.getElementById("s_end").onclick=()=>{root.innerHTML="";renderSteril();};
     document.getElementById("s_next").onclick=()=>form(types[0]); return;
   }
@@ -1333,11 +1477,11 @@ function sterWizard(parcId,dernier=null){
     const triee=[...liste].sort((a,b)=>{const x=cle(a),y=cle(b);return x<y?-1:x>y?1:a.n-b.n;});
     const lab=(ic,t)=>`<div class="stLab">${ic}<span>${t}</span></div>`;
     root.innerHTML=`<div class="modal"><div class="box stBox"><form id="sForm">
-      <div class="stTitre">✂️ Stérilisation – ${esc(p.guilde)}</div>
-      ${lab('<img src="plume.webp" alt="">',"Type de dragodinde")}
+      <div class="stTitre">Stérilisation – ${esc(p.guilde)}</div>
+      ${lab('',"Type de dragodinde")}
       <button type="button" class="combo stCombo" id="s_type">${esc(type)}</button>
       <div class="dispo stDispo"><span class="pil m">♂ ${pl(nM,"# mâle","# mâles")}</span><span class="pil f">♀ ${pl(nF,"# femelle","# femelles")}</span></div>
-      <div class="stSec"><div class="stPlank"><img src="plume.webp" alt=""><span>Dragodindes à classer stériles</span></div>
+      <div class="stSec"><div class="stPlank"><span>Dragodindes à classer stériles</span></div>
         <div class="stOutils">
           <button type="button" class="stB vert" id="s_all"><i>✔</i>Tout cocher</button>
           <button type="button" class="stB rouge" id="s_none"><i>✖</i>Tout décocher</button>
@@ -1348,11 +1492,11 @@ function sterWizard(parcId,dernier=null){
           <div class="stepper stStep"><button type="button" class="stMoins">−</button><input type="number" class="stNb" min="0" max="${x==="M"?nM:nF}" value="0" inputmode="numeric"><button type="button" class="stPlus">＋</button></div></div>`).join("")}
         <button type="button" class="stDetailBtn" id="s_det">${detail?"▾ Masquer le détail":"▸ Choisir une par une"}</button>
         <div id="s_detail" ${detail?"":"hidden"}>
-        <button type="button" class="combo stCombo stTri" id="s_tri">⇅ Trier : ${TRIS_S.find(x=>x[0]===tri)?.[1]}</button>
+        <button type="button" class="combo stCombo stTri" id="s_tri">Trier : ${TRIS_S.find(x=>x[0]===tri)?.[1]}</button>
         <div class="chkList stList">${triee.map(({d,n})=>`<label class="stRow"><input type="checkbox" value="${d.id}" data-sx="${d.sexe}" ${coches.includes(d.id)?"checked":""}><span class="stCase"></span>
           <span class="stSexe ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span>
           <span class="stNom"><b>${esc(d.nom)} n°${n}</b><small>${[d.repro==="oui"?"Reproductrice":"Non reproductrice",d.cam==="oui"?"Caméléone":""].filter(Boolean).join(" · ")}</small></span>
-          <img class="stFeuille" src="plume.webp" alt=""></label>`).join("")}</div></div></div>
+          </label>`).join("")}</div></div></div>
       <div class="stBas"><button type="button" class="stB annuler" id="s_cancel"><i>↩</i>Annuler</button><button type="submit" class="stB valider"><i>✔</i>Valider</button></div>
     </form></div></div>`;
     const cochees=()=>[...root.querySelectorAll(".stList input:checked")].map(b=>b.value);
@@ -1423,7 +1567,7 @@ document.getElementById("sterReset").onclick=async()=>{
 document.getElementById("newsList").innerHTML=MAJ.map(m=>
   `<div class="card maj"><h3>Version ${m.v}<small>${m.d}</small></h3><ul>${m.t.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("");
 const lastSeen=Store.get("majVue",0);
-const pastille=on=>{document.getElementById("newsImg").src=on?"btn_maj_new.webp":"btn_maj.webp";};
+const pastille=on=>{document.getElementById("newsDot").hidden=!on;};
 pastille(MAJ[0].v>lastSeen);
 addEventListener("hashchange",()=>{if(location.hash==="#news"){Store.set("majVue",MAJ[0].v);pastille(false)}});
 if(location.hash==="#news")Store.set("majVue",MAJ[0].v);
@@ -1451,8 +1595,7 @@ function scintiller(){
       e.style.animationDelay=(Math.random()*2.6).toFixed(2)+"s";e.style.animationDuration=(2.2+Math.random()*1.4).toFixed(2)+"s";b.appendChild(e);});
   });
 }
-let skT; new MutationObserver(()=>{clearTimeout(skT);skT=setTimeout(scintiller,30);}).observe(document.body,{childList:true,subtree:true});
-scintiller();
+// (étincelles désactivées : thème épuré)
 
 show(); // affichage de la page de départ, une fois tout le reste prêt
 </script>
