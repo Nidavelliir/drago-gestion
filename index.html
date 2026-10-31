@@ -283,6 +283,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 .stepper input{text-align:center;font-size:20px;font-weight:800}
 .dispo{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
 .done{text-align:center;font-size:18px;margin:6px 0 14px}
+.bravo{text-align:center;line-height:1.5;font-size:16px;margin:4px 0 16px}
 .f input[type=datetime-local],.f select{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.5);background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
 </style>
 </head>
@@ -395,6 +396,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:25,d:"31/10/2026",t:["Accoupler : quand tous les types d'un parc ont été accouplés, un message de fin s'affiche avec un bouton « Parc suivant ➜ » pour enchaîner directement sur le parc suivant."]},
   {v:24,d:"31/10/2026",t:["Accouchements : bouton à droite du titre pour passer de l'affichage deux par ligne (▦) à une par ligne (☰), et inversement. Le choix est retenu."]},
   {v:23,d:"31/10/2026",t:["Boutons « Créer un parc » et « Stérilisation » bien alignés.","Accouchements : cartes de gestation plus compactes, deux par ligne.","Les effets de brillance sont retirés : à la place, de petites étoiles scintillent sur chaque bouton de l'appli (et sur ceux qui viendront)."]},
   {v:22,d:"31/10/2026",t:["La liste des dragodindes d'un parc s'affiche dans un cadre doré illustré, avec médaillons numérotés et pastilles colorées (Mâle, Femelle, ✔ Oui, ✖ Non).","Nouveaux boutons « Ajouter » et « Trier ».","Effet de brillance et de scintillement sur tous les boutons illustrés."]},
@@ -808,10 +810,24 @@ function accWizard(faits=[],dernier=null){
   const possibles=T.filter(t=>t.max>0), reste=possibles.filter(t=>!faits.includes(t.type));
   const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# accouplement","# accouplements")} de type <b>${esc(dernier.type)}</b> ${pl(dernier.n,"enregistré","enregistrés")}.</p>`:"";
   if(!reste.length){
-    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>${fin}
-      <p>${dernier?"Il n'y a plus d'autre type à accoupler dans ce parc.":"Aucun type ne peut être accouplé : il faut au moins un <b>mâle</b> et une <b>femelle</b> reproducteurs et disponibles du même type."}</p>
-      <button class="btn" id="w_end">${dernier?"Terminé":"Compris"}</button></div></div>`;
-    document.getElementById("w_end").onclick=()=>root.innerHTML=""; return;
+    // parc suivant dans la liste (on revient au premier après le dernier)
+    const L=getParcs(), k=L.findIndex(x=>x.id===p.id), suiv=L.length>1?L[(k+1)%L.length]:null;
+    const allerSuivant=()=>{root.innerHTML=""; location.replace("#acc-"+suiv.id);};
+    if(dernier){
+      root.innerHTML=`<div class="modal"><div class="box"><h3>🎉 Parc terminé !</h3>${fin}
+        <p class="bravo">Toutes les dragodindes du parc <b>« ${esc(p.guilde)} »</b> ont été accouplées !<br>Tu as sûrement les pieds qui collent, mais passe au suivant : l'argent ne tombe pas du ciel ! 💰</p>
+        <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Terminé</button>${suiv?`<button class="btn" id="w_suiv" style="white-space:nowrap">Suivant ➜</button>`:""}</div>
+        ${suiv?`<p class="muted" style="text-align:center;font-size:13px;margin:10px 0 0">Prochain parc : <b>${esc(suiv.guilde)}</b></p>`:""}</div></div>`;
+      document.getElementById("w_end").onclick=()=>root.innerHTML="";
+      if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
+      return;
+    }
+    root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>
+      <p>Aucun type ne peut être accouplé : il faut au moins un <b>mâle</b> et une <b>femelle</b> reproducteurs et disponibles du même type.</p>
+      <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Compris</button>${suiv?`<button class="btn" id="w_suiv" style="white-space:nowrap">Suivant ➜</button>`:""}</div></div></div>`;
+    document.getElementById("w_end").onclick=()=>root.innerHTML="";
+    if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
+    return;
   }
   if(dernier){
     root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>${fin}
