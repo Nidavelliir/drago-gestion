@@ -15,6 +15,7 @@
   --bg:#1f3d24; --bg2:#14291a; --gold:#ffc23a; --gold2:#e8891c; --ink:#2a1a08; --txt:#fbeecb;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%}
 body{
   font-family:"Trebuchet MS",system-ui,-apple-system,sans-serif;color:var(--txt);
@@ -23,8 +24,7 @@ body{
 }
 .page{display:none;min-height:100dvh;padding:20px 16px 32px;max-width:640px;margin:0 auto}
 .page.on{display:flex;flex-direction:column}
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:rgba(10,20,8,.5);opacity:0;transition:opacity .2s}
-body.inner::before{opacity:1}
+
 
 /* ---- Accueil ---- */
 #home{justify-content:center;gap:10px}
@@ -69,6 +69,36 @@ body.inner::before{opacity:1}
 .card{background:rgba(22,30,14,.82);border:2px solid rgba(255,194,58,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);border-radius:18px;padding:18px;line-height:1.45}
 .card b{color:var(--gold)}
 .muted{opacity:.75;font-size:14px}
+
+/* ---- Gestion des parcs ---- */
+.btn{display:block;width:100%;border:3px solid #3a2208;border-radius:16px;cursor:pointer;padding:14px 16px;
+  background:linear-gradient(#ffd45c,var(--gold2));color:var(--ink);font-size:18px;font-weight:800;font-family:inherit;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 5px 12px rgba(0,0,0,.45)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:rgba(22,30,14,.85);color:var(--txt);border-color:rgba(255,194,58,.6)}
+.parcList{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.parcBtn{display:flex;justify-content:space-between;align-items:center;text-align:left;font-size:20px;
+  background:linear-gradient(#2b1d0c,#1a1208);color:#ffe08a;border:3px solid var(--gold)}
+.parcBtn small{font-size:13px;font-weight:600;color:var(--txt);opacity:.8}
+form.card{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.f label.t{display:block;font-weight:700;color:var(--gold);margin-bottom:5px;font-size:15px}
+.f input[type=text],.f input[type=number]{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.5);
+  background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choice label{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:10px;cursor:pointer;
+  border:2px solid rgba(255,194,58,.5);background:rgba(255,255,255,.06);font-weight:700}
+.choice input{accent-color:var(--gold2);width:18px;height:18px;margin:0}
+.choice label:has(input:checked){background:rgba(255,194,58,.28);border-color:var(--gold)}
+.formBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.empty{text-align:center}
+.tableWrap{overflow-x:auto;border-radius:16px;border:2px solid rgba(255,194,58,.6);background:rgba(22,30,14,.88)}
+table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowrap}
+.dragos th{background:#1a1208;color:var(--gold);text-align:left;padding:10px;position:sticky;top:0}
+.dragos td{padding:10px;border-top:1px solid rgba(255,194,58,.25)}
+.dragos tr:nth-child(even) td{background:rgba(255,255,255,.04)}
+.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px}
+.tag.m{background:#2f6fd6;color:#fff}.tag.f{background:#e0479e;color:#fff}
+.tag.oui{background:#3d9a4a;color:#fff}.tag.non{background:rgba(255,255,255,.15)}
 </style>
 </head>
 <body>
@@ -93,10 +123,31 @@ body.inner::before{opacity:1}
 <!-- ============ GESTION DES PARCS ============ -->
 <section id="parcs" class="page">
   <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Gestion des parcs</h2></div>
-  <div class="card">
-    <p><b>Page en préparation.</b></p>
-    <p>C'est ici qu'on enregistrera les parcs et leurs dragodindes. Les pages Accouplements et Accouchements utiliseront ces informations.</p>
-  </div>
+  <button class="btn" id="newParcBtn">＋ Créer un parc</button>
+
+  <form id="parcForm" class="card" hidden autocomplete="off">
+    <div class="f"><label class="t" for="fGuilde">Nom de la guilde</label><input type="text" id="fGuilde" required></div>
+    <div class="f"><label class="t" for="fNom">Nom de la dragodinde</label><input type="text" id="fNom" required></div>
+    <div class="f"><label class="t" for="fType">Type de la dragodinde</label><input type="text" id="fType" required></div>
+    <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Sexe</span>
+      <div class="choice"><label><input type="radio" name="sexe" value="M" required> Mâle</label><label><input type="radio" name="sexe" value="F"> Femelle</label></div></div>
+    <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Reproductrice</span>
+      <div class="choice"><label><input type="radio" name="repro" value="oui" required> Oui</label><label><input type="radio" name="repro" value="non"> Non</label></div></div>
+    <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Caméléone</span>
+      <div class="choice"><label><input type="radio" name="cam" value="oui" required> Oui</label><label><input type="radio" name="cam" value="non"> Non</label></div></div>
+    <div class="f"><label class="t" for="fNb">Nombre de dragodindes à ajouter</label><input type="number" id="fNb" min="1" max="200" value="1" inputmode="numeric" required></div>
+    <div class="f"><label class="t" for="fObjet">Objet obtenu à la vente</label><input type="text" id="fObjet"></div>
+    <div class="f"><label class="t" for="fGest">Temps de gestation</label><input type="text" id="fGest" placeholder="ex. 48 h"></div>
+    <div class="formBtns"><button type="button" class="btn ghost" id="cancelParc">Annuler</button><button type="submit" class="btn">Valider</button></div>
+  </form>
+
+  <div class="parcList" id="parcList"></div>
+</section>
+
+<!-- ============ DÉTAIL D'UN PARC ============ -->
+<section id="parc" class="page">
+  <div class="top"><button class="back" data-go="parcs" aria-label="Retour">←</button><h2 id="parcTitle">Parc</h2></div>
+  <div id="parcBody"></div>
 </section>
 
 <!-- ============ ACCOUPLEMENTS ============ -->
@@ -126,6 +177,7 @@ body.inner::before{opacity:1}
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:7,d:"31/10/2026",t:["Gestion des parcs : bouton « Créer un parc » avec le formulaire (guilde, dragodinde, type, sexe, reproductrice, caméléone, nombre, objet à la vente, gestation).","Chaque parc apparaît avec le nom de sa guilde ; en l'ouvrant, on voit ses dragodindes, une par ligne.","Même arrière-plan sur toutes les pages."]},
   {v:6,d:"31/10/2026",t:["Nouvel arrière-plan illustré (le parc et l'écurie) sur toute l'appli."]},
   {v:5,d:"31/10/2026",t:["Nouvelle version, plus nette, du bouton Gestion des parcs."]},
   {v:4,d:"31/10/2026",t:["Nouveaux visuels pour les boutons Accouplements et Accouchements sur l'accueil."]},
@@ -145,20 +197,59 @@ const Store={
 
 // Navigation entre les pages (le bouton retour du téléphone fonctionne aussi)
 const PAGES=["home","parcs","accouplements","accouchements","news"];
+let depth=0; // nombre de pages ouvertes depuis l'appli (pour que ← fasse un vrai retour)
 function show(){
   const id=location.hash.slice(1);
-  const p=PAGES.includes(id)?id:"home";
+  let p=PAGES.includes(id)?id:"home";
+  if(id.startsWith("parc-")){ if(renderParc(id.slice(5))) p="parc"; else p="parcs"; }
+  if(p==="parcs") renderParcs();
   document.querySelectorAll(".page").forEach(s=>s.classList.toggle("on",s.id===p));
-  document.body.classList.toggle("inner",p!=="home");
   scrollTo(0,0);
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("[data-go]");if(!b)return;
   const to=b.dataset.go;
-  if(to==="home"){ if(history.length>1&&location.hash) history.back(); else location.hash=""; }
-  else location.hash=to;
+  if(b.classList.contains("back")){ if(depth>0){depth--;history.back();} else location.replace("#"+(to==="home"?"":to)); }
+  else { depth++; location.hash=to; }
 });
-addEventListener("hashchange",show);show();
+addEventListener("hashchange",show);
+
+// ================= GESTION DES PARCS =================
+// Données : drago_parcs = [{id, guilde, dragos:[{nom,type,sexe,repro,cam,objet,gest}]}]
+const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const getParcs=()=>Store.get("parcs",[]);
+const form=document.getElementById("parcForm");
+function renderParcs(){
+  const L=getParcs(), el=document.getElementById("parcList");
+  el.innerHTML=L.length?L.map(p=>`<button class="btn parcBtn" data-go="parc-${p.id}">${esc(p.guilde)}<small>${p.dragos.length} dragodinde${p.dragos.length>1?"s":""}</small></button>`).join("")
+    :(form.hidden?`<div class="card empty muted">Aucun parc pour l'instant.</div>`:"");
+}
+function renderParc(id){
+  const p=getParcs().find(x=>x.id===id); if(!p) return false;
+  document.getElementById("parcTitle").textContent=p.guilde;
+  const oui=v=>`<span class="tag ${v}">${v==="oui"?"Oui":"Non"}</span>`;
+  document.getElementById("parcBody").innerHTML=`<div class="tableWrap"><table class="dragos">
+    <thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
+    <tbody>${p.dragos.map((d,i)=>`<tr><td>${i+1}</td><td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
+      <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td>
+      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table></div>`;
+  return true;
+}
+document.getElementById("newParcBtn").onclick=()=>{form.reset();form.hidden=false;document.getElementById("newParcBtn").hidden=true;renderParcs();document.getElementById("fGuilde").focus();};
+function closeForm(){form.hidden=true;document.getElementById("newParcBtn").hidden=false;renderParcs();}
+document.getElementById("cancelParc").onclick=closeForm;
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  const v=id=>document.getElementById(id).value.trim(), r=n=>form.querySelector(`input[name=${n}]:checked`).value;
+  const guilde=v("fGuilde"), nb=Math.max(1,Math.min(200,parseInt(v("fNb"))||1));
+  const d={nom:v("fNom"),type:v("fType"),sexe:r("sexe"),repro:r("repro"),cam:r("cam"),objet:v("fObjet"),gest:v("fGest")};
+  const L=getParcs();
+  // même nom de guilde → on ajoute au parc existant
+  let p=L.find(x=>x.guilde.toLowerCase()===guilde.toLowerCase());
+  if(!p){p={id:Date.now().toString(36),guilde,dragos:[]};L.push(p);}
+  for(let i=0;i<nb;i++)p.dragos.push({...d});
+  Store.set("parcs",L); closeForm();
+});
 
 // Onglet Mises à jour : liste + pastille rouge s'il y a du nouveau depuis la dernière visite
 document.getElementById("newsList").innerHTML=MAJ.map(m=>
@@ -179,6 +270,8 @@ document.getElementById("refresh").addEventListener("click",function(){
     window.caches?caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith("drago-")).map(x=>caches.delete(x)))).catch(()=>{}):0
   ]).then(()=>{clearTimeout(t);go()});
 });
+
+show(); // affichage de la page de départ, une fois tout le reste prêt
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
 </body>
