@@ -28,22 +28,17 @@ body{
 
 /* ---- Accueil ---- */
 #home{justify-content:center;gap:10px}
-#refresh{position:fixed;top:calc(12px + env(safe-area-inset-top));left:12px;z-index:5;
-  width:48px;height:48px;border-radius:14px;border:3px solid #3a2208;cursor:pointer;
-  background:linear-gradient(#ffd45c,var(--gold2));color:var(--ink);font-size:26px;font-weight:800;line-height:1;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 10px rgba(0,0,0,.4)}
+#refresh{position:fixed;top:calc(8px + env(safe-area-inset-top));left:8px;z-index:5;width:64px;border:0;background:none;padding:0;cursor:pointer}
+#refresh img,#newsBtn img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}
 #refresh:active{transform:scale(.92)}
-#newsBtn{position:fixed;top:calc(16px + env(safe-area-inset-top));right:12px;z-index:5;
-  height:40px;padding:0 14px;border-radius:20px;border:3px solid #3a2208;cursor:pointer;
-  background:linear-gradient(#ffd45c,var(--gold2));color:var(--ink);font-size:14px;font-weight:800;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 10px rgba(0,0,0,.4)}
+#refresh.spin img{animation:spin .8s linear infinite}
+#newsBtn{position:fixed;top:calc(10px + env(safe-area-inset-top));right:8px;z-index:5;width:150px;border:0;background:none;padding:0;cursor:pointer}
 #newsBtn:active{transform:scale(.94)}
-#newsDot{position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#e23b2e;border:2px solid #fff}
+#newsDot{display:none}
 .maj{margin-bottom:14px}
 .maj h3{margin:0 0 6px;color:var(--gold);font-size:17px}
 .maj h3 small{color:var(--txt);opacity:.7;font-weight:400;font-size:13px;margin-left:6px}
 .maj ul{margin:0;padding-left:20px;line-height:1.45}
-#refresh.spin{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tile{border:0;background:none;padding:0;cursor:pointer;display:block;width:100%;
   transition:transform .12s ease,filter .12s ease}
@@ -180,8 +175,8 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCUEIL ============ -->
 <section id="home" class="page">
-  <button id="refresh" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour">⟳</button>
-  <button id="newsBtn" data-go="news">📜 Mises à jour<i id="newsDot" hidden></i></button>
+  <button id="refresh" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour"><img src="btn_refresh.webp" alt="⟳"></button>
+  <button id="newsBtn" data-go="news" aria-label="Mises à jour"><img id="newsImg" src="btn_maj.webp" alt="Mises à jour"><i id="newsDot" hidden></i></button>
   <button class="tile" data-go="parcs" aria-label="Gestion des parcs">
     <img src="btn_parcs.webp?v=5" alt="Gestion des parcs">
   </button>
@@ -274,6 +269,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:16,d:"31/10/2026",t:["Nouveaux visuels sur l'accueil : bouton de mise à jour ⟳ et bouton « Mises à jour » (avec la pastille rouge quand il y a du nouveau)."]},
   {v:15,d:"31/10/2026",t:["Nouveaux visuels dans la Gestion des parcs : bandeau de titre (qui sert aussi de retour), bouton « Créer un parc », plaque de chaque parc avec le nom de la guilde et le nombre de dragodindes, et bouton « Réinitialiser tous les parcs »."]},
   {v:14,d:"31/10/2026",t:["Les menus déroulants s'ouvrent maintenant dans une fenêtre au même style que le reste de l'appli (coins arrondis, bordure dorée).","Accoupler : on choisit d'abord un type de dragodinde du parc (avec le nombre de mâles et femelles disponibles), puis le nombre d'accouplements (de 1 au nombre de couples possibles).","Après validation : « Suivant » pour accoupler un autre type, ou « Terminé » pour fermer.","Un mâle en cours d'accouplement n'est plus proposé pour un autre couple."]},
   {v:13,d:"31/10/2026",t:["Les champs Nom, Type, Objet obtenu et Temps de gestation sont maintenant de vrais menus déroulants avec les valeurs déjà enregistrées, plus « ➕ Nouveau… » pour en écrire une autre."]},
@@ -766,8 +762,9 @@ setInterval(()=>{if(location.hash.startsWith("#acc-")&&!document.querySelector("
 document.getElementById("newsList").innerHTML=MAJ.map(m=>
   `<div class="card maj"><h3>Version ${m.v}<small>${m.d}</small></h3><ul>${m.t.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("");
 const lastSeen=Store.get("majVue",0);
-document.getElementById("newsDot").hidden=!(MAJ[0].v>lastSeen);
-addEventListener("hashchange",()=>{if(location.hash==="#news"){Store.set("majVue",MAJ[0].v);document.getElementById("newsDot").hidden=true}});
+const pastille=on=>{document.getElementById("newsImg").src=on?"btn_maj_new.webp":"btn_maj.webp";};
+pastille(MAJ[0].v>lastSeen);
+addEventListener("hashchange",()=>{if(location.hash==="#news"){Store.set("majVue",MAJ[0].v);pastille(false)}});
 if(location.hash==="#news")Store.set("majVue",MAJ[0].v);
 
 // Bouton ⟳ : vide le cache de CETTE appli (préfixe "drago-") et recharge la dernière version.

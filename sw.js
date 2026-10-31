@@ -1,5 +1,5 @@
-const C="drago-v15";
-const F=["./","index.html","manifest.webmanifest","btn_parcs.webp","fond.webp","btn_accouplement.webp","btn_accouchement.webp","btn_accoupler.webp","hdr_parcs.webp","btn_creer_parc.webp","btn_reset_parcs.webp","plaque_parc.webp","plume.webp","icon-192.png","icon-512.png","icon-maskable-192.png","icon-maskable-512.png"];
+const C="drago-v16";
+const F=["./","index.html","manifest.webmanifest","btn_parcs.webp","fond.webp","btn_accouplement.webp","btn_accouchement.webp","btn_accoupler.webp","hdr_parcs.webp","btn_creer_parc.webp","btn_reset_parcs.webp","plaque_parc.webp","plume.webp","btn_refresh.webp","btn_maj.webp","btn_maj_new.webp","icon-192.png","icon-512.png","icon-maskable-192.png","icon-maskable-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(u=>c.add(new Request(u,{cache:"reload"})).catch(()=>0)))).then(()=>self.skipWaiting()))});
 // ne supprime que les anciens caches de CETTE appli (préfixe "drago-")
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x.startsWith("drago-")&&x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
