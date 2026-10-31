@@ -169,8 +169,8 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 
   <form id="parcForm" class="card" hidden autocomplete="off">
     <div class="f"><label class="t" for="fGuilde">Nom de la guilde</label><input type="text" id="fGuilde" required></div>
-    <div class="f"><label class="t" for="fNom">Nom de la dragodinde</label><input type="text" id="fNom" required></div>
-    <div class="f"><label class="t" for="fType">Type de la dragodinde</label><input type="text" id="fType" required></div>
+    <div class="f"><label class="t" for="fNom">Nom de la dragodinde</label><input type="text" id="fNom" list="dl_nom" required></div>
+    <div class="f"><label class="t" for="fType">Type de la dragodinde</label><input type="text" id="fType" list="dl_type" required></div>
     <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Sexe</span>
       <div class="choice"><label><input type="radio" name="sexe" value="M" required> Mâle</label><label><input type="radio" name="sexe" value="F"> Femelle</label></div></div>
     <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Reproductrice</span>
@@ -178,8 +178,8 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
     <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Caméléone</span>
       <div class="choice"><label><input type="radio" name="cam" value="oui" required> Oui</label><label><input type="radio" name="cam" value="non"> Non</label></div></div>
     <div class="f"><label class="t" for="fNb">Nombre de dragodindes à ajouter</label><input type="number" id="fNb" min="1" max="200" value="1" inputmode="numeric" required></div>
-    <div class="f"><label class="t" for="fObjet">Objet obtenu à la vente</label><input type="text" id="fObjet"></div>
-    <div class="f"><label class="t" for="fGest">Temps de gestation</label><input type="text" id="fGest" placeholder="ex. 48 h"></div>
+    <div class="f"><label class="t" for="fObjet">Objet obtenu à la vente</label><input type="text" id="fObjet" list="dl_objet"></div>
+    <div class="f"><label class="t" for="fGest">Temps de gestation</label><input type="text" id="fGest" list="dl_gest" placeholder="ex. 48 h"></div>
     <div class="formBtns"><button type="button" class="btn ghost" id="cancelParc">Annuler</button><button type="submit" class="btn">Valider</button></div>
   </form>
 
@@ -236,10 +236,12 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 </section>
 
 <div id="modalRoot"></div>
+<div id="dlRoot"></div>
 
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:12,d:"31/10/2026",t:["Listes déroulantes : en créant, ajoutant ou modifiant une dragodinde, l'appli propose les noms, types, objets obtenus et temps de gestation déjà enregistrés. Tu peux toujours en écrire un nouveau."]},
   {v:11,d:"31/10/2026",t:["Dans un parc : bouton « ＋ Ajouter » en haut pour ajouter des dragodindes à un parc déjà créé (avec confirmation).","Bouton « ⇅ Trier » : tri par nom, type, sexe, reproductrice, caméléone, objet à la vente, gestation ou ordre d'ajout, en croissant ou décroissant. Le n° de chaque dragodinde ne change pas."]},
   {v:10,d:"31/10/2026",t:["Nouveau visuel pour le bouton « Accoupler » dans la page d'un parc."]},
   {v:9,d:"31/10/2026",t:["Accouplements : choix d'un parc, puis bouton « Accoupler » qui propose les mâles et femelles reproducteurs du parc.","Chaque accouplement en cours affiche la date de naissance prévue (d'après le temps de gestation de la femelle) et un compte à rebours.","Un accouplement peut être modifié (✏️) ou annulé (🗑) ; réinitialisation possible par parc ou pour tous, toujours avec confirmation."]},
@@ -346,6 +348,15 @@ form.addEventListener("submit",e=>{
   Store.set("parcs",L); closeForm();
 });
 
+// ================= LISTES DÉROULANTES =================
+// Propose les noms, types, objets et temps de gestation déjà saisis dans tous les parcs.
+function majListes(){
+  const L=getParcs().flatMap(p=>p.dragos), uniq=k=>[...new Set(L.map(d=>(d[k]||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"fr"));
+  document.getElementById("dlRoot").innerHTML=["nom","type","objet","gest"].map(k=>`<datalist id="dl_${k}">${uniq(k).map(v=>`<option value="${esc(v)}">`).join("")}</datalist>`).join("");
+}
+majListes();
+document.addEventListener("focusin",e=>{if(e.target.matches("input[list^=dl_]"))majListes();});
+
 // ================= FENÊTRE DE CONFIRMATION =================
 // Règle de l'appli : toute modification, réinitialisation ou suppression passe par
 // cette fenêtre, avec un récapitulatif de ce qui va se passer.
@@ -372,13 +383,13 @@ function editDrago(i){
   const radio=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name="e_${n}" value="${a}" ${d[n]===a?"checked":""}> ${la}</label><label><input type="radio" name="e_${n}" value="${b}" ${d[n]===b?"checked":""}> ${lb}</label></div>`;
   const lab=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
   root.innerHTML=`<div class="modal"><div class="box"><h3>✏️ Modifier la ligne ${i+1}</h3><form id="editForm" class="f" autocomplete="off">
-    <div class="f">${lab("Nom de la dragodinde")}<input type="text" id="e_nom" value="${esc(d.nom)}" required></div>
-    <div class="f">${lab("Type de la dragodinde")}<input type="text" id="e_type" value="${esc(d.type)}" required></div>
+    <div class="f">${lab("Nom de la dragodinde")}<input type="text" id="e_nom" list="dl_nom" value="${esc(d.nom)}" required></div>
+    <div class="f">${lab("Type de la dragodinde")}<input type="text" id="e_type" list="dl_type" value="${esc(d.type)}" required></div>
     <div class="f">${lab("Sexe")}${radio("sexe","M","F","Mâle","Femelle")}</div>
     <div class="f">${lab("Reproductrice")}${radio("repro","oui","non","Oui","Non")}</div>
     <div class="f">${lab("Caméléone")}${radio("cam","oui","non","Oui","Non")}</div>
-    <div class="f">${lab("Objet obtenu à la vente")}<input type="text" id="e_objet" value="${esc(d.objet)}"></div>
-    <div class="f">${lab("Temps de gestation")}<input type="text" id="e_gest" value="${esc(d.gest)}"></div>
+    <div class="f">${lab("Objet obtenu à la vente")}<input type="text" id="e_objet" list="dl_objet" value="${esc(d.objet)}"></div>
+    <div class="f">${lab("Temps de gestation")}<input type="text" id="e_gest" list="dl_gest" value="${esc(d.gest)}"></div>
     <div class="formBtns"><button type="button" class="btn ghost" id="e_cancel">Annuler</button><button type="submit" class="btn">Enregistrer</button></div>
   </form></div></div>`;
   document.getElementById("e_cancel").onclick=()=>root.innerHTML="";
@@ -411,14 +422,14 @@ const radio2=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name
 document.getElementById("addDrago").onclick=()=>{
   const p=parcCourant(), root=document.getElementById("modalRoot");
   root.innerHTML=`<div class="modal"><div class="box"><h3>＋ Ajouter au parc ${esc(p.guilde)}</h3><form id="addForm" autocomplete="off">
-    <div class="f">${labT("Nom de la dragodinde")}<input type="text" id="n_nom" required></div>
-    <div class="f">${labT("Type de la dragodinde")}<input type="text" id="n_type" required></div>
+    <div class="f">${labT("Nom de la dragodinde")}<input type="text" id="n_nom" list="dl_nom" required></div>
+    <div class="f">${labT("Type de la dragodinde")}<input type="text" id="n_type" list="dl_type" required></div>
     <div class="f">${labT("Sexe")}${radio2("n_sexe","M","F","Mâle","Femelle")}</div>
     <div class="f">${labT("Reproductrice")}${radio2("n_repro","oui","non","Oui","Non")}</div>
     <div class="f">${labT("Caméléone")}${radio2("n_cam","oui","non","Oui","Non")}</div>
     <div class="f">${labT("Nombre de dragodindes à ajouter")}<input type="number" id="n_nb" min="1" max="200" value="1" inputmode="numeric" required></div>
-    <div class="f">${labT("Objet obtenu à la vente")}<input type="text" id="n_objet"></div>
-    <div class="f">${labT("Temps de gestation")}<input type="text" id="n_gest" placeholder="ex. 48 h"></div>
+    <div class="f">${labT("Objet obtenu à la vente")}<input type="text" id="n_objet" list="dl_objet"></div>
+    <div class="f">${labT("Temps de gestation")}<input type="text" id="n_gest" list="dl_gest" placeholder="ex. 48 h"></div>
     <div class="formBtns"><button type="button" class="btn ghost" id="n_cancel">Annuler</button><button type="submit" class="btn">Ajouter</button></div>
   </form></div></div>`;
   document.getElementById("n_cancel").onclick=()=>root.innerHTML="";

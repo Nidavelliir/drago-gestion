@@ -1,4 +1,4 @@
-const C="drago-v11";
+const C="drago-v12";
 const F=["./","index.html","manifest.webmanifest","btn_parcs.webp","fond.webp","btn_accouplement.webp","btn_accouchement.webp","btn_accoupler.webp","icon-192.png","icon-512.png","icon-maskable-192.png","icon-maskable-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>Promise.all(F.map(u=>c.add(new Request(u,{cache:"reload"})).catch(()=>0)))).then(()=>self.skipWaiting()))});
 // ne supprime que les anciens caches de CETTE appli (préfixe "drago-")
