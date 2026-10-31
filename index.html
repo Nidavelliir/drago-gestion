@@ -31,6 +31,16 @@ body{
   background:linear-gradient(#ffd45c,var(--gold2));color:var(--ink);font-size:26px;font-weight:800;line-height:1;
   box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 10px rgba(0,0,0,.4)}
 #refresh:active{transform:scale(.92)}
+#newsBtn{position:fixed;top:calc(16px + env(safe-area-inset-top));right:12px;z-index:5;
+  height:40px;padding:0 14px;border-radius:20px;border:3px solid #3a2208;cursor:pointer;
+  background:linear-gradient(#ffd45c,var(--gold2));color:var(--ink);font-size:14px;font-weight:800;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 10px rgba(0,0,0,.4)}
+#newsBtn:active{transform:scale(.94)}
+#newsDot{position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#e23b2e;border:2px solid #fff}
+.maj{margin-bottom:14px}
+.maj h3{margin:0 0 6px;color:var(--gold);font-size:17px}
+.maj h3 small{color:var(--txt);opacity:.7;font-weight:400;font-size:13px;margin-left:6px}
+.maj ul{margin:0;padding-left:20px;line-height:1.45}
 #refresh.spin{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .tile{border:0;background:none;padding:0;cursor:pointer;display:block;width:100%;
@@ -64,6 +74,7 @@ body{
 <!-- ============ ACCUEIL ============ -->
 <section id="home" class="page">
   <button id="refresh" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour">⟳</button>
+  <button id="newsBtn" data-go="news">📜 Mises à jour<i id="newsDot" hidden></i></button>
   <button class="tile" data-go="parcs" aria-label="Gestion des parcs">
     <img src="btn_parcs.webp" alt="Gestion des parcs">
   </button>
@@ -104,6 +115,21 @@ body{
   </div>
 </section>
 
+<!-- ============ MISES À JOUR ============ -->
+<section id="news" class="page">
+  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Mises à jour</h2></div>
+  <div id="newsList"></div>
+</section>
+
+<script>
+// Journal des mises à jour : la plus récente en premier.
+const MAJ=[
+  {v:3,d:"31/10/2026",t:["Ajout de cet onglet « Mises à jour » en haut à droite de l'accueil."]},
+  {v:2,d:"31/10/2026",t:["Retrait du titre sur l'accueil.","Ajout du bouton ⟳ en haut à gauche pour charger la dernière version de l'appli."]},
+  {v:1,d:"31/10/2026",t:["Création de Drago Gestion : accueil avec les boutons Gestion des parcs, Accouplements et Accouchements.","Icône du certificat pour l'installation sur le téléphone."]}
+];
+</script>
+
 <script>
 // Stockage : toutes les clés sont préfixées "drago_" pour ne jamais se mélanger
 // avec les autres applis hébergées sur la même adresse GitHub (Quiz Master Quest, belote…).
@@ -113,7 +139,7 @@ const Store={
 };
 
 // Navigation entre les pages (le bouton retour du téléphone fonctionne aussi)
-const PAGES=["home","parcs","accouplements","accouchements"];
+const PAGES=["home","parcs","accouplements","accouchements","news"];
 function show(){
   const id=location.hash.slice(1);
   const p=PAGES.includes(id)?id:"home";
@@ -127,6 +153,14 @@ document.addEventListener("click",e=>{
   else location.hash=to;
 });
 addEventListener("hashchange",show);show();
+
+// Onglet Mises à jour : liste + pastille rouge s'il y a du nouveau depuis la dernière visite
+document.getElementById("newsList").innerHTML=MAJ.map(m=>
+  `<div class="card maj"><h3>Version ${m.v}<small>${m.d}</small></h3><ul>${m.t.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("");
+const lastSeen=Store.get("majVue",0);
+document.getElementById("newsDot").hidden=!(MAJ[0].v>lastSeen);
+addEventListener("hashchange",()=>{if(location.hash==="#news"){Store.set("majVue",MAJ[0].v);document.getElementById("newsDot").hidden=true}});
+if(location.hash==="#news")Store.set("majVue",MAJ[0].v);
 
 // Bouton ⟳ : vide le cache de CETTE appli (préfixe "drago-") et recharge la dernière version.
 // Les caches des autres applis (Quiz Master Quest…) ne sont pas touchés.
