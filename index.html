@@ -116,6 +116,9 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 .ico:active{transform:scale(.9)}
 .ico.del{border-color:rgba(226,59,46,.7)}
 .ico:has(img){border:0;background:none;width:42px;height:40px}
+.ico.ok{width:40px;height:40px;border-radius:12px;border:3px solid #e9b23a;background:linear-gradient(#5fd36a,#1f8a2c);color:#fff;font-size:22px;font-weight:900;
+  text-shadow:0 2px 0 #0d4a14;box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 3px 6px rgba(0,0,0,.45)}
+.ico.ok.pret{animation:pulse 1.4s ease-in-out infinite;box-shadow:0 0 12px rgba(125,255,138,.9),inset 0 2px 0 rgba(255,255,255,.45)}
 .ico img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
 .btn.danger{background:linear-gradient(#ff6b5e,#c4271c);color:#fff;border-color:#5a0d07}
 .tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
@@ -166,6 +169,8 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 .gest .who>span{display:flex;align-items:center;gap:6px;font-size:16px;padding-bottom:4px;border-bottom:1px solid rgba(233,178,58,.25)}
 .gest .who>span:last-child{border:0}
 .gest .who b{color:#ffd23a}
+.gest .who .muted{font-size:13px;white-space:nowrap}
+.gest .who>span{flex-wrap:wrap}
 .gest .who .tag{padding:3px 8px;font-size:14px;border:2px solid rgba(255,255,255,.35)}
 .gest .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .timer{position:relative;display:flex;align-items:center;gap:6px;margin:12px 0 10px;border-radius:18px;padding:6px 10px 6px 4px;
@@ -347,6 +352,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:21,d:"31/10/2026",t:["Accouchements : bouton vert ✔ sur chaque gestation pour la valider comme terminée, sans confirmation. Il clignote quand la gestation est prête."]},
   {v:20,d:"31/10/2026",t:["Nouveau bouton retour (flèche dorée) et nouvelles plaques de titre en haut des pages Accouplements, Accouchements, Stérilisation et Mises à jour.","Nouvelle plaque (maison et œuf) pour le nom de chaque parc dans Accouchements et dans le registre des stériles."]},
   {v:19,d:"31/10/2026",t:["Nouveau logo de l'appli : le certificat de dragodinde dans son cadre doré."]},
   {v:18,d:"31/10/2026",t:["Nouveau bandeau avec le nom de la guilde (et la flèche de retour) en haut de la page d'un parc et de ses accouplements.","Cadres illustrés « mâles disponibles » et « femelles disponibles » dans la page d'accouplement d'un parc.","Nouvelles cartes de gestation dans Accouchements : minuteur avec l'œuf violet, œuf doré quand elle est prête, barre de progression dorée, dates Début / Fin.","Nouveaux boutons Modifier (crayon) et Supprimer (corbeille) partout dans l'appli."]},
@@ -871,7 +877,7 @@ function renderGest(){
       return `<div class="card gest"><div class="head"><div class="who">
           <span><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></span>
           <span><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></span></div>
-          <div class="act"><button class="ico" data-gedit="${a.id}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler"><img src="ico_del.webp" alt="🗑"></button></div></div>
+          <div class="act"><button class="ico ok ${reste<=0&&a.gestH?"pret":""}" data-gok="${a.id}" aria-label="Valider la gestation terminée">✔</button><button class="ico" data-gedit="${a.id}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler"><img src="ico_del.webp" alt="🗑"></button></div></div>
         ${tm}${a.gestH?`<div class="barre"><i style="width:${pct.toFixed(1)}%"></i></div>`:""}
         <div class="dates"><span>📅 Début : ${fmtDate(a.debut)}</span><span>🏁 ${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
     }).join("");
@@ -886,6 +892,11 @@ setInterval(()=>{
   if(fini||Date.now()%60000<1000)renderGest();
 },1000);
 document.getElementById("gestList").addEventListener("click",async e=>{
+  const ok=e.target.closest("[data-gok]");
+  if(ok){ // validation directe, sans confirmation (demande de l'utilisateur)
+    const c=ok.closest(".gest"); c.style.transition="opacity .3s,transform .3s"; c.style.opacity="0"; c.style.transform="scale(.95)";
+    setTimeout(()=>{setAccs(getAccs().filter(x=>x.id!==ok.dataset.gok)); renderGest();},300); return;
+  }
   const ed=e.target.closest("[data-gedit]"), de=e.target.closest("[data-gdel]"); if(!ed&&!de)return;
   const a=getAccs().find(x=>x.id===(ed||de).dataset[ed?"gedit":"gdel"]); if(!a)return;
   curAcc=a.parcId; const p=accParc(), byId=Object.fromEntries(p.dragos.map(d=>[d.id,d]));
