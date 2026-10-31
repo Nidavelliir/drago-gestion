@@ -77,7 +77,23 @@ body{
 .btn:active{transform:scale(.97)}
 .btn.ghost{background:rgba(22,30,14,.85);color:var(--txt);border-color:rgba(255,194,58,.6)}
 .parcList{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-.parcBtn{display:flex;justify-content:space-between;align-items:center;text-align:left;font-size:20px;
+/* boutons image */
+.imgBtn,.back.imgBack{display:block;width:100%;border:0;background:none;padding:0;cursor:pointer;height:auto;border-radius:0}
+.imgBtn img,.imgBack img{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.imgBtn:active,.imgBack:active{transform:scale(.97)}
+.back.imgBack{margin:0 0 12px}
+.imgBack img{width:100%}
+/* plaque d'un parc (nom de guilde + nombre de dragodindes) */
+.btn.parcBtn{position:relative;display:flex;align-items:center;gap:2%;width:100%;aspect-ratio:1100/181;padding:0 6% 0 18.5%;
+  background:url("plaque_parc.webp") center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));
+  font-family:inherit;text-align:left;cursor:pointer}
+.parcBtn .nomG{flex:1;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.08;overflow-wrap:anywhere;font-size:clamp(13px,4.1vw,22px);font-weight:900;color:#fff2b8;
+  text-shadow:0 2px 0 #4a2306,0 0 3px #3a1a04,1px 1px 0 #3a1a04,-1px -1px 0 #3a1a04}
+.parcBtn .sep{width:2px;align-self:stretch;margin:5.5% 0;background:#f5b72a;border-radius:2px;flex:none}
+.parcBtn .plume{height:44%;width:auto;flex:none}
+.parcBtn .nbG{flex:none;font-size:clamp(10px,3vw,15px);font-weight:800;color:#fff2b8;white-space:nowrap;text-shadow:0 2px 0 #4a2306,1px 1px 0 #3a1a04,-1px -1px 0 #3a1a04}
+.parcBtn:active{transform:scale(.97)}
+.oldParcBtn{display:flex;justify-content:space-between;align-items:center;text-align:left;font-size:20px;
   background:linear-gradient(#2b1d0c,#1a1208);color:#ffe08a;border:3px solid var(--gold)}
 .parcBtn small{font-size:13px;font-weight:600;color:var(--txt);opacity:.8}
 form.card{display:flex;flex-direction:column;gap:12px;margin-top:16px}
@@ -181,8 +197,8 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ GESTION DES PARCS ============ -->
 <section id="parcs" class="page">
-  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Gestion des parcs</h2></div>
-  <button class="btn" id="newParcBtn">＋ Créer un parc</button>
+  <button class="back imgBack" data-go="home" aria-label="Retour – Gestion des parcs"><img src="hdr_parcs.webp" alt="← Gestion des parcs"></button>
+  <button class="imgBtn" id="newParcBtn" aria-label="Créer un parc"><img src="btn_creer_parc.webp" alt="Créer un parc"></button>
 
   <form id="parcForm" class="card" hidden autocomplete="off">
     <div class="f"><label class="t" for="fGuilde">Nom de la guilde</label><input type="text" id="fGuilde" required></div>
@@ -201,7 +217,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
   </form>
 
   <div class="parcList" id="parcList"></div>
-  <button class="btn ghost" id="resetAll" style="margin-top:22px" hidden>♻️ Réinitialiser tous les parcs</button>
+  <button class="imgBtn" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs"><img src="btn_reset_parcs.webp" alt="Réinitialiser tous les parcs"></button>
 </section>
 
 <!-- ============ DÉTAIL D'UN PARC ============ -->
@@ -258,6 +274,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:15,d:"31/10/2026",t:["Nouveaux visuels dans la Gestion des parcs : bandeau de titre (qui sert aussi de retour), bouton « Créer un parc », plaque de chaque parc avec le nom de la guilde et le nombre de dragodindes, et bouton « Réinitialiser tous les parcs »."]},
   {v:14,d:"31/10/2026",t:["Les menus déroulants s'ouvrent maintenant dans une fenêtre au même style que le reste de l'appli (coins arrondis, bordure dorée).","Accoupler : on choisit d'abord un type de dragodinde du parc (avec le nombre de mâles et femelles disponibles), puis le nombre d'accouplements (de 1 au nombre de couples possibles).","Après validation : « Suivant » pour accoupler un autre type, ou « Terminé » pour fermer.","Un mâle en cours d'accouplement n'est plus proposé pour un autre couple."]},
   {v:13,d:"31/10/2026",t:["Les champs Nom, Type, Objet obtenu et Temps de gestation sont maintenant de vrais menus déroulants avec les valeurs déjà enregistrées, plus « ➕ Nouveau… » pour en écrire une autre."]},
   {v:12,d:"31/10/2026",t:["Suggestions des valeurs déjà saisies pendant la frappe (remplacées par des menus déroulants en version 13)."]},
@@ -319,10 +336,11 @@ const getAccs=()=>Store.get("accs",[]);
 const setAccs=a=>Store.set("accs",a);
 const form=document.getElementById("parcForm");
 let curParc=null;
+const plaque=(go,nom,info)=>`<button class="btn parcBtn" data-go="${go}"><span class="nomG">${esc(nom)}</span><span class="sep"></span><img class="plume" src="plume.webp" alt=""><span class="nbG">${info}</span></button>`;
 function renderParcs(){
   const L=getParcs(), el=document.getElementById("parcList");
   document.getElementById("resetAll").hidden=!L.length;
-  el.innerHTML=L.length?L.map(p=>`<button class="btn parcBtn" data-go="parc-${p.id}">${esc(p.guilde)}<small>${p.dragos.length} dragodinde${p.dragos.length>1?"s":""}</small></button>`).join("")
+  el.innerHTML=L.length?L.map(p=>plaque(`parc-${p.id}`,p.guilde,pl(p.dragos.length,"# dragodinde","# dragodindes"))).join("")
     :(form.hidden?`<div class="card empty muted">Aucun parc pour l'instant.</div>`:"");
 }
 // ---- Tri (affichage seulement : le n° de chaque dragodinde ne change pas) ----
@@ -565,7 +583,7 @@ function renderAccParcs(){
   const L=getParcs(), A=getAccs(), el=document.getElementById("accParcList");
   document.getElementById("accResetAll").hidden=!A.length;
   el.innerHTML=L.length?L.map(p=>{const n=A.filter(a=>a.parcId===p.id).length;
-    return `<button class="btn parcBtn" data-go="acc-${p.id}">${esc(p.guilde)}<small>${n?pl(n,"# accouplement en cours","# accouplements en cours"):pl(p.dragos.length,"# dragodinde","# dragodindes")}</small></button>`}).join("")
+    return plaque(`acc-${p.id}`,p.guilde,n?pl(n,"# accouplement en cours","# accouplements en cours"):pl(p.dragos.length,"# dragodinde","# dragodindes"))}).join("")
     :`<div class="card empty muted">Aucun parc pour l'instant. Crée d'abord un parc dans la Gestion des parcs.</div>`;
 }
 // état de chaque dragodinde du parc pour l'accouplement
