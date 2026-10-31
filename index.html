@@ -115,6 +115,8 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
   font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .ico:active{transform:scale(.9)}
 .ico.del{border-color:rgba(226,59,46,.7)}
+.ico:has(img){border:0;background:none;width:42px;height:40px}
+.ico img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
 .btn.danger{background:linear-gradient(#ff6b5e,#c4271c);color:#fff;border-color:#5a0d07}
 .tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
 .tools .btn{font-size:15px;padding:12px 10px}
@@ -127,23 +129,48 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 .modal .warn{background:rgba(226,59,46,.18);border:1px solid rgba(226,59,46,.6);border-radius:10px;padding:8px 10px;font-size:14px}
 .modal .box form{display:flex;flex-direction:column;gap:12px}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+/* bandeau titre avec nom de guilde */
+.back.hdrG{position:relative;display:block;width:100%;height:auto;border:0;background:none;padding:0;border-radius:0;margin:0 0 12px;cursor:pointer}
+.hdrG img{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.hdrG .hdrTxt{position:absolute;left:22%;right:6.5%;top:39%;height:33%;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-size:clamp(15px,5.2vw,28px);font-weight:900;color:#ffe9a8;line-height:1.05;overflow:hidden;
+  text-shadow:0 2px 0 #5a2c06,1px 1px 0 #3a1a04,-1px -1px 0 #3a1a04,0 0 10px rgba(255,170,40,.6)}
+.hdrG:active{transform:scale(.97)}
+/* cadres mâles / femelles disponibles */
+.statImg{position:relative;width:100%}
+.statImg img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}
+.statImg .sv{position:absolute;left:35%;right:12%;top:13%;height:57%;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.statImg .sv b{font-size:clamp(18px,6vw,30px);font-weight:900}
+.statImg .sv span{font-size:clamp(9px,2.7vw,13px);font-weight:800;color:#ffeccc;text-shadow:0 1px 0 #000,0 0 4px #000;margin-top:2px;text-align:center}
+.statImg.m .sv b{color:#bfe3ff;text-shadow:0 0 8px #2f8cff,0 2px 0 #062a5a}
+.statImg.f .sv b{color:#ffd0ee;text-shadow:0 0 8px #ff3fb4,0 2px 0 #4a0638}
 /* ---- Accouchements ---- */
-.gest{padding:14px;margin-bottom:12px}
-.gest .who{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.card.gest{position:relative;padding:14px 14px 12px;margin-bottom:14px;border-radius:22px;border:3px solid #e9b23a;
+  background:radial-gradient(ellipse at 50% 0%,#1d4430 0%,#0e2619 70%);box-shadow:inset 0 0 0 2px rgba(120,60,0,.6),inset 0 0 22px rgba(255,190,60,.18),0 8px 18px rgba(0,0,0,.5);backdrop-filter:none}
+.gest .who{display:flex;flex-direction:column;gap:4px}
+.gest .who>span{display:flex;align-items:center;gap:6px;font-size:16px;padding-bottom:4px;border-bottom:1px solid rgba(233,178,58,.25)}
+.gest .who>span:last-child{border:0}
+.gest .who b{color:#ffd23a}
+.gest .who .tag{padding:3px 8px;font-size:14px;border:2px solid rgba(255,255,255,.35)}
 .gest .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.timer{margin:12px 0 8px;text-align:center;border-radius:14px;padding:10px 8px;background:linear-gradient(#2a1a08,#140c04);border:2px solid var(--gold);
-  box-shadow:inset 0 0 18px rgba(255,194,58,.25),0 0 12px rgba(255,194,58,.25)}
-.timer .t{font-size:clamp(26px,8.5vw,40px);font-weight:900;letter-spacing:1px;color:#ffe08a;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 10px rgba(255,194,58,.7),0 2px 0 #7a3d06}
-.timer .l{font-size:12px;opacity:.75;text-transform:uppercase;letter-spacing:1.5px}
-.timer.pret{border-color:#7dff8a;box-shadow:0 0 18px rgba(125,255,138,.6);animation:pulse 1.4s ease-in-out infinite}
-.timer.pret .t{font-size:clamp(20px,6vw,28px);color:#b9ffbf;text-shadow:0 0 12px rgba(125,255,138,.9)}
-.timer.inconnu .t{font-size:18px;color:var(--txt);text-shadow:none}
-@keyframes pulse{50%{transform:scale(1.03)}}
-.barre{height:10px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
-.barre i{display:block;height:100%;background:linear-gradient(90deg,#ffd45c,#e8891c);border-radius:6px}
-.gest .dates{display:flex;justify-content:space-between;font-size:12.5px;opacity:.85;margin-top:6px;gap:8px}
-.grpParc{color:var(--gold);margin:18px 0 8px;font-size:17px;text-shadow:0 0 8px #000,0 0 3px #000}
+.timer{position:relative;display:flex;align-items:center;gap:6px;margin:12px 0 10px;border-radius:18px;padding:6px 10px 6px 4px;
+  background:radial-gradient(ellipse at 70% 50%,#5a1d8a 0%,#2a0a4a 75%);border:3px solid #e9b23a;box-shadow:inset 0 0 18px rgba(200,90,255,.35),0 0 12px rgba(255,194,58,.25)}
+.timer .oeuf{width:27%;max-width:110px;flex:none}
+.timer .txt{flex:1;text-align:center;min-width:0}
+.timer .t{font-size:clamp(26px,8vw,40px);font-weight:900;letter-spacing:.5px;color:#ffe14a;font-variant-numeric:tabular-nums;white-space:nowrap;
+  text-shadow:0 0 12px rgba(255,200,40,.75),0 2px 0 #7a3d06}
+.timer .l{font-size:12px;font-weight:800;color:#fff3d6;text-transform:uppercase;letter-spacing:2.5px}
+.timer.pret{background:radial-gradient(ellipse at 30% 50%,#2f7a2a 0%,#0f3a14 75%);box-shadow:inset 0 0 18px rgba(255,220,90,.35),0 0 18px rgba(125,255,138,.45);animation:pulse 1.6s ease-in-out infinite}
+.timer.pret .t{font-size:clamp(22px,6.8vw,34px);white-space:normal;line-height:1.05;color:#ffeab0;text-shadow:0 0 12px rgba(255,210,90,.8),0 2px 0 #5a2c06}
+.timer.inconnu{background:rgba(0,0,0,.35)}
+.timer.inconnu .t{font-size:16px;color:var(--txt);text-shadow:none;white-space:normal}
+@keyframes pulse{50%{transform:scale(1.02)}}
+.barre{height:16px;border-radius:10px;background:#0c3a3a;border:2px solid #e9b23a;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+.barre i{display:block;height:100%;background:linear-gradient(#fff28a,#ffd21a 45%,#e8a10c);border-radius:8px;box-shadow:0 0 8px rgba(255,220,60,.8)}
+.gest .dates{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.gest .dates span{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;padding:7px 6px;border-radius:999px;border:2px solid #c9921f;background:rgba(0,0,0,.35);white-space:nowrap}
+.grpParc{margin:18px 0 10px;font-size:18px;color:#ffe9a8;text-align:center;padding:9px 14px;border-radius:16px;border:3px solid #e9b23a;
+  background:linear-gradient(#7a4316,#4a250a);box-shadow:inset 0 2px 0 rgba(255,220,150,.3),0 6px 12px rgba(0,0,0,.45);text-shadow:0 2px 0 #2a1204}
 /* ---- Stérilisation ---- */
 .chk{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.4);background:rgba(255,255,255,.05);cursor:pointer}
 .chk input{width:20px;height:20px;accent-color:var(--gold2);flex:none}
@@ -159,7 +186,7 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
   background:linear-gradient(#ffd45c,var(--gold2));border:4px solid #3a2208;
   box-shadow:inset 0 3px 0 rgba(255,255,255,.55),inset 0 -5px 0 rgba(0,0,0,.18),0 8px 14px rgba(0,0,0,.45)}
 .accBtn .plate span{background:#1a1208;color:#ffe08a;font-weight:800;font-size:20px;padding:8px 14px;border-radius:10px;border:2px solid var(--gold)}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .stat{text-align:center;padding:12px 8px}
 .stat b{display:block;font-size:26px}
 h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #000,0 0 3px #000}
@@ -245,7 +272,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ DÉTAIL D'UN PARC ============ -->
 <section id="parc" class="page">
-  <div class="top"><button class="back" data-go="parcs" aria-label="Retour">←</button><h2 id="parcTitle">Parc</h2></div>
+  <button class="back hdrG" data-go="parcs" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="parcTitle">Parc</span></button>
   <div class="tools" style="margin:0 0 14px">
     <button class="btn" id="addDrago">＋ Ajouter</button>
     <button class="btn ghost" id="sortBtn">⇅ Trier</button>
@@ -268,7 +295,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCOUPLEMENTS D'UN PARC ============ -->
 <section id="acc" class="page">
-  <div class="top"><button class="back" data-go="accouplements" aria-label="Retour">←</button><h2 id="accTitle">Parc</h2></div>
+  <button class="back hdrG" data-go="accouplements" aria-label="Retour"><img src="hdr_guilde.webp" alt=""><span class="hdrTxt" id="accTitle">Parc</span></button>
   <div id="accStats"></div>
   <button class="accBtn" id="accGo" aria-label="Accoupler"><img src="btn_accoupler.webp" alt="Accoupler"></button>
   <h4 class="sec">Accouplements en cours</h4>
@@ -305,6 +332,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:18,d:"31/10/2026",t:["Nouveau bandeau avec le nom de la guilde (et la flèche de retour) en haut de la page d'un parc et de ses accouplements.","Cadres illustrés « mâles disponibles » et « femelles disponibles » dans la page d'accouplement d'un parc.","Nouvelles cartes de gestation dans Accouchements : minuteur avec l'œuf violet, œuf doré quand elle est prête, barre de progression dorée, dates Début / Fin.","Nouveaux boutons Modifier (crayon) et Supprimer (corbeille) partout dans l'appli."]},
   {v:17,d:"31/10/2026",t:["Accouchements : chaque gestation issue d'un accouplement s'affiche avec un grand minuteur (jours, heures, minutes, secondes), une barre de progression et « Prête à accoucher ! » à la fin.","Nouveau bouton « Stérilisation » à côté de « Créer un parc » : choix du parc, puis du type, puis des dragodindes à classer stériles. Elles sont retirées du parc.","Registre des stériles dans la page Stérilisation, avec possibilité de remettre une dragodinde dans son parc ↩️ ou de la supprimer.","Accoupler : les dragodindes déjà en gestation restent proposées, le nombre de couples possibles ne baisse plus après validation."]},
   {v:16,d:"31/10/2026",t:["Nouveaux visuels sur l'accueil : bouton de mise à jour ⟳ et bouton « Mises à jour » (avec la pastille rouge quand il y a du nouveau)."]},
   {v:15,d:"31/10/2026",t:["Nouveaux visuels dans la Gestion des parcs : bandeau de titre (qui sert aussi de retour), bouton « Créer un parc », plaque de chaque parc avec le nom de la guilde et le nombre de dragodindes, et bouton « Réinitialiser tous les parcs »."]},
@@ -397,7 +425,7 @@ function renderParc(id){
   document.getElementById("parcBody").innerHTML=`<div class="tableWrap"><table class="dragos">
     <thead><tr><th>#</th><th>Actions</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
     <tbody>${trier(p.dragos).map(({d,i})=>`<tr><td>${i+1}</td>
-      <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier">✏️</button><button class="ico del" data-del="${i}" aria-label="Supprimer">🗑</button></div></td>
+      <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-del="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></td>
       <td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
       <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td>
       <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table></div>`
@@ -632,7 +660,9 @@ function renderAcc(id){
   curAcc=id;
   document.getElementById("accTitle").textContent=p.guilde;
   const E=etat(p), mDisp=E.filter(e=>e.d.sexe==="M"&&!e.raison).length, fDisp=E.filter(e=>e.d.sexe==="F"&&!e.raison).length;
-  document.getElementById("accStats").innerHTML=`<div class="stats"><div class="card stat"><b style="color:#6ea8ff">♂ ${mDisp}</b>mâle${mDisp>1?"s":""} disponible${mDisp>1?"s":""}</div><div class="card stat"><b style="color:#ff7cc4">♀ ${fDisp}</b>femelle${fDisp>1?"s":""} disponible${fDisp>1?"s":""}</div></div>`;
+  document.getElementById("accStats").innerHTML=`<div class="stats">
+    <div class="statImg m"><img src="stat_m.webp" alt=""><div class="sv"><b>♂ ${mDisp}</b><span>${pl(mDisp,"mâle disponible","mâles disponibles")}</span></div></div>
+    <div class="statImg f"><img src="stat_f.webp" alt=""><div class="sv"><b>♀ ${fDisp}</b><span>${pl(fDisp,"femelle disponible","femelles disponibles")}</span></div></div></div>`;
   const byId=Object.fromEntries(p.dragos.map((d,i)=>[d.id,{...d,n:i+1}]));
   const A=getAccs().filter(a=>a.parcId===p.id).sort((a,b)=>a.debut-b.debut);
   document.getElementById("accResetParc").hidden=!A.length;
@@ -642,7 +672,7 @@ function renderAcc(id){
       <div><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></div>
       <div style="margin-top:4px"><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></div>
       <div class="when">Accouplés le ${fmtDate(a.debut)}<br>${fin?(r?`Naissance prévue le ${fmtDate(fin)} · encore ${r}`:`<span class="ready">Prête à accoucher !</span>`):`Gestation : ${esc(a.gestTxt)||"non renseignée"}`}</div></div>
-      <div class="act" style="flex-direction:column"><button class="ico" data-aedit="${a.id}" aria-label="Modifier">✏️</button><button class="ico del" data-adel="${a.id}" aria-label="Annuler">🗑</button></div></div>`}).join("")
+      <div class="act" style="flex-direction:column"><button class="ico" data-aedit="${a.id}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-adel="${a.id}" aria-label="Annuler"><img src="ico_del.webp" alt="🗑"></button></div></div>`}).join("")
     :`<div class="card empty muted">Aucun accouplement en cours dans ce parc.</div>`;
   return true;
 }
@@ -818,15 +848,15 @@ function renderGest(){
     html+=`<h4 class="grpParc">🏡 ${esc(p.guilde)} · ${pl(G.length,"# gestation","# gestations")}</h4>`;
     html+=G.map(a=>{
       const m=byId[a.maleId], f=byId[a.femId], fi=fin(a), reste=fi-now, pct=a.gestH?Math.min(100,Math.max(0,(now-a.debut)/(a.gestH*3600000)*100)):0;
-      const tm=!a.gestH?`<div class="timer inconnu"><div class="t">Temps de gestation non renseigné</div></div>`
-        :reste<=0?`<div class="timer pret"><div class="t">🥚 Prête à accoucher !</div></div>`
-        :`<div class="timer"><div class="l">Temps restant</div><div class="t" data-fin="${fi}">${minuteur(reste)}</div></div>`;
+      const tm=!a.gestH?`<div class="timer inconnu"><div class="txt"><div class="t">Temps de gestation non renseigné</div></div></div>`
+        :reste<=0?`<div class="timer pret"><img class="oeuf" src="oeuf_dore.webp" alt=""><div class="txt"><div class="t">Prête à accoucher !</div></div></div>`
+        :`<div class="timer"><img class="oeuf" src="oeuf_violet.webp" alt=""><div class="txt"><div class="l">✦ Temps restant ✦</div><div class="t" data-fin="${fi}">${minuteur(reste)}</div></div></div>`;
       return `<div class="card gest"><div class="head"><div class="who">
           <span><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></span>
           <span><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></span></div>
-          <div class="act"><button class="ico" data-gedit="${a.id}" aria-label="Modifier">✏️</button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler">🗑</button></div></div>
+          <div class="act"><button class="ico" data-gedit="${a.id}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler"><img src="ico_del.webp" alt="🗑"></button></div></div>
         ${tm}${a.gestH?`<div class="barre"><i style="width:${pct.toFixed(1)}%"></i></div>`:""}
-        <div class="dates"><span>Début : ${fmtDate(a.debut)}</span><span>${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
+        <div class="dates"><span>📅 Début : ${fmtDate(a.debut)}</span><span>🏁 ${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
     }).join("");
   });
   el.innerHTML=html;
@@ -868,7 +898,7 @@ function renderSteril(){
   el.innerHTML=Object.entries(grp).map(([g,arr])=>`<h4 class="grpParc">🏡 ${esc(g)} · ${pl(arr.length,"# stérile","# stériles")}</h4>`+arr.map(({d,i})=>
     `<div class="card ster"><div class="who"><div><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span> <b>${esc(d.nom)}</b> <span class="muted">${esc(d.type)}</span></div>
       <div class="muted" style="font-size:12.5px;margin-top:3px">Stérile depuis le ${fmtDate(d.date)}${d.cam==="oui"?" · caméléone":""}${d.objet?" · objet : "+esc(d.objet):""}</div></div>
-      <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer">🗑</button></div></div>`).join("")).join("");
+      <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></div>`).join("")).join("");
 }
 document.getElementById("sterParcList").addEventListener("click",e=>{const b=e.target.closest("[data-ster]");if(b)sterWizard(b.dataset.ster);});
 function sterWizard(parcId,dernier=null){
