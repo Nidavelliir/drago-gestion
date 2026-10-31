@@ -301,7 +301,9 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 .finSep i{flex:1;height:2px;background:linear-gradient(90deg,transparent,#f2c23a,transparent)}
 .finSep img{width:22px}
 .finSac{display:block;width:62%;margin:2px auto 6px}
-.btn.finSuiv{margin:4px 0 6px;font-size:18px}
+.imgBtn.finSuiv{margin:4px 0 0}
+.finProchain{margin:2px 0 6px;font-size:13px;opacity:.85}
+.formBtns.imgDuo{gap:6px;align-items:center}
 .btn.finSuiv small{display:block;font-size:12px;font-weight:700;opacity:.8}
 .finFin{width:100%}
 .bravo{text-align:center;line-height:1.5;font-size:16px;margin:4px 0 16px}
@@ -417,6 +419,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:27,d:"31/10/2026",t:["Nouveaux boutons illustrés « Terminé », « Suivant » et « Parc suivant » dans les fenêtres d'accouplement et de stérilisation."]},
   {v:26,d:"31/10/2026",t:["Nouvelle fenêtre « Parc terminé ! » illustrée (plaque de titre, œuf doré, pastille verte, sac d'or et bouton Terminé)."]},
   {v:25,d:"31/10/2026",t:["Accoupler : quand tous les types d'un parc ont été accouplés, un message de fin s'affiche avec un bouton « Parc suivant ➜ » pour enchaîner directement sur le parc suivant."]},
   {v:24,d:"31/10/2026",t:["Accouchements : bouton à droite du titre pour passer de l'affichage deux par ligne (▦) à une par ligne (☰), et inversement. Le choix est retenu."]},
@@ -844,8 +847,8 @@ function accWizard(faits=[],dernier=null){
         <div class="finSep"><i></i><img src="plume.webp" alt=""><i></i></div>
         <p class="finTxt">Tu as sûrement les pieds qui collent, mais passe au suivant : l'argent ne tombe pas du ciel !</p>
         <img class="finSac" src="sac_or.webp" alt="">
-        ${suiv?`<button class="btn finSuiv" id="w_suiv">Parc suivant ➜ <small>${esc(suiv.guilde)}</small></button>`:""}
-        <button class="imgBtn finFin" id="w_end" aria-label="Terminé"><img src="btn_termine.webp" alt="✔ Terminé"></button>
+        ${suiv?`<button class="imgBtn finSuiv" id="w_suiv" aria-label="Parc suivant"><img src="btn_parc_suivant.webp" alt="Parc suivant »"></button><p class="finProchain">Prochain parc : <b>${esc(suiv.guilde)}</b></p>`:""}
+        <button class="imgBtn finFin" id="w_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button>
       </div></div>`;
       document.getElementById("w_end").onclick=()=>root.innerHTML="";
       if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
@@ -853,7 +856,7 @@ function accWizard(faits=[],dernier=null){
     }
     root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>
       <p>Aucun type ne peut être accouplé : il faut au moins un <b>mâle</b> et une <b>femelle</b> reproducteurs et disponibles du même type.</p>
-      <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Compris</button>${suiv?`<button class="btn" id="w_suiv" style="white-space:nowrap">Suivant ➜</button>`:""}</div></div></div>`;
+      <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Compris</button>${suiv?`<button class="imgBtn" id="w_suiv" aria-label="Parc suivant"><img src="btn_parc_suivant.webp" alt="Parc suivant »"></button>`:""}</div></div></div>`;
     document.getElementById("w_end").onclick=()=>root.innerHTML="";
     if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
     return;
@@ -861,7 +864,7 @@ function accWizard(faits=[],dernier=null){
   if(dernier){
     root.innerHTML=`<div class="modal"><div class="box"><h3>💞 Accouplement – ${esc(p.guilde)}</h3>${fin}
       <p class="muted" style="text-align:center">Encore ${pl(reste.length,"# type disponible","# types disponibles")} : ${reste.map(t=>esc(t.type)).join(", ")}</p>
-      <div class="formBtns"><button class="btn ghost" id="w_end">Terminé</button><button class="btn" id="w_next">Suivant ➜</button></div></div></div>`;
+      <div class="formBtns imgDuo"><button class="imgBtn" id="w_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button><button class="imgBtn" id="w_next" aria-label="Suivant"><img src="btn_suivant.webp" alt="Suivant »"></button></div></div></div>`;
     document.getElementById("w_end").onclick=()=>root.innerHTML="";
     document.getElementById("w_next").onclick=()=>formType(reste[0].type);
     return;
@@ -1032,12 +1035,12 @@ function sterWizard(parcId,dernier=null){
   const types=Object.keys(T).sort((a,b)=>a.localeCompare(b,"fr"));
   const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# dragodinde classée stérile","# dragodindes classées stériles")} (${esc(dernier.type)}).</p>`:"";
   if(!types.length){
-    root.innerHTML=`<div class="modal"><div class="box"><h3>✂️ Stérilisation – ${esc(p.guilde)}</h3>${fin}<p>${dernier?"Le parc est maintenant vide.":"Ce parc ne contient aucune dragodinde."}</p><button class="btn" id="s_end">${dernier?"Terminé":"Compris"}</button></div></div>`;
+    root.innerHTML=`<div class="modal"><div class="box"><h3>✂️ Stérilisation – ${esc(p.guilde)}</h3>${fin}<p>${dernier?"Le parc est maintenant vide.":"Ce parc ne contient aucune dragodinde."}</p>${dernier?`<button class="imgBtn" id="s_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button>`:`<button class="btn" id="s_end">Compris</button>`}</div></div>`;
     document.getElementById("s_end").onclick=()=>{root.innerHTML="";renderSteril();}; return;
   }
   if(dernier){
     root.innerHTML=`<div class="modal"><div class="box"><h3>✂️ Stérilisation – ${esc(p.guilde)}</h3>${fin}
-      <div class="formBtns"><button class="btn ghost" id="s_end">Terminé</button><button class="btn" id="s_next">Suivant ➜</button></div></div></div>`;
+      <div class="formBtns imgDuo"><button class="imgBtn" id="s_end" aria-label="Terminé"><img src="btn_termine.webp?v=27" alt="✔ Terminé"></button><button class="imgBtn" id="s_next" aria-label="Suivant"><img src="btn_suivant.webp" alt="Suivant »"></button></div></div></div>`;
     document.getElementById("s_end").onclick=()=>{root.innerHTML="";renderSteril();};
     document.getElementById("s_next").onclick=()=>form(types[0]); return;
   }
