@@ -555,13 +555,30 @@ button.combo::after{color:var(--mut)!important}
 .pair .when{color:var(--mut)}
 .maj h3{color:var(--ink)!important}
 #sortInfo{background:var(--card)!important;border:1px solid var(--line)!important;color:var(--mut)}
+
+/* ===== Mode sombre ===== */
+#themeBtn{position:fixed!important;top:calc(16px + env(safe-area-inset-top));left:66px;height:38px;padding:0 12px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
+html.dark{--bg:#141716;--card:#1e2220;--line:#2f3532;--ink:#e9ece9;--mut:#9aa19c;--acc:#4f9a74;--acc2:#1f3a2c;--dan:#e0675b;--m:#7aa3ff;--f:#f07bb5;color-scheme:dark}
+html.dark .tag.m,html.dark .pil.m,html.dark .stSexe.m{background:#1f2c48!important}
+html.dark .tag.f,html.dark .pil.f,html.dark .stSexe.f{background:#43203a!important}
+html.dark .tag.non{background:#2a2f2c!important}
+html.dark .tag.mix{background:#3e3218!important;color:#e8b860!important}
+html.dark .btn.danger,html.dark .stB.rouge,html.dark #delParc{background:var(--card)!important;border-color:#5a2c27!important}
+html.dark .modal{background:rgba(0,0,0,.55)!important}
+html.dark .modal .warn{background:#3a1f1c!important}
+html.dark .barre{background:#2a2f2c!important}
+html.dark .stCase{background:var(--card)!important}
+html.dark .f input,html.dark .f select{color-scheme:dark}
 </style>
+<script>try{if(JSON.parse(localStorage.getItem("drago_sombre")))document.documentElement.classList.add("dark")}catch(e){}</script>
 </head>
 <body>
 
 <!-- ============ ACCUEIL ============ -->
 <section id="home" class="page">
   <button id="refresh" class="shine" aria-label="Rafraîchir l'application" title="Chercher la dernière mise à jour">⟳</button>
+  <button id="themeBtn" aria-label="Mode sombre"></button>
   <button id="newsBtn" class="shine" data-go="news" aria-label="Mises à jour">Mises à jour<i id="newsDot" hidden></i></button>
   <button class="tile shine" data-go="parcs" aria-label="Gestion des parcs">
     <span class="tileT">Gestion des parcs</span><span class="tileS">Parcs, dragodindes, stériles</span>
@@ -666,6 +683,7 @@ button.combo::after{color:var(--mut)!important}
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:36,d:"31/10/2026",t:["Mode sombre : bouton ☾ en haut de l'accueil (☀ pour revenir au mode clair). Il s'applique à toute l'appli et ton choix est retenu."]},
   {v:35,d:"31/10/2026",t:["Le bouton « Stérilisation » est retiré. La stérilisation se fait maintenant dans la fiche d'un type (en touchant le tableau d'un parc) avec les compteurs « Stériles ♂ » et « Stériles ♀ » : augmenter retire des dragodindes du parc, diminuer les y remet."]},
   {v:34,d:"31/10/2026",t:["Nouveau look entièrement épuré : fond clair, cartes blanches, boutons texte simples, plus d'illustrations ni d'effets."]},
   {v:33,d:"31/10/2026",t:["Toucher le tableau d'un parc l'ouvre en plein écran et en mode paysage, pour lire chaque ligne en entier sans faire défiler."]},
@@ -1616,6 +1634,13 @@ function scintiller(){
   });
 }
 // (étincelles désactivées : thème épuré)
+
+// Mode clair / sombre (choix retenu)
+function appliquerTheme(){const d=Store.get("sombre",false);document.documentElement.classList.toggle("dark",d);
+  document.getElementById("themeBtn").textContent=d?"☀":"☾";document.getElementById("themeBtn").title=d?"Mode clair":"Mode sombre";
+  document.querySelector('meta[name="theme-color"]').content=d?"#141716":"#f5f4f0";}
+document.getElementById("themeBtn").onclick=()=>{Store.set("sombre",!Store.get("sombre",false));appliquerTheme();};
+appliquerTheme();
 
 show(); // affichage de la page de départ, une fois tout le reste prêt
 </script>
