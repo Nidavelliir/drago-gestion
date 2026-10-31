@@ -190,6 +190,11 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 <!-- ============ DÉTAIL D'UN PARC ============ -->
 <section id="parc" class="page">
   <div class="top"><button class="back" data-go="parcs" aria-label="Retour">←</button><h2 id="parcTitle">Parc</h2></div>
+  <div class="tools" style="margin:0 0 14px">
+    <button class="btn" id="addDrago">＋ Ajouter</button>
+    <button class="btn ghost" id="sortBtn">⇅ Trier</button>
+  </div>
+  <div id="sortInfo" style="margin:-4px 0 10px;display:inline-block;align-self:flex-start;background:rgba(22,30,14,.88);border:1px solid rgba(255,194,58,.5);border-radius:10px;padding:5px 10px;font-size:14px"></div>
   <div id="parcBody"></div>
   <div class="tools">
     <button class="btn ghost" id="resetParc">♻️ Réinitialiser le parc</button>
@@ -235,6 +240,7 @@ h4.sec{color:var(--gold);margin:22px 0 10px;font-size:18px;text-shadow:0 0 8px #
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:11,d:"31/10/2026",t:["Dans un parc : bouton « ＋ Ajouter » en haut pour ajouter des dragodindes à un parc déjà créé (avec confirmation).","Bouton « ⇅ Trier » : tri par nom, type, sexe, reproductrice, caméléone, objet à la vente, gestation ou ordre d'ajout, en croissant ou décroissant. Le n° de chaque dragodinde ne change pas."]},
   {v:10,d:"31/10/2026",t:["Nouveau visuel pour le bouton « Accoupler » dans la page d'un parc."]},
   {v:9,d:"31/10/2026",t:["Accouplements : choix d'un parc, puis bouton « Accoupler » qui propose les mâles et femelles reproducteurs du parc.","Chaque accouplement en cours affiche la date de naissance prévue (d'après le temps de gestation de la femelle) et un compte à rebours.","Un accouplement peut être modifié (✏️) ou annulé (🗑) ; réinitialisation possible par parc ou pour tous, toujours avec confirmation."]},
   {v:8,d:"31/10/2026",t:["Chaque dragodinde d'un parc peut être modifiée (✏️) ou supprimée (🗑) ligne par ligne.","Nouveaux boutons : réinitialiser un parc, supprimer un parc, réinitialiser tous les parcs.","Chaque modification, réinitialisation ou suppression demande une confirmation avec le récapitulatif de ce qui va se passer."]},
@@ -298,14 +304,25 @@ function renderParcs(){
   el.innerHTML=L.length?L.map(p=>`<button class="btn parcBtn" data-go="parc-${p.id}">${esc(p.guilde)}<small>${p.dragos.length} dragodinde${p.dragos.length>1?"s":""}</small></button>`).join("")
     :(form.hidden?`<div class="card empty muted">Aucun parc pour l'instant.</div>`:"");
 }
+// ---- Tri (affichage seulement : le n° de chaque dragodinde ne change pas) ----
+const TRIS=[["","Ordre d'ajout"],["nom","Nom"],["type","Type"],["sexe","Sexe"],["repro","Reproductrice"],["cam","Caméléone"],["objet","Objet à la vente"],["gest","Temps de gestation"]];
+const getTri=()=>Store.get("tri",{k:"",dir:1});
+function trier(L){
+  const {k,dir}=getTri(), A=L.map((d,i)=>({d,i}));
+  if(!k) return dir<0?A.reverse():A;
+  const cle=d=>k==="gest"?(gestHeures(d.gest)??Infinity):k==="sexe"?(d.sexe==="M"?"Mâle":"Femelle"):k==="repro"||k==="cam"?(d[k]==="oui"?0:1):String(d[k]||"").toLowerCase();
+  return A.sort((a,b)=>{const x=cle(a.d),y=cle(b.d);return (x<y?-1:x>y?1:a.i-b.i)*dir;});
+}
 function renderParc(id){
   const p=getParcs().find(x=>x.id===id); if(!p) return false;
+  const t=getTri(), nomTri=TRIS.find(x=>x[0]===t.k)?.[1];
+  const si=document.getElementById("sortInfo"); si.hidden=!(t.k||t.dir<0); si.textContent=(t.k||t.dir<0)?`Trié par : ${nomTri} (${t.k==="repro"||t.k==="cam"?(t.dir>0?"Oui d'abord":"Non d'abord"):t.dir>0?"croissant":"décroissant"})`:"";
   curParc=id;
   document.getElementById("parcTitle").textContent=p.guilde;
   const oui=v=>`<span class="tag ${v}">${v==="oui"?"Oui":"Non"}</span>`;
   document.getElementById("parcBody").innerHTML=`<div class="tableWrap"><table class="dragos">
     <thead><tr><th>#</th><th>Actions</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
-    <tbody>${p.dragos.map((d,i)=>`<tr><td>${i+1}</td>
+    <tbody>${trier(p.dragos).map(({d,i})=>`<tr><td>${i+1}</td>
       <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier">✏️</button><button class="ico del" data-del="${i}" aria-label="Supprimer">🗑</button></div></td>
       <td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
       <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td>
@@ -388,6 +405,52 @@ async function delDrago(i){
     p.dragos.splice(i,1); saveParc(p); setAccs(getAccs().filter(a=>a.maleId!==d.id&&a.femId!==d.id)); renderParc(p.id);
   }
 }
+// ---- Ajouter des dragodindes à un parc existant ----
+const labT=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
+const radio2=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name="${n}" value="${a}" required> ${la}</label><label><input type="radio" name="${n}" value="${b}"> ${lb}</label></div>`;
+document.getElementById("addDrago").onclick=()=>{
+  const p=parcCourant(), root=document.getElementById("modalRoot");
+  root.innerHTML=`<div class="modal"><div class="box"><h3>＋ Ajouter au parc ${esc(p.guilde)}</h3><form id="addForm" autocomplete="off">
+    <div class="f">${labT("Nom de la dragodinde")}<input type="text" id="n_nom" required></div>
+    <div class="f">${labT("Type de la dragodinde")}<input type="text" id="n_type" required></div>
+    <div class="f">${labT("Sexe")}${radio2("n_sexe","M","F","Mâle","Femelle")}</div>
+    <div class="f">${labT("Reproductrice")}${radio2("n_repro","oui","non","Oui","Non")}</div>
+    <div class="f">${labT("Caméléone")}${radio2("n_cam","oui","non","Oui","Non")}</div>
+    <div class="f">${labT("Nombre de dragodindes à ajouter")}<input type="number" id="n_nb" min="1" max="200" value="1" inputmode="numeric" required></div>
+    <div class="f">${labT("Objet obtenu à la vente")}<input type="text" id="n_objet"></div>
+    <div class="f">${labT("Temps de gestation")}<input type="text" id="n_gest" placeholder="ex. 48 h"></div>
+    <div class="formBtns"><button type="button" class="btn ghost" id="n_cancel">Annuler</button><button type="submit" class="btn">Ajouter</button></div>
+  </form></div></div>`;
+  document.getElementById("n_cancel").onclick=()=>root.innerHTML="";
+  document.getElementById("addForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.target, v=id=>f.querySelector("#"+id).value.trim(), r=n=>f.querySelector(`[name=${n}]:checked`).value;
+    const d={nom:v("n_nom"),type:v("n_type"),sexe:r("n_sexe"),repro:r("n_repro"),cam:r("n_cam"),objet:v("n_objet"),gest:v("n_gest")};
+    const nb=Math.max(1,Math.min(200,parseInt(v("n_nb"))||1)), saisie=root.innerHTML;
+    const ok=await confirmBox({titre:"Confirmer l'ajout",ok:"Ajouter",lignes:[
+      `${pl(nb,"# dragodinde sera ajoutée","# dragodindes seront ajoutées")} au parc <b>${esc(p.guilde)}</b> :`,
+      `<b>${esc(d.nom)}</b> · ${esc(d.type)} · ${lib.sexe(d.sexe)} · Reproductrice : ${lib.repro(d.repro)} · Caméléone : ${lib.cam(d.cam)}`,
+      `Objet à la vente : ${esc(d.objet)||"—"} · Gestation : ${esc(d.gest)||"—"}`,
+      `Le parc passera de ${p.dragos.length} à ${pl(p.dragos.length+nb,"# dragodinde","# dragodindes")}.`]});
+    if(ok){const q=parcCourant();for(let i=0;i<nb;i++)q.dragos.push({...d,id:uid()});saveParc(q);renderParc(q.id);}
+    else document.getElementById("addDrago").click();
+  };
+};
+// ---- Trier ----
+document.getElementById("sortBtn").onclick=()=>{
+  const t=getTri(), root=document.getElementById("modalRoot");
+  root.innerHTML=`<div class="modal"><div class="box"><h3>⇅ Trier les dragodindes</h3><form id="sortForm">
+    <div class="f">${labT("Trier par")}<div class="col" style="display:flex;flex-direction:column;gap:6px">${TRIS.map(([k,l])=>`<label class="opt"><input type="radio" name="tk" value="${k}" ${t.k===k?"checked":""}><b>${l}</b></label>`).join("")}</div></div>
+    <div class="f">${labT("Ordre")}<div class="choice"><label><input type="radio" name="td" value="1" ${t.dir>0?"checked":""}> Croissant</label><label><input type="radio" name="td" value="-1" ${t.dir<0?"checked":""}> Décroissant</label></div></div>
+    <div class="formBtns"><button type="button" class="btn ghost" id="t_cancel">Annuler</button><button type="submit" class="btn">Appliquer</button></div>
+  </form></div></div>`;
+  document.getElementById("t_cancel").onclick=()=>root.innerHTML="";
+  document.getElementById("sortForm").onsubmit=e=>{
+    e.preventDefault();
+    Store.set("tri",{k:e.target.querySelector("[name=tk]:checked").value,dir:+e.target.querySelector("[name=td]:checked").value});
+    root.innerHTML=""; renderParc(curParc);
+  };
+};
 document.getElementById("parcBody").addEventListener("click",e=>{
   const ed=e.target.closest("[data-edit]"), de=e.target.closest("[data-del]");
   if(ed)editDrago(+ed.dataset.edit); if(de)delDrago(+de.dataset.del);
