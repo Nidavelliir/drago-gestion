@@ -99,6 +99,22 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 .tag{display:inline-block;padding:2px 8px;border-radius:8px;font-weight:700;font-size:12px}
 .tag.m{background:#2f6fd6;color:#fff}.tag.f{background:#e0479e;color:#fff}
 .tag.oui{background:#3d9a4a;color:#fff}.tag.non{background:rgba(255,255,255,.15)}
+.act{display:flex;gap:6px}
+.ico{width:36px;height:36px;border-radius:10px;border:2px solid rgba(255,194,58,.6);background:rgba(255,255,255,.08);
+  font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.ico:active{transform:scale(.9)}
+.ico.del{border-color:rgba(226,59,46,.7)}
+.btn.danger{background:linear-gradient(#ff6b5e,#c4271c);color:#fff;border-color:#5a0d07}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.tools .btn{font-size:15px;padding:12px 10px}
+/* fenêtres (modales) */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .box{width:100%;max-width:480px;max-height:90dvh;overflow:auto;background:#1c2412;border:3px solid var(--gold);border-radius:20px;padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.modal h3{margin:0 0 10px;color:var(--gold);font-size:20px}
+.modal ul{margin:6px 0 12px;padding-left:20px;line-height:1.5}
+.modal .warn{background:rgba(226,59,46,.18);border:1px solid rgba(226,59,46,.6);border-radius:10px;padding:8px 10px;font-size:14px}
+.modal .box form{display:flex;flex-direction:column;gap:12px}
 </style>
 </head>
 <body>
@@ -142,12 +158,17 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
   </form>
 
   <div class="parcList" id="parcList"></div>
+  <button class="btn ghost" id="resetAll" style="margin-top:22px" hidden>♻️ Réinitialiser tous les parcs</button>
 </section>
 
 <!-- ============ DÉTAIL D'UN PARC ============ -->
 <section id="parc" class="page">
   <div class="top"><button class="back" data-go="parcs" aria-label="Retour">←</button><h2 id="parcTitle">Parc</h2></div>
   <div id="parcBody"></div>
+  <div class="tools">
+    <button class="btn ghost" id="resetParc">♻️ Réinitialiser le parc</button>
+    <button class="btn danger" id="delParc">🗑 Supprimer le parc</button>
+  </div>
 </section>
 
 <!-- ============ ACCOUPLEMENTS ============ -->
@@ -174,9 +195,12 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
   <div id="newsList"></div>
 </section>
 
+<div id="modalRoot"></div>
+
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:8,d:"31/10/2026",t:["Chaque dragodinde d'un parc peut être modifiée (✏️) ou supprimée (🗑) ligne par ligne.","Nouveaux boutons : réinitialiser un parc, supprimer un parc, réinitialiser tous les parcs.","Chaque modification, réinitialisation ou suppression demande une confirmation avec le récapitulatif de ce qui va se passer."]},
   {v:7,d:"31/10/2026",t:["Gestion des parcs : bouton « Créer un parc » avec le formulaire (guilde, dragodinde, type, sexe, reproductrice, caméléone, nombre, objet à la vente, gestation).","Chaque parc apparaît avec le nom de sa guilde ; en l'ouvrant, on voit ses dragodindes, une par ligne.","Même arrière-plan sur toutes les pages."]},
   {v:6,d:"31/10/2026",t:["Nouvel arrière-plan illustré (le parc et l'écurie) sur toute l'appli."]},
   {v:5,d:"31/10/2026",t:["Nouvelle version, plus nette, du bouton Gestion des parcs."]},
@@ -219,20 +243,26 @@ addEventListener("hashchange",show);
 const esc=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const getParcs=()=>Store.get("parcs",[]);
 const form=document.getElementById("parcForm");
+let curParc=null;
 function renderParcs(){
   const L=getParcs(), el=document.getElementById("parcList");
+  document.getElementById("resetAll").hidden=!L.length;
   el.innerHTML=L.length?L.map(p=>`<button class="btn parcBtn" data-go="parc-${p.id}">${esc(p.guilde)}<small>${p.dragos.length} dragodinde${p.dragos.length>1?"s":""}</small></button>`).join("")
     :(form.hidden?`<div class="card empty muted">Aucun parc pour l'instant.</div>`:"");
 }
 function renderParc(id){
   const p=getParcs().find(x=>x.id===id); if(!p) return false;
+  curParc=id;
   document.getElementById("parcTitle").textContent=p.guilde;
   const oui=v=>`<span class="tag ${v}">${v==="oui"?"Oui":"Non"}</span>`;
   document.getElementById("parcBody").innerHTML=`<div class="tableWrap"><table class="dragos">
-    <thead><tr><th>#</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
-    <tbody>${p.dragos.map((d,i)=>`<tr><td>${i+1}</td><td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
+    <thead><tr><th>#</th><th>Actions</th><th>Nom</th><th>Type</th><th>Sexe</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
+    <tbody>${p.dragos.map((d,i)=>`<tr><td>${i+1}</td>
+      <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier">✏️</button><button class="ico del" data-del="${i}" aria-label="Supprimer">🗑</button></div></td>
+      <td><b>${esc(d.nom)}</b></td><td>${esc(d.type)}</td>
       <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td>
-      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table></div>`;
+      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join("")}</tbody></table></div>`
+    +(p.dragos.length?"":`<div class="card empty muted">Ce parc est vide.</div>`);
   return true;
 }
 document.getElementById("newParcBtn").onclick=()=>{form.reset();form.hidden=false;document.getElementById("newParcBtn").hidden=true;renderParcs();document.getElementById("fGuilde").focus();};
@@ -250,6 +280,95 @@ form.addEventListener("submit",e=>{
   for(let i=0;i<nb;i++)p.dragos.push({...d});
   Store.set("parcs",L); closeForm();
 });
+
+// ================= FENÊTRE DE CONFIRMATION =================
+// Règle de l'appli : toute modification, réinitialisation ou suppression passe par
+// cette fenêtre, avec un récapitulatif de ce qui va se passer.
+function confirmBox({titre,lignes=[],avert="",ok="Valider",danger=false}){
+  return new Promise(res=>{
+    const root=document.getElementById("modalRoot");
+    root.innerHTML=`<div class="modal"><div class="box"><h3>${titre}</h3>
+      <p style="margin:0">En validant :</p><ul>${lignes.map(l=>`<li>${l}</li>`).join("")}</ul>
+      ${avert?`<p class="warn">${avert}</p>`:""}
+      <div class="formBtns"><button class="btn ghost" data-r="0">Annuler</button><button class="btn ${danger?"danger":""}" data-r="1">${ok}</button></div></div></div>`;
+    root.querySelector(".modal").onclick=e=>{const b=e.target.closest("[data-r]");if(b||e.target.classList.contains("modal")){root.innerHTML="";res(b?.dataset.r==="1");}};
+  });
+}
+const lib={sexe:v=>v==="M"?"Mâle":"Femelle",repro:v=>v==="oui"?"Oui":"Non",cam:v=>v==="oui"?"Oui":"Non"};
+const CHAMPS=[["nom","Nom"],["type","Type"],["sexe","Sexe"],["repro","Reproductrice"],["cam","Caméléone"],["objet","Objet à la vente"],["gest","Gestation"]];
+const pl=(n,un,plusieurs)=>n>1?plusieurs.replace("#",n):un.replace("#",n);
+const val=(k,v)=>lib[k]?lib[k](v):(v||"—");
+function saveParc(p){const L=getParcs();const i=L.findIndex(x=>x.id===p.id);if(i>=0)L[i]=p;Store.set("parcs",L);}
+const parcCourant=()=>getParcs().find(x=>x.id===curParc);
+
+// Modifier une dragodinde (une ligne)
+function editDrago(i){
+  const p=parcCourant(), d=p.dragos[i], root=document.getElementById("modalRoot");
+  const radio=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name="e_${n}" value="${a}" ${d[n]===a?"checked":""}> ${la}</label><label><input type="radio" name="e_${n}" value="${b}" ${d[n]===b?"checked":""}> ${lb}</label></div>`;
+  const lab=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
+  root.innerHTML=`<div class="modal"><div class="box"><h3>✏️ Modifier la ligne ${i+1}</h3><form id="editForm" class="f" autocomplete="off">
+    <div class="f">${lab("Nom de la dragodinde")}<input type="text" id="e_nom" value="${esc(d.nom)}" required></div>
+    <div class="f">${lab("Type de la dragodinde")}<input type="text" id="e_type" value="${esc(d.type)}" required></div>
+    <div class="f">${lab("Sexe")}${radio("sexe","M","F","Mâle","Femelle")}</div>
+    <div class="f">${lab("Reproductrice")}${radio("repro","oui","non","Oui","Non")}</div>
+    <div class="f">${lab("Caméléone")}${radio("cam","oui","non","Oui","Non")}</div>
+    <div class="f">${lab("Objet obtenu à la vente")}<input type="text" id="e_objet" value="${esc(d.objet)}"></div>
+    <div class="f">${lab("Temps de gestation")}<input type="text" id="e_gest" value="${esc(d.gest)}"></div>
+    <div class="formBtns"><button type="button" class="btn ghost" id="e_cancel">Annuler</button><button type="submit" class="btn">Enregistrer</button></div>
+  </form></div></div>`;
+  document.getElementById("e_cancel").onclick=()=>root.innerHTML="";
+  document.getElementById("editForm").onsubmit=async e=>{
+    e.preventDefault();
+    const f=e.target, n={...d,nom:f.querySelector("#e_nom").value.trim(),type:f.querySelector("#e_type").value.trim(),
+      sexe:f.querySelector("[name=e_sexe]:checked").value,repro:f.querySelector("[name=e_repro]:checked").value,cam:f.querySelector("[name=e_cam]:checked").value,
+      objet:f.querySelector("#e_objet").value.trim(),gest:f.querySelector("#e_gest").value.trim()};
+    const diffs=CHAMPS.filter(([k])=>(d[k]||"")!==(n[k]||"")).map(([k,l])=>`<b>${l}</b> : ${esc(val(k,d[k]))} → ${esc(val(k,n[k]))}`);
+    if(!diffs.length){root.innerHTML="";return;}
+    if(await confirmBox({titre:"Confirmer la modification",lignes:[`La ligne ${i+1} (${esc(d.nom)}) du parc <b>${esc(p.guilde)}</b> sera modifiée :`,...diffs],ok:"Enregistrer"})){
+      p.dragos[i]=n; saveParc(p); renderParc(p.id);
+    }
+  };
+}
+// Supprimer une dragodinde (une ligne)
+async function delDrago(i){
+  const p=parcCourant(), d=p.dragos[i];
+  if(await confirmBox({titre:"Supprimer cette dragodinde ?",danger:true,ok:"Supprimer",
+    lignes:[`La ligne ${i+1} sera retirée du parc <b>${esc(p.guilde)}</b> : ${esc(d.nom)} (${esc(d.type)}, ${lib.sexe(d.sexe)}).`,`Le parc passera de ${p.dragos.length} à ${pl(p.dragos.length-1,"# dragodinde","# dragodindes")}.`],
+    avert:"Cette action est définitive."})){
+    p.dragos.splice(i,1); saveParc(p); renderParc(p.id);
+  }
+}
+document.getElementById("parcBody").addEventListener("click",e=>{
+  const ed=e.target.closest("[data-edit]"), de=e.target.closest("[data-del]");
+  if(ed)editDrago(+ed.dataset.edit); if(de)delDrago(+de.dataset.del);
+});
+// Réinitialiser un parc (le vider)
+document.getElementById("resetParc").onclick=async()=>{
+  const p=parcCourant();
+  if(await confirmBox({titre:"Réinitialiser ce parc ?",danger:true,ok:"Réinitialiser",
+    lignes:[`${pl(p.dragos.length,"La dragodinde","Les # dragodindes")} du parc <b>${esc(p.guilde)}</b> ${pl(p.dragos.length,"sera retirée","seront retirées")}.`,"Le parc restera dans la liste, vide, prêt à être rempli de nouveau."],
+    avert:"Cette action est définitive."})){
+    p.dragos=[]; saveParc(p); renderParc(p.id);
+  }
+};
+// Supprimer un parc
+document.getElementById("delParc").onclick=async()=>{
+  const p=parcCourant();
+  if(await confirmBox({titre:"Supprimer ce parc ?",danger:true,ok:"Supprimer",
+    lignes:[`Le parc <b>${esc(p.guilde)}</b> disparaîtra de la Gestion des parcs.`,p.dragos.length?`${pl(p.dragos.length,"Sa dragodinde sera supprimée","Ses # dragodindes seront supprimées")} avec lui.`:"Il est déjà vide."],
+    avert:"Cette action est définitive."})){
+    Store.set("parcs",getParcs().filter(x=>x.id!==p.id)); depth=Math.max(0,depth-1); location.replace("#parcs");
+  }
+};
+// Tout réinitialiser
+document.getElementById("resetAll").onclick=async()=>{
+  const L=getParcs(), n=L.reduce((a,p)=>a+p.dragos.length,0);
+  if(await confirmBox({titre:"Réinitialiser tous les parcs ?",danger:true,ok:"Tout réinitialiser",
+    lignes:[`${pl(L.length,"Le parc sera supprimé","Les # parcs seront supprimés")} : ${L.map(p=>"<b>"+esc(p.guilde)+"</b>").join(", ")}.`,`Au total, ${pl(n,"# dragodinde sera effacée","# dragodindes seront effacées")}.`,"La Gestion des parcs repartira de zéro."],
+    avert:"Cette action est définitive."})){
+    Store.set("parcs",[]); renderParcs();
+  }
+};
 
 // Onglet Mises à jour : liste + pastille rouge s'il y a du nouveau depuis la dernière visite
 document.getElementById("newsList").innerHTML=MAJ.map(m=>
