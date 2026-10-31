@@ -283,6 +283,27 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 .stepper input{text-align:center;font-size:20px;font-weight:800}
 .dispo{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
 .done{text-align:center;font-size:18px;margin:6px 0 14px}
+.modal .box.finBox{position:relative;text-align:center;padding:14px 16px 12px;border-radius:26px;border:4px solid #f2c23a;
+  background:radial-gradient(ellipse at 50% 35%,#1e5a26 0%,#0f3416 65%,#0a2510 100%);
+  box-shadow:inset 0 0 0 3px #7a4a0c,inset 0 0 0 6px rgba(255,210,90,.45),inset 0 0 30px rgba(255,200,80,.18),0 0 24px rgba(255,200,60,.35),0 12px 40px rgba(0,0,0,.6)}
+.finTitre{margin:-4px auto 0;width:92%}
+.finTitre span{font-size:clamp(17px,5.6vw,26px)}
+.finOeuf{display:block;width:44%;margin:-4px auto -6px}
+.finPill{display:flex;align-items:center;gap:10px;text-align:center;justify-content:center;margin:6px 0 10px;padding:8px 12px;border-radius:999px;
+  border:3px solid #f2c23a;background:linear-gradient(#3fae3a,#14661c);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 0 10px rgba(120,230,80,.35)}
+.finPill span:last-child{font-weight:900;font-style:italic;font-size:clamp(13px,4vw,17px);color:#fff;text-shadow:0 2px 0 #0a3a0e;line-height:1.2}
+.finPill em{color:#ffe14a}
+.finCoche{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;
+  background:radial-gradient(circle at 40% 35%,#6be05a,#1f8a2c);border:3px solid #f2c23a;text-shadow:0 1px 0 #0a3a0e}
+.finTxt{margin:4px 0;font-weight:700;font-size:clamp(14px,4.2vw,17px);line-height:1.35;color:#fff3e0;text-shadow:0 2px 0 rgba(0,0,0,.5)}
+.finTxt b{color:#ffd23a}
+.finSep{display:flex;align-items:center;gap:8px;margin:6px 8%}
+.finSep i{flex:1;height:2px;background:linear-gradient(90deg,transparent,#f2c23a,transparent)}
+.finSep img{width:22px}
+.finSac{display:block;width:62%;margin:2px auto 6px}
+.btn.finSuiv{margin:4px 0 6px;font-size:18px}
+.btn.finSuiv small{display:block;font-size:12px;font-weight:700;opacity:.8}
+.finFin{width:100%}
 .bravo{text-align:center;line-height:1.5;font-size:16px;margin:4px 0 16px}
 .f input[type=datetime-local],.f select{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.5);background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
 </style>
@@ -396,6 +417,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:26,d:"31/10/2026",t:["Nouvelle fenêtre « Parc terminé ! » illustrée (plaque de titre, œuf doré, pastille verte, sac d'or et bouton Terminé)."]},
   {v:25,d:"31/10/2026",t:["Accoupler : quand tous les types d'un parc ont été accouplés, un message de fin s'affiche avec un bouton « Parc suivant ➜ » pour enchaîner directement sur le parc suivant."]},
   {v:24,d:"31/10/2026",t:["Accouchements : bouton à droite du titre pour passer de l'affichage deux par ligne (▦) à une par ligne (☰), et inversement. Le choix est retenu."]},
   {v:23,d:"31/10/2026",t:["Boutons « Créer un parc » et « Stérilisation » bien alignés.","Accouchements : cartes de gestation plus compactes, deux par ligne.","Les effets de brillance sont retirés : à la place, de petites étoiles scintillent sur chaque bouton de l'appli (et sur ceux qui viendront)."]},
@@ -814,10 +836,17 @@ function accWizard(faits=[],dernier=null){
     const L=getParcs(), k=L.findIndex(x=>x.id===p.id), suiv=L.length>1?L[(k+1)%L.length]:null;
     const allerSuivant=()=>{root.innerHTML=""; location.replace("#acc-"+suiv.id);};
     if(dernier){
-      root.innerHTML=`<div class="modal"><div class="box"><h3>🎉 Parc terminé !</h3>${fin}
-        <p class="bravo">Toutes les dragodindes du parc <b>« ${esc(p.guilde)} »</b> ont été accouplées !<br>Tu as sûrement les pieds qui collent, mais passe au suivant : l'argent ne tombe pas du ciel ! 💰</p>
-        <div class="formBtns"${suiv?"":` style="grid-template-columns:1fr"`}><button class="btn ghost" id="w_end">Terminé</button>${suiv?`<button class="btn" id="w_suiv" style="white-space:nowrap">Suivant ➜</button>`:""}</div>
-        ${suiv?`<p class="muted" style="text-align:center;font-size:13px;margin:10px 0 0">Prochain parc : <b>${esc(suiv.guilde)}</b></p>`:""}</div></div>`;
+      root.innerHTML=`<div class="modal"><div class="box finBox">
+        <div class="titrePl finTitre"><img src="titre_plaque.webp" alt=""><span>🎉 Parc terminé !</span></div>
+        <img class="finOeuf" src="nid_oeuf.webp" alt="">
+        <div class="finPill"><span class="finCoche">✔</span><span>${pl(dernier.n,"# accouplement","# accouplements")} de type <em>${esc(dernier.type)}</em> ${pl(dernier.n,"enregistré","enregistrés")}.</span></div>
+        <p class="finTxt">Toutes les dragodindes du parc <b>« ${esc(p.guilde)} »</b> ont été accouplées !</p>
+        <div class="finSep"><i></i><img src="plume.webp" alt=""><i></i></div>
+        <p class="finTxt">Tu as sûrement les pieds qui collent, mais passe au suivant : l'argent ne tombe pas du ciel !</p>
+        <img class="finSac" src="sac_or.webp" alt="">
+        ${suiv?`<button class="btn finSuiv" id="w_suiv">Parc suivant ➜ <small>${esc(suiv.guilde)}</small></button>`:""}
+        <button class="imgBtn finFin" id="w_end" aria-label="Terminé"><img src="btn_termine.webp" alt="✔ Terminé"></button>
+      </div></div>`;
       document.getElementById("w_end").onclick=()=>root.innerHTML="";
       if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
       return;
