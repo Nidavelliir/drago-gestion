@@ -136,6 +136,8 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .cadre .tableWrap{cursor:zoom-in}
 /* vue agrandie */
 #grandRoot .grandVue{position:fixed;inset:0;z-index:45;background:rgba(5,15,6,.94);overflow:auto;padding:calc(10px + env(safe-area-inset-top)) 6px 20px;container-type:inline-size}
+#grandRoot .grandVue.pivot{inset:auto;top:0;left:100vw;width:100vh;height:100vw;transform-origin:top left;transform:rotate(90deg);
+  padding:10px calc(10px + env(safe-area-inset-top)) 16px}
 .grandTop{display:flex;align-items:center;justify-content:space-between;margin:0 6px 6px;color:#ffd96a;font-size:18px}
 .grandFermer{width:40px;height:40px;border-radius:12px;border:2px solid #e9b23a;background:linear-gradient(#e2473a,#8a1410);color:#fff;font-size:20px;font-weight:900;cursor:pointer}
 .cadre.grand .tableWrap{overflow:visible;cursor:default}
@@ -520,6 +522,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:33,d:"31/10/2026",t:["Toucher le tableau d'un parc l'ouvre en plein écran et en mode paysage, pour lire chaque ligne en entier sans faire défiler."]},
   {v:32,d:"31/10/2026",t:["Gestion des parcs : plus de liste numérotée. Toucher une ligne ouvre la fiche du type où tout se règle par des nombres (mâles, femelles, reproductrices, caméléones) et par nom, objet, gestation. Possibilité de retirer tout le type."]},
   {v:31,d:"31/10/2026",t:["Gestion des parcs : nouveau tableau, une ligne par type avec, dans l'ordre : type, mâles, femelles, reproductrices, caméléones, total, nom, état (accouplements en cours), stériles mâles, stériles femelles.","Touche le tableau (ou ⤢) pour l'agrandir en plein écran et tout voir d'un coup ; touche une ligne pour voir, modifier ou supprimer les dragodindes de ce type."]},
   {v:30,d:"31/10/2026",t:["Stérilisation : dans la fenêtre, les dragodindes sont rassemblées en deux lignes (mâles / femelles) avec un compteur − / ＋ pour choisir combien stériliser. « ▸ Choisir une par une » affiche toujours le détail.","Registre des stériles : regroupé par type et par sexe (×n), avec ▸ pour voir le détail."]},
@@ -650,13 +653,33 @@ function tableauParc(p,grand){
     <div class="tableWrap"><table class="dragos synth">
     <thead><tr>${(grand?["Type","♂","♀","Re-<br>pro","Ca-<br>mél.","Tot.","Nom","État","Stér.<br>♂","Stér.<br>♀"]:["Type","♂<br>Mâles","♀<br>Femelles","Repro-<br>ductrices","Camé-<br>léones","Total","Nom","État","Stériles<br>♂","Stériles<br>♀"]).map(h=>`<th>${h}</th>`).join("")}</tr></thead>
     <tbody>${rows}</tbody></table>${L.length?"":`<p class="muted" style="text-align:center;padding:20px 0">Ce parc est vide.</p>`}</div>
-    <p class="tAide">${grand?"Touche une ligne pour modifier ce type.":"Touche le tableau pour l'agrandir."}</p></div>`;
+    <p class="tAide">${grand?"Touche une ligne pour modifier ce type.":"Touche le tableau pour l'agrandir en paysage."}</p></div>`;
 }
 function ouvrirGrand(){
   const p=parcCourant(), o=document.getElementById("grandRoot");
   o.innerHTML=`<div class="grandVue"><div class="grandTop"><b>${esc(p.guilde)}</b><button class="grandFermer" id="grandFermer" aria-label="Fermer">✕</button></div>${tableauParc(p,true)}</div>`;
-  document.getElementById("grandFermer").onclick=()=>o.innerHTML="";
+  const vue=o.querySelector(".grandVue");
+  document.getElementById("grandFermer").onclick=fermerGrand;
+  if(!dejaPaysage){ // premier affichage : on bascule en paysage
+    dejaPaysage=true;
+    const pivoter=()=>{if(innerHeight>innerWidth)vue.classList.add("pivot");};
+    const fs=document.documentElement.requestFullscreen?.bind(document.documentElement);
+    (fs?fs({navigationUI:"hide"}):Promise.reject())
+      .then(()=>screen.orientation?.lock?screen.orientation.lock("landscape"):Promise.reject())
+      .catch(()=>pivoter());
+    setTimeout(pivoter,700); // si le téléphone est resté en portrait, on fait pivoter l'affichage
+  } else if(document.querySelector(".grandVue")&&grandPivot) vue.classList.add("pivot");
+  grandPivot=vue.classList.contains("pivot");
+  setTimeout(()=>{grandPivot=vue.classList.contains("pivot");},400);
 }
+let dejaPaysage=false, grandPivot=false;
+function fermerGrand(){
+  document.getElementById("grandRoot").innerHTML=""; dejaPaysage=false; grandPivot=false;
+  try{screen.orientation?.unlock?.();}catch(e){}
+  if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});
+}
+// si l'utilisateur tourne lui-même le téléphone, on retire la rotation forcée
+addEventListener("resize",()=>{const v=document.querySelector(".grandVue");if(v&&innerWidth>innerHeight){v.classList.remove("pivot");grandPivot=false;}});
 // Fiche d'un type : tout se règle par des nombres (pas de liste numérotée)
 function editType(g){
   const root=document.getElementById("modalRoot"), p=parcCourant(), D=g.items.map(x=>x.d);
@@ -721,7 +744,7 @@ function renderParc(id){
   const oui=v=>`<span class="tag ${v}">${v==="oui"?"✔ Oui":"✖ Non"}</span>`;
   const nM=p.dragos.filter(d=>d.sexe==="M").length;
   document.getElementById("parcBody").innerHTML=tableauParc(p,false);
-  if(document.querySelector("#grandRoot .grandVue"))ouvrirGrand()
+  if(document.querySelector("#grandRoot .grandVue")){grandPivot=document.querySelector(".grandVue").classList.contains("pivot");ouvrirGrand();}
   ;
   return true;
 }
