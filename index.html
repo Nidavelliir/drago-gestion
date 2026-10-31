@@ -129,6 +129,21 @@ table.dragos{border-collapse:collapse;width:100%;font-size:14px;white-space:nowr
 .modal .warn{background:rgba(226,59,46,.18);border:1px solid rgba(226,59,46,.6);border-radius:10px;padding:8px 10px;font-size:14px}
 .modal .box form{display:flex;flex-direction:column;gap:12px}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+/* en-tête : bouton retour + plaque de titre */
+.topImg{display:flex;align-items:center;gap:6px;margin:0 0 12px}
+.back.arrowBack{width:19%;max-width:84px;height:auto;flex:none;border:0;background:none;padding:0;border-radius:0}
+.arrowBack img{display:block;width:100%;height:auto;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}
+.titrePl{position:relative;flex:1;min-width:0}
+.titrePl img{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.titrePl span{position:absolute;left:13.5%;right:13.5%;top:36%;height:36%;display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;
+  font-size:clamp(18px,6.4vw,32px);font-weight:900;color:#ffe066;text-shadow:0 3px 0 #6a2e05,1px 1px 0 #4a1e03,-1px -1px 0 #4a1e03,1px -1px 0 #4a1e03,-1px 1px 0 #4a1e03,0 0 10px rgba(255,200,60,.6)}
+/* plaque de groupe (parc · nombre) */
+.grpPl{position:relative;margin:18px 0 10px}
+.grpPl img{display:block;width:100%;height:auto;filter:drop-shadow(0 5px 10px rgba(0,0,0,.45))}
+.grpPl span{position:absolute;left:27%;right:24%;top:26%;height:36%;display:flex;align-items:center;justify-content:center;text-align:center;gap:4px;white-space:nowrap;
+  font-size:clamp(11px,3.6vw,19px);font-weight:900;color:#ffeab8;line-height:1.35;overflow:visible;text-shadow:0 2px 0 #3a1a04,1px 1px 0 #2a1204,-1px -1px 0 #2a1204}
+.grpPl .gn{font-style:normal;min-width:0;overflow:hidden;text-overflow:ellipsis;padding-top:2px}
+.arrowBack:active,.hdrG:active{transform:scale(.95)}
 /* bandeau titre avec nom de guilde */
 .back.hdrG{position:relative;display:block;width:100%;height:auto;border:0;background:none;padding:0;border-radius:0;margin:0 0 12px;cursor:pointer}
 .hdrG img{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
@@ -287,7 +302,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCOUPLEMENTS ============ -->
 <section id="accouplements" class="page">
-  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Accouplements</h2></div>
+  <div class="topImg"><button class="back arrowBack" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Accouplements</span></div></div>
   <h4 class="sec">Choisis un parc</h4>
   <div class="parcList" id="accParcList" style="margin-top:0"></div>
   <button class="btn ghost" id="accResetAll" style="margin-top:22px" hidden>♻️ Réinitialiser tous les accouplements</button>
@@ -305,24 +320,24 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 
 <!-- ============ ACCOUCHEMENTS ============ -->
 <section id="accouchements" class="page">
-  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Accouchements</h2></div>
+  <div class="topImg"><button class="back arrowBack" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_accouchements.webp" alt="Accouchements"></div></div>
   <div id="gestList"></div>
   <button class="btn ghost" id="gestReset" style="margin-top:12px" hidden>♻️ Réinitialiser toutes les gestations</button>
 </section>
 
 <!-- ============ STÉRILISATION ============ -->
 <section id="steril" class="page">
-  <div class="top"><button class="back" data-go="parcs" aria-label="Retour">←</button><h2>Stérilisation</h2></div>
+  <div class="topImg"><button class="back arrowBack" data-go="parcs" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Stérilisation</span></div></div>
   <h4 class="sec" style="margin-top:0">Choisis un parc</h4>
   <div class="parcList" id="sterParcList" style="margin-top:0"></div>
-  <h4 class="sec">🗂 Registre des stériles</h4>
+  <h4 class="sec">Registre des stériles</h4>
   <div id="sterList"></div>
   <button class="btn ghost" id="sterReset" style="margin-top:12px" hidden>♻️ Vider le registre des stériles</button>
 </section>
 
 <!-- ============ MISES À JOUR ============ -->
 <section id="news" class="page">
-  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Mises à jour</h2></div>
+  <div class="topImg"><button class="back arrowBack" data-go="home" aria-label="Retour"><img src="btn_retour.webp" alt="←"></button><div class="titrePl"><img src="titre_plaque.webp" alt=""><span>Mises à jour</span></div></div>
   <div id="newsList"></div>
 </section>
 
@@ -332,6 +347,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:20,d:"31/10/2026",t:["Nouveau bouton retour (flèche dorée) et nouvelles plaques de titre en haut des pages Accouplements, Accouchements, Stérilisation et Mises à jour.","Nouvelle plaque (maison et œuf) pour le nom de chaque parc dans Accouchements et dans le registre des stériles."]},
   {v:19,d:"31/10/2026",t:["Nouveau logo de l'appli : le certificat de dragodinde dans son cadre doré."]},
   {v:18,d:"31/10/2026",t:["Nouveau bandeau avec le nom de la guilde (et la flèche de retour) en haut de la page d'un parc et de ses accouplements.","Cadres illustrés « mâles disponibles » et « femelles disponibles » dans la page d'accouplement d'un parc.","Nouvelles cartes de gestation dans Accouchements : minuteur avec l'œuf violet, œuf doré quand elle est prête, barre de progression dorée, dates Début / Fin.","Nouveaux boutons Modifier (crayon) et Supprimer (corbeille) partout dans l'appli."]},
   {v:17,d:"31/10/2026",t:["Accouchements : chaque gestation issue d'un accouplement s'affiche avec un grand minuteur (jours, heures, minutes, secondes), une barre de progression et « Prête à accoucher ! » à la fin.","Nouveau bouton « Stérilisation » à côté de « Créer un parc » : choix du parc, puis du type, puis des dragodindes à classer stériles. Elles sont retirées du parc.","Registre des stériles dans la page Stérilisation, avec possibilité de remettre une dragodinde dans son parc ↩️ ou de la supprimer.","Accoupler : les dragodindes déjà en gestation restent proposées, le nombre de couples possibles ne baisse plus après validation."]},
@@ -846,7 +862,7 @@ function renderGest(){
   L.forEach(p=>{
     const G=A.filter(a=>a.parcId===p.id).sort((a,b)=>fin(a)-fin(b)); if(!G.length)return;
     const byId=Object.fromEntries(p.dragos.map((d,i)=>[d.id,{...d,n:i+1}]));
-    html+=`<h4 class="grpParc">🏡 ${esc(p.guilde)} · ${pl(G.length,"# gestation","# gestations")}</h4>`;
+    html+=`<div class="grpPl"><img src="grp_plaque.webp" alt=""><span><em class="gn">${esc(p.guilde)}</em>· ${pl(G.length,"# gestation","# gestations")}</span></div>`;
     html+=G.map(a=>{
       const m=byId[a.maleId], f=byId[a.femId], fi=fin(a), reste=fi-now, pct=a.gestH?Math.min(100,Math.max(0,(now-a.debut)/(a.gestH*3600000)*100)):0;
       const tm=!a.gestH?`<div class="timer inconnu"><div class="txt"><div class="t">Temps de gestation non renseigné</div></div></div>`
@@ -896,7 +912,7 @@ function renderSteril(){
   const el=document.getElementById("sterList");
   if(!S.length){el.innerHTML=`<div class="card empty muted">Aucune dragodinde stérile enregistrée.</div>`;return;}
   const grp={}; S.forEach((d,i)=>{(grp[d.guilde]??=[]).push({d,i});});
-  el.innerHTML=Object.entries(grp).map(([g,arr])=>`<h4 class="grpParc">🏡 ${esc(g)} · ${pl(arr.length,"# stérile","# stériles")}</h4>`+arr.map(({d,i})=>
+  el.innerHTML=Object.entries(grp).map(([g,arr])=>`<div class="grpPl"><img src="grp_plaque.webp" alt=""><span><em class="gn">${esc(g)}</em>· ${pl(arr.length,"# stérile","# stériles")}</span></div>`+arr.map(({d,i})=>
     `<div class="card ster"><div class="who"><div><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span> <b>${esc(d.nom)}</b> <span class="muted">${esc(d.type)}</span></div>
       <div class="muted" style="font-size:12.5px;margin-top:3px">Stérile depuis le ${fmtDate(d.date)}${d.cam==="oui"?" · caméléone":""}${d.objet?" · objet : "+esc(d.objet):""}</div></div>
       <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></div>`).join("")).join("");
