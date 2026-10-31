@@ -123,6 +123,37 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .dragos tr.subRow .numB{min-width:24px;height:24px;font-size:11px}
 .ico.tog{font-size:18px;color:#ffd96a;width:32px;height:32px;border-radius:9px;border:2px solid #e9b23a;background:rgba(0,0,0,.35)}
 .typeG{color:#ffd96a!important}
+.dragos.synth td{padding:8px 7px}
+.dragos.synth th{font-size:12.5px;line-height:1.15;padding:7px 6px}
+.dragos.synth .tType{color:#ffd96a;font-weight:900;text-align:left}
+.dragos.synth .tTot{color:#bfffb0;font-weight:900}
+.dragos.synth .tNom{font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+.zero{opacity:.35}
+.tEtat{color:#ff9fd6}
+.cadre.grand .dragos.synth th{white-space:nowrap}
+.tAide{text-align:center;font-size:12px;opacity:.75;margin:8px 0 0}
+.agrandir{position:absolute;right:5.5cqw;top:1.3cqw;z-index:4;width:30px;height:30px;border-radius:9px;border:2px solid #e9b23a;background:rgba(0,0,0,.45);color:#ffd96a;font-size:18px;font-weight:900;cursor:pointer;padding:0}
+.cadre .tableWrap{cursor:zoom-in}
+/* vue agrandie */
+#grandRoot .grandVue{position:fixed;inset:0;z-index:45;background:rgba(5,15,6,.94);overflow:auto;padding:calc(10px + env(safe-area-inset-top)) 6px 20px;container-type:inline-size}
+.grandTop{display:flex;align-items:center;justify-content:space-between;margin:0 6px 6px;color:#ffd96a;font-size:18px}
+.grandFermer{width:40px;height:40px;border-radius:12px;border:2px solid #e9b23a;background:linear-gradient(#e2473a,#8a1410);color:#fff;font-size:20px;font-weight:900;cursor:pointer}
+.cadre.grand .tableWrap{overflow:visible;cursor:default}
+.cadre.grand table.synth{table-layout:fixed;white-space:normal;font-size:clamp(9px,2.6cqw,15px)}
+.cadre.grand .dragos.synth th{font-size:clamp(8px,2.4cqw,14px);padding:5px 1px;line-height:1.1}
+.cadre.grand .dragos.synth td{padding:8px 2px;word-break:break-word}
+.cadre.grand .dragos.synth th:first-child,.cadre.grand .dragos.synth td:first-child{width:17%}
+.cadre.grand .dragos.synth th:nth-child(7),.cadre.grand .dragos.synth td:nth-child(7){width:14%}
+.cadre.grand .dragos.synth th:nth-child(8),.cadre.grand .dragos.synth td:nth-child(8){width:12%}
+.cadre.grand .tag{font-size:clamp(7px,2cqw,12px);padding:2px 4px;white-space:normal}
+.cadre.grand .tRow{cursor:pointer}
+.cadre.grand .tRow:active td{background:rgba(255,200,60,.25)!important}
+/* détail d'un type */
+.dtSec{border:2px solid #e9b23a;border-radius:14px;padding:8px;margin-top:10px;background:rgba(0,0,0,.2)}
+.dtHead{display:flex;align-items:center;justify-content:space-between;color:#ffd96a;margin-bottom:6px}
+.dtRow{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(233,178,58,.3)}
+.dtNom{flex:1;min-width:0;display:flex;flex-direction:column}
+.dtNom small{opacity:.8;font-size:11.5px}
 .tag.mix{background:linear-gradient(#e0a43a,#9a5a10);color:#fff}
 .numB{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 4px;border-radius:50%;font-weight:900;font-size:13px;color:#fff3c0;
   background:radial-gradient(circle at 40% 35%,#7a4a14,#3a1e06);border:2px solid #f0bf3a;box-shadow:0 0 0 2px #6a3c0a,0 0 8px rgba(255,200,60,.5);text-shadow:0 1px 0 #000}
@@ -478,12 +509,14 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
   <div id="newsList"></div>
 </section>
 
+<div id="grandRoot"></div>
 <div id="modalRoot"></div>
 <div id="pickRoot"></div>
 
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:31,d:"31/10/2026",t:["Gestion des parcs : nouveau tableau, une ligne par type avec, dans l'ordre : type, mâles, femelles, reproductrices, caméléones, total, nom, état (accouplements en cours), stériles mâles, stériles femelles.","Touche le tableau (ou ⤢) pour l'agrandir en plein écran et tout voir d'un coup ; touche une ligne pour voir, modifier ou supprimer les dragodindes de ce type."]},
   {v:30,d:"31/10/2026",t:["Stérilisation : dans la fenêtre, les dragodindes sont rassemblées en deux lignes (mâles / femelles) avec un compteur − / ＋ pour choisir combien stériliser. « ▸ Choisir une par une » affiche toujours le détail.","Registre des stériles : regroupé par type et par sexe (×n), avec ▸ pour voir le détail."]},
   {v:29,d:"31/10/2026",t:["Gestion des parcs : les dragodindes d'un même type sont regroupées sur une seule ligne, une pour les mâles et une pour les femelles, avec leur quantité (×14…).","Sur chaque ligne : ▸ pour voir le détail une par une (et les modifier ou supprimer individuellement), ✏️ pour modifier tout le groupe d'un coup, 🗑 pour en retirer le nombre voulu."]},
   {v:28,d:"31/10/2026",t:["Stérilisation : nouvelle fenêtre au style illustré (pastilles mâles/femelles, lignes dorées quand elles sont cochées, boutons Tout cocher / Tout décocher, Annuler / Valider).","Bouton « ⇅ Trier » dans la fenêtre de stérilisation : par numéro, nom, mâles ou femelles d'abord, reproductrices ou non d'abord, caméléones d'abord. Les cases cochées sont gardées pendant le tri."]},
@@ -587,6 +620,56 @@ function groupes(p){
     if(!G.has(k))G.set(k,{key:k,type:t,sexe:x.d.sexe,items:[]}); G.get(k).items.push(x);});
   return groupesCache=[...G.values()];
 }
+// ---- Tableau de synthèse : une ligne par type ----
+let typesCache=[];
+function syntheseTypes(p){
+  const ordre=[], T=new Map(), S=getSter().filter(x=>x.parcId===p.id), A=getAccs().filter(a=>a.parcId===p.id);
+  const byId=Object.fromEntries(p.dragos.map(d=>[d.id,d]));
+  const get=t=>{const k=t.toLowerCase(); if(!T.has(k)){T.set(k,{type:t,items:[],sM:0,sF:0,etat:0});ordre.push(k);} return T.get(k);};
+  trier(p.dragos).forEach(x=>get((x.d.type||"").trim()||"Sans type").items.push(x));
+  S.forEach(x=>{const g=get((x.type||"").trim()||"Sans type"); x.sexe==="M"?g.sM++:g.sF++;});
+  A.forEach(a=>{const f=byId[a.femId]||byId[a.maleId]; if(f)get((f.type||"").trim()||"Sans type").etat++;});
+  return typesCache=ordre.map(k=>T.get(k));
+}
+function tableauParc(p,grand){
+  const L=syntheseTypes(p), nM=p.dragos.filter(d=>d.sexe==="M").length;
+  const z=v=>v?v:`<span class="zero">0</span>`;
+  const rows=L.map((g,gi)=>{
+    const D=g.items.map(x=>x.d), M=D.filter(d=>d.sexe==="M").length, F=D.length-M;
+    const noms=[...new Set(D.map(d=>d.nom||""))];
+    return `<tr class="tRow" data-trow="${gi}"><td class="tType">${esc(g.type)}</td><td>${z(M)}</td><td>${z(F)}</td><td>${z(D.filter(d=>d.repro==="oui").length)}</td><td>${z(D.filter(d=>d.cam==="oui").length)}</td>
+      <td class="tTot">${z(D.length)}</td><td class="tNom">${noms.length>1?"<i class='muted'>Plusieurs</i>":esc(noms[0])||"—"}</td>
+      <td>${g.etat?(grand?`<b class="tEtat">${g.etat} 💞</b>`:`<span class="tag oui">${pl(g.etat,"# accouplé","# accouplés")}</span>`):`<span class="zero">—</span>`}</td><td>${z(g.sM)}</td><td>${z(g.sF)}</td></tr>`;}).join("");
+  return `<div class="cadre ${grand?"grand":""}"><div class="cadreTitre">${pl(p.dragos.length,"# dragodinde","# dragodindes")} · ♂ ${nM} · ♀ ${p.dragos.length-nM}</div>
+    ${grand?"":`<button class="agrandir" id="agrandir" aria-label="Agrandir le tableau">⤢</button>`}
+    <div class="tableWrap"><table class="dragos synth">
+    <thead><tr>${(grand?["Type","♂","♀","Re-<br>pro","Ca-<br>mél.","Tot.","Nom","État","Stér.<br>♂","Stér.<br>♀"]:["Type","♂<br>Mâles","♀<br>Femelles","Repro-<br>ductrices","Camé-<br>léones","Total","Nom","État","Stériles<br>♂","Stériles<br>♀"]).map(h=>`<th>${h}</th>`).join("")}</tr></thead>
+    <tbody>${rows}</tbody></table>${L.length?"":`<p class="muted" style="text-align:center;padding:20px 0">Ce parc est vide.</p>`}</div>
+    <p class="tAide">${grand?"Touche une ligne pour voir et modifier ses dragodindes.":"Touche le tableau pour l'agrandir."}</p></div>`;
+}
+function ouvrirGrand(){
+  const p=parcCourant(), o=document.getElementById("grandRoot");
+  o.innerHTML=`<div class="grandVue"><div class="grandTop"><b>${esc(p.guilde)}</b><button class="grandFermer" id="grandFermer" aria-label="Fermer">✕</button></div>${tableauParc(p,true)}</div>`;
+  document.getElementById("grandFermer").onclick=()=>o.innerHTML="";
+}
+// Détail d'un type : mâles / femelles, modification et suppression
+function detailType(g){
+  const root=document.getElementById("modalRoot");
+  const M=g.items.filter(x=>x.d.sexe==="M"), F=g.items.filter(x=>x.d.sexe==="F");
+  groupesCache=[{key:"M",type:g.type,sexe:"M",items:M},{key:"F",type:g.type,sexe:"F",items:F}];
+  const bloc=(gi,L,t)=>L.length?`<div class="dtSec"><div class="dtHead"><b>${t} (${L.length})</b><div class="act"><button class="ico" data-dgedit="${gi}" aria-label="Modifier tous"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-dgdel="${gi}" aria-label="Retirer"><img src="ico_del.webp" alt="🗑"></button></div></div>`
+    +L.map(({d,i})=>`<div class="dtRow"><span class="numB">${i+1}</span><span class="dtNom"><b>${esc(d.nom)}</b><small>${[d.repro==="oui"?"Reproductrice":"Non reproductrice",d.cam==="oui"?"Caméléone":"",d.gest?"Gestation "+esc(d.gest):"",d.objet?"Objet : "+esc(d.objet):""].filter(Boolean).join(" · ")}</small></span>
+      <div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-del="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></div>`).join("")+`</div>`:"";
+  root.innerHTML=`<div class="modal"><div class="box stBox"><div class="stTitre">${esc(g.type)}</div>
+    ${bloc(0,M,"♂ Mâles")}${bloc(1,F,"♀ Femelles")}${!g.items.length?`<p class="muted" style="text-align:center">Plus aucune dragodinde de ce type dans le parc.</p>`:""}
+    <button class="btn" id="dtFermer" style="margin-top:10px">Fermer</button></div></div>`;
+  document.getElementById("dtFermer").onclick=()=>root.innerHTML="";
+  root.querySelector(".box").onclick=e=>{
+    const a=e.target.closest("[data-dgedit]"), b=e.target.closest("[data-dgdel]"), c=e.target.closest("[data-edit]"), d=e.target.closest("[data-del]");
+    if(a)editGroupe(groupesCache[+a.dataset.dgedit]); if(b)delGroupe(groupesCache[+b.dataset.dgdel]);
+    if(c)editDrago(+c.dataset.edit); if(d)delDrago(+d.dataset.del);
+  };
+}
 function renderParc(id){
   const p=getParcs().find(x=>x.id===id); if(!p) return false;
   const t=getTri(), nomTri=TRIS.find(x=>x[0]===t.k)?.[1];
@@ -595,23 +678,8 @@ function renderParc(id){
   document.getElementById("parcTitle").textContent=p.guilde;
   const oui=v=>`<span class="tag ${v}">${v==="oui"?"✔ Oui":"✖ Non"}</span>`;
   const nM=p.dragos.filter(d=>d.sexe==="M").length;
-  document.getElementById("parcBody").innerHTML=`<div class="cadre"><div class="cadreTitre">${pl(p.dragos.length,"# dragodinde","# dragodindes")} · ♂ ${nM} · ♀ ${p.dragos.length-nM}</div><div class="tableWrap"><table class="dragos">
-    <thead><tr><th>Qté</th><th>Actions</th><th>Type</th><th>Sexe</th><th>Nom</th><th>Reproductrice</th><th>Caméléone</th><th>Objet à la vente</th><th>Gestation</th></tr></thead>
-    <tbody>${groupes(p).map((g,gi)=>{
-      const c=k=>{const v=[...new Set(g.items.map(x=>x.d[k]||""))];return v.length===1?v[0]:null;};
-      const ouiG=k=>{const v=c(k);return v===null?`<span class="tag mix">Mixte</span>`:oui(v);};
-      const ouvert=groupesOuverts.has(g.key);
-      return `<tr class="gRow"><td><span class="numB qte">×${g.items.length}</span></td>
-      <td><div class="act"><button class="ico tog" data-gtog="${gi}" aria-label="Voir le détail">${ouvert?"▾":"▸"}</button><button class="ico" data-ggedit="${gi}" aria-label="Modifier le groupe"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-ggdel="${gi}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></td>
-      <td><b class="typeG">${esc(g.type)}</b></td>
-      <td><span class="tag ${g.sexe==="M"?"m":"f"}">${g.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td><td>${c("nom")===null?"<i class='muted'>Plusieurs noms</i>":esc(c("nom"))}</td>
-      <td>${ouiG("repro")}</td><td>${ouiG("cam")}</td><td>${c("objet")===null?"<i class='muted'>Variable</i>":esc(c("objet"))||"—"}</td><td>${c("gest")===null?"<i class='muted'>Variable</i>":esc(c("gest"))||"—"}</td></tr>`
-      +(ouvert?g.items.map(({d,i})=>`<tr class="subRow"><td><span class="numB">${i+1}</span></td>
-      <td><div class="act"><button class="ico" data-edit="${i}" aria-label="Modifier"><img src="ico_edit.webp" alt="✏️"></button><button class="ico del" data-del="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></td>
-      <td>${esc(d.type)}</td>
-      <td><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂ Mâle":"♀ Femelle"}</span></td><td><b>${esc(d.nom)}</b></td>
-      <td>${oui(d.repro)}</td><td>${oui(d.cam)}</td><td>${esc(d.objet)||"—"}</td><td>${esc(d.gest)||"—"}</td></tr>`).join(""):"");
-    }).join("")}</tbody></table>${p.dragos.length?"":`<p class="muted" style="text-align:center;padding:20px 0">Ce parc est vide.</p>`}</div></div>`
+  document.getElementById("parcBody").innerHTML=tableauParc(p,false);
+  if(document.querySelector("#grandRoot .grandVue"))ouvrirGrand()
   ;
   return true;
 }
@@ -783,6 +851,8 @@ document.getElementById("sortBtn").onclick=()=>{
   };
 };
 document.getElementById("parcBody").addEventListener("click",e=>{
+  if(e.target.closest(".cadre")&&!e.target.closest("button")){ouvrirGrand();return;}
+  if(e.target.closest("#agrandir")){ouvrirGrand();return;}
   const tg=e.target.closest("[data-gtog]"), ge=e.target.closest("[data-ggedit]"), gd=e.target.closest("[data-ggdel]");
   if(tg){const g=groupesCache[+tg.dataset.gtog]; groupesOuverts.has(g.key)?groupesOuverts.delete(g.key):groupesOuverts.add(g.key); renderParc(curParc); return;}
   if(ge){editGroupe(groupesCache[+ge.dataset.ggedit]);return;}
@@ -837,6 +907,7 @@ function delGroupe(g){
     } else delGroupe(g);
   };
 }
+document.getElementById("grandRoot").addEventListener("click",e=>{const r=e.target.closest("[data-trow]"); if(r)detailType(typesCache[+r.dataset.trow]);});
 // Réinitialiser un parc (le vider)
 document.getElementById("resetParc").onclick=async()=>{
   const p=parcCourant();
