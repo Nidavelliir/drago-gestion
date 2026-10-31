@@ -241,6 +241,52 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .chkList{display:flex;flex-direction:column;gap:6px;max-height:42dvh;overflow:auto;margin:8px 0}
 .ster{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px}
 .ster .who{flex:1;min-width:0}
+/* ---- Fenêtre Stérilisation (d'après la maquette) ---- */
+.modal .box.stBox{padding:12px 12px 10px;border-radius:24px;border:4px solid #f2c23a;
+  background:radial-gradient(ellipse at 50% 30%,#1e5a26 0%,#0f3416 65%,#0a2510 100%);
+  box-shadow:inset 0 0 0 3px #7a4a0c,inset 0 0 0 6px rgba(255,210,90,.4),0 0 20px rgba(255,200,60,.3),0 12px 40px rgba(0,0,0,.6)}
+.stBox form{gap:8px!important}
+.stTitre{text-align:center;padding:9px 12px;border-radius:999px;border:3px solid #e9b23a;background:linear-gradient(#8a4e1a,#5a2c0c);
+  font-weight:900;font-size:clamp(14px,4.4vw,19px);color:#ffeab8;text-shadow:0 2px 0 #2a1204;box-shadow:inset 0 2px 0 rgba(255,220,150,.3),0 4px 8px rgba(0,0,0,.4);
+  line-height:1.2}
+.stLab{display:flex;align-items:center;gap:6px;font-weight:800;color:#ffd96a;text-shadow:0 2px 0 #1a0a00;font-size:16px}
+.stLab img{width:20px}
+.combo.stCombo{background:linear-gradient(#fff6dc,#f1dfae);border:3px solid #e9b23a;border-radius:14px;font-weight:800;color:#3a2208;box-shadow:inset 0 2px 0 #fff,0 3px 6px rgba(0,0,0,.35)}
+.combo.stCombo::after{color:#c6801a}
+.combo.stTri{font-size:14px;padding:8px 12px;margin-bottom:6px}
+.stDispo{margin:0}
+.pil{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-weight:900;font-size:14px;color:#fff;border:2px solid rgba(255,255,255,.7);text-shadow:0 1px 0 rgba(0,0,0,.4)}
+.pil.m{background:linear-gradient(#5aa2ff,#1e5fd6);box-shadow:0 0 8px rgba(70,140,255,.7)}
+.pil.f{background:linear-gradient(#ff7cc8,#c42a8a);box-shadow:0 0 8px rgba(255,90,180,.7)}
+.stSec{border:3px solid #e9b23a;border-radius:16px;padding:22px 8px 8px;margin-top:16px;position:relative;background:rgba(0,0,0,.18)}
+.stPlank{position:absolute;top:-16px;left:8px;display:flex;align-items:center;gap:6px;padding:4px 14px 4px 8px;border-radius:10px;border:2px solid #e9b23a;
+  background:linear-gradient(#8a4e1a,#5a2c0c);font-weight:900;font-size:14px;color:#ffeab8;text-shadow:0 1px 0 #2a1204}
+.stPlank img{width:18px}
+.stOutils{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.stOutils .stB{font-size:13.5px;white-space:nowrap;gap:5px;padding:8px 4px}
+.stB{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 6px;border-radius:999px;border:3px solid #e9b23a;cursor:pointer;
+  font-family:inherit;font-weight:900;font-size:15px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.4);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 4px 8px rgba(0,0,0,.4)}
+.stB i{font-style:normal;display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;border:2px solid #fff;font-size:14px}
+.stB.vert{background:linear-gradient(#4cc04a,#1a7a22)}.stB.vert i{background:#e8ff6a;color:#1a6a12;border-color:#1a6a12}
+.stB.rouge{background:linear-gradient(#e2473a,#8a1410)}
+.stB:active{transform:scale(.95)}
+.stList{max-height:30dvh;gap:6px;padding:6px;border:2px solid #e9b23a;border-radius:12px;background:rgba(0,0,0,.2)}
+.stRow{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:12px;border:2px solid rgba(233,178,58,.75);background:linear-gradient(#1a4a20,#0f3014);cursor:pointer}
+.stRow input{display:none}
+.stCase{flex:none;width:26px;height:26px;border-radius:6px;background:#f4f4f4;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-weight:900;color:#5a2c0c}
+.stRow:has(input:checked){background:linear-gradient(#d9a62a,#8a5a10);border-color:#ffe07a;box-shadow:0 0 10px rgba(255,210,80,.6)}
+.stRow:has(input:checked) .stCase{background:linear-gradient(#ffd45c,#e8891c);border-color:#7a3d06}
+.stRow:has(input:checked) .stCase::after{content:"✔";font-size:17px}
+.stSexe{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#fff;border:2px solid #fff}
+.stSexe.m{background:radial-gradient(circle at 40% 35%,#5aa2ff,#1a4ec0)}.stSexe.f{background:radial-gradient(circle at 40% 35%,#ff7cc8,#b4247c)}
+.stNom{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.stNom b{color:#fff;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+.stNom small{color:#ffeccc;font-size:11.5px;opacity:.9}
+.stFeuille{flex:none;width:18px;opacity:.5;filter:hue-rotate(60deg) saturate(.6)}
+.stBas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.stBas .stB{font-size:19px;padding:11px 6px}
+.stB.annuler{background:linear-gradient(#2a5a3a,#0f2a18)}.stB.annuler i{border:0;font-size:22px;color:#ffd96a}
+.stB.valider{background:linear-gradient(#ffd45c,#e8891c);color:#3a1a04;text-shadow:0 1px 0 rgba(255,255,255,.5)}.stB.valider i{border:0;font-size:22px;color:#3a1a04}
 /* ---- Accouplements ---- */
 .accBtn{display:block;margin:18px auto 6px;width:min(100%,360px);border:0;background:none;padding:0;cursor:pointer}
 .accBtn:active{transform:scale(.95)}
@@ -419,6 +465,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:28,d:"31/10/2026",t:["Stérilisation : nouvelle fenêtre au style illustré (pastilles mâles/femelles, lignes dorées quand elles sont cochées, boutons Tout cocher / Tout décocher, Annuler / Valider).","Bouton « ⇅ Trier » dans la fenêtre de stérilisation : par numéro, nom, mâles ou femelles d'abord, reproductrices ou non d'abord, caméléones d'abord. Les cases cochées sont gardées pendant le tri."]},
   {v:27,d:"31/10/2026",t:["Nouveaux boutons illustrés « Terminé », « Suivant » et « Parc suivant » dans les fenêtres d'accouplement et de stérilisation."]},
   {v:26,d:"31/10/2026",t:["Nouvelle fenêtre « Parc terminé ! » illustrée (plaque de titre, œuf doré, pastille verte, sac d'or et bouton Terminé)."]},
   {v:25,d:"31/10/2026",t:["Accoupler : quand tous les types d'un parc ont été accouplés, un message de fin s'affiche avec un bouton « Parc suivant ➜ » pour enchaîner directement sur le parc suivant."]},
@@ -1045,21 +1092,39 @@ function sterWizard(parcId,dernier=null){
     document.getElementById("s_next").onclick=()=>form(types[0]); return;
   }
   form(types[0]);
-  function form(type){
+  function form(type,coches=[]){
     const liste=T[type], nM=liste.filter(x=>x.d.sexe==="M").length, nF=liste.length-nM;
-    root.innerHTML=`<div class="modal"><div class="box"><h3>✂️ Stérilisation – ${esc(p.guilde)}</h3><form id="sForm">
-      <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Type de dragodinde</span>
-        <button type="button" class="combo" id="s_type">${esc(type)}</button>
-        <div class="dispo"><span class="tag m">♂ ${pl(nM,"# mâle","# mâles")}</span><span class="tag f">♀ ${pl(nF,"# femelle","# femelles")}</span></div></div>
-      <div class="f"><span style="display:block;font-weight:700;color:var(--gold);margin:4px 0 0">Dragodindes à classer stériles</span>
-        <div class="formBtns" style="margin-top:6px"><button type="button" class="btn ghost" id="s_all" style="font-size:14px;padding:8px">Tout cocher</button><button type="button" class="btn ghost" id="s_none" style="font-size:14px;padding:8px">Tout décocher</button></div>
-        <div class="chkList">${liste.map(({d,n})=>`<label class="chk"><input type="checkbox" value="${d.id}"><span><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span> <b>${esc(d.nom)}</b> <span class="muted">n°${n}${d.repro==="oui"?" · reproductrice":""}${d.cam==="oui"?" · caméléone":""}</span></span></label>`).join("")}</div></div>
-      <div class="formBtns"><button type="button" class="btn ghost" id="s_cancel">Annuler</button><button type="submit" class="btn">Valider</button></div></form></div></div>`;
+    const tri=Store.get("triSter","n"), TRIS_S=[["n","Numéro"],["nom","Nom"],["M","Mâles d'abord"],["F","Femelles d'abord"],["repro","Reproductrices d'abord"],["nonrepro","Non reproductrices d'abord"],["cam","Caméléones d'abord"]];
+    const cle={n:x=>x.n,nom:x=>(x.d.nom||"").toLowerCase(),M:x=>x.d.sexe==="M"?0:1,F:x=>x.d.sexe==="F"?0:1,repro:x=>x.d.repro==="oui"?0:1,nonrepro:x=>x.d.repro==="oui"?1:0,cam:x=>x.d.cam==="oui"?0:1}[tri]||(x=>x.n);
+    const triee=[...liste].sort((a,b)=>{const x=cle(a),y=cle(b);return x<y?-1:x>y?1:a.n-b.n;});
+    const lab=(ic,t)=>`<div class="stLab">${ic}<span>${t}</span></div>`;
+    root.innerHTML=`<div class="modal"><div class="box stBox"><form id="sForm">
+      <div class="stTitre">✂️ Stérilisation – ${esc(p.guilde)}</div>
+      ${lab('<img src="plume.webp" alt="">',"Type de dragodinde")}
+      <button type="button" class="combo stCombo" id="s_type">${esc(type)}</button>
+      <div class="dispo stDispo"><span class="pil m">♂ ${pl(nM,"# mâle","# mâles")}</span><span class="pil f">♀ ${pl(nF,"# femelle","# femelles")}</span></div>
+      <div class="stSec"><div class="stPlank"><img src="plume.webp" alt=""><span>Dragodindes à classer stériles</span></div>
+        <div class="stOutils">
+          <button type="button" class="stB vert" id="s_all"><i>✔</i>Tout cocher</button>
+          <button type="button" class="stB rouge" id="s_none"><i>✖</i>Tout décocher</button>
+        </div>
+        <button type="button" class="combo stCombo stTri" id="s_tri">⇅ Trier : ${TRIS_S.find(x=>x[0]===tri)?.[1]}</button>
+        <div class="chkList stList">${triee.map(({d,n})=>`<label class="stRow"><input type="checkbox" value="${d.id}" ${coches.includes(d.id)?"checked":""}><span class="stCase"></span>
+          <span class="stSexe ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span>
+          <span class="stNom"><b>${esc(d.nom)} n°${n}</b><small>${[d.repro==="oui"?"Reproductrice":"Non reproductrice",d.cam==="oui"?"Caméléone":""].filter(Boolean).join(" · ")}</small></span>
+          <img class="stFeuille" src="plume.webp" alt=""></label>`).join("")}</div></div>
+      <div class="stBas"><button type="button" class="stB annuler" id="s_cancel"><i>↩</i>Annuler</button><button type="submit" class="stB valider"><i>✔</i>Valider</button></div>
+    </form></div></div>`;
+    const cochees=()=>[...root.querySelectorAll(".stList input:checked")].map(b=>b.value);
+    document.getElementById("s_tri").onclick=async()=>{
+      const c=cochees(), v=await pickList({titre:"Trier les dragodindes",current:tri,options:TRIS_S.map(([k,l])=>({value:k,label:l}))});
+      if(v){Store.set("triSter",v);} form(type,c);
+    };
     document.getElementById("s_type").onclick=async()=>{
       const v=await pickList({titre:"Type de dragodinde",current:type,options:types.map(t=>{const m=T[t].filter(x=>x.d.sexe==="M").length;return {value:t,label:esc(t),sub:`♂ ${pl(m,"# mâle","# mâles")} · ♀ ${pl(T[t].length-m,"# femelle","# femelles")}`};})});
       if(v)form(v);
     };
-    const boxes=()=>[...root.querySelectorAll(".chkList input")];
+    const boxes=()=>[...root.querySelectorAll(".stList input")];
     document.getElementById("s_all").onclick=()=>boxes().forEach(b=>b.checked=true);
     document.getElementById("s_none").onclick=()=>boxes().forEach(b=>b.checked=false);
     document.getElementById("s_cancel").onclick=()=>{root.innerHTML="";renderSteril();};
