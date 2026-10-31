@@ -556,6 +556,20 @@ button.combo::after{color:var(--mut)!important}
 .maj h3{color:var(--ink)!important}
 #sortInfo{background:var(--card)!important;border:1px solid var(--line)!important;color:var(--mut)}
 
+.dragos.accT{table-layout:fixed;white-space:normal;font-size:13.5px}
+.dragos.accT td,.dragos.accT th{padding:8px 3px!important;overflow-wrap:break-word}
+.dragos.accT th{font-size:11.5px!important;word-break:normal}
+.dragos.accT th:nth-child(1),.dragos.accT td:nth-child(1){width:26%}
+.dragos.accT th:nth-child(2),.dragos.accT td:nth-child(2){width:24%}
+.dragos.accT th:nth-child(3),.dragos.accT td:nth-child(3){width:18%}
+.accT .tNom{max-width:none}
+.tRow{cursor:pointer}
+.tRow.vide td{opacity:.55}
+.gPret,.gProch{display:block;font-size:10.5px;font-weight:600;margin-top:2px;font-family:ui-monospace,Menlo,monospace}
+.gPret{color:var(--acc);font-family:inherit}.gProch{color:var(--mut)}
+#gestBox{max-height:88dvh}
+#gestBox .gestListe{display:flex;flex-direction:column;gap:10px}
+#gestBox .timer.pret .t{font-size:20px!important}
 /* ===== Mode sombre ===== */
 #themeBtn{position:fixed!important;top:calc(16px + env(safe-area-inset-top));left:66px;height:38px;padding:0 12px;border-radius:999px;border:1px solid var(--line);
   background:var(--card);color:var(--ink);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
@@ -683,6 +697,7 @@ html.dark .f input,html.dark .f select{color-scheme:dark}
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:38,d:"31/10/2026",t:["Correction : la page Accouplements reprend son affichage précédent.","Accouchements : un tableau par parc, une ligne par type (type, nom, gestations en cours avec le prochain minuteur ou le nombre de prêtes, stériles, mâles, femelles).","Touche une ligne pour voir les gestations de ce type avec leurs minuteurs, les valider (✔) une par une ou toutes les prêtes d'un coup."]},
   {v:36,d:"31/10/2026",t:["Mode sombre : bouton ☾ en haut de l'accueil (☀ pour revenir au mode clair). Il s'applique à toute l'appli et ton choix est retenu."]},
   {v:35,d:"31/10/2026",t:["Le bouton « Stérilisation » est retiré. La stérilisation se fait maintenant dans la fiche d'un type (en touchant le tableau d'un parc) avec les compteurs « Stériles ♂ » et « Stériles ♀ » : augmenter retire des dragodindes du parc, diminuer les y remet."]},
   {v:34,d:"31/10/2026",t:["Nouveau look entièrement épuré : fond clair, cartes blanches, boutons texte simples, plus d'illustrations ni d'effets."]},
@@ -1413,40 +1428,68 @@ function minuteur(ms){ // "1 j 23:59:58"
 const getVue=()=>Store.get("vueGest","grille");
 function majVueBtn(){const b=document.getElementById("vueBtn");const g=getVue()==="grille";b.textContent=g?"☰":"▦";b.title=g?"Afficher une gestation par ligne":"Afficher deux gestations par ligne";}
 document.getElementById("vueBtn").onclick=()=>{Store.set("vueGest",getVue()==="grille"?"liste":"grille");renderGest();};
+const finG=a=>a.gestH?a.debut+a.gestH*3600000:Infinity;
+// cartes de gestation (utilisées dans la fiche d'un type)
+function cartesGest(G,p){
+  const now=Date.now(), byId=Object.fromEntries(p.dragos.map(d=>[d.id,d]));
+  return G.map(a=>{
+    const m=byId[a.maleId], f=byId[a.femId], fi=finG(a), reste=fi-now, pct=a.gestH?Math.min(100,Math.max(0,(now-a.debut)/(a.gestH*3600000)*100)):0;
+    const tm=!a.gestH?`<div class="timer inconnu"><div class="txt"><div class="t">Temps de gestation non renseigné</div></div></div>`
+      :reste<=0?`<div class="timer pret"><div class="txt"><div class="t">Prête à accoucher !</div></div></div>`
+      :`<div class="timer"><div class="txt"><div class="l">Temps restant</div><div class="t" data-fin="${fi}">${minuteur(reste)}</div></div></div>`;
+    return `<div class="card gest"><div class="head"><div class="who"><span><span class="tag f">♀</span> <b>${esc(f?.nom)}</b></span><span><span class="tag m">♂</span> <b>${esc(m?.nom)}</b></span></div>
+        <div class="act"><button class="ico ok ${reste<=0&&a.gestH?"pret":""}" data-gok="${a.id}" aria-label="Valider la gestation terminée">✔</button><button class="ico" data-gedit="${a.id}" aria-label="Modifier">✎</button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler">✕</button></div></div>
+      ${tm}${a.gestH?`<div class="barre"><i style="width:${pct.toFixed(1)}%"></i></div>`:""}
+      <div class="dates"><span>Début : ${fmtDate(a.debut)}</span><span>${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
+  }).join("");
+}
+let gestTypes=[], gestFiche=null;
+const gestDuType=(p,g)=>{const ids=new Set(g.items.map(x=>x.d.id));return getAccs().filter(a=>a.parcId===p.id&&(ids.has(a.femId)||ids.has(a.maleId))).sort((a,b)=>finG(a)-finG(b));};
 function renderGest(){
-  majVueBtn();
+  document.getElementById("vueBtn").hidden=true;
   const L=getParcs(), A=getAccs(), el=document.getElementById("gestList"), now=Date.now();
   document.getElementById("gestReset").hidden=!A.length;
   if(!A.length){el.innerHTML=`<div class="card empty muted">Aucune gestation en cours. Les accouplements validés apparaîtront ici avec leur minuteur.</div>`;return;}
-  const fin=a=>a.gestH?a.debut+a.gestH*3600000:Infinity;
-  let html="";
+  gestTypes=[]; let html="";
   L.forEach(p=>{
-    const G=A.filter(a=>a.parcId===p.id).sort((a,b)=>fin(a)-fin(b)); if(!G.length)return;
-    const byId=Object.fromEntries(p.dragos.map((d,i)=>[d.id,{...d,n:i+1}]));
-    html+=`<div class="grpPl"><span><em class="gn">${esc(p.guilde)}</em>· ${pl(G.length,"# gestation","# gestations")}</span></div>`;
-    html+=`<div class="${getVue()==="liste"?"gestListe":"gestGrid"}">`+G.map(a=>{
-      const m=byId[a.maleId], f=byId[a.femId], fi=fin(a), reste=fi-now, pct=a.gestH?Math.min(100,Math.max(0,(now-a.debut)/(a.gestH*3600000)*100)):0;
-      const tm=!a.gestH?`<div class="timer inconnu"><div class="txt"><div class="t">Temps de gestation non renseigné</div></div></div>`
-        :reste<=0?`<div class="timer pret"><div class="txt"><div class="t">Prête à accoucher !</div></div></div>`
-        :`<div class="timer"><div class="txt"><div class="l">Temps restant</div><div class="t" data-fin="${fi}">${minuteur(reste)}</div></div></div>`;
-      return `<div class="card gest"><div class="head"><div class="who">
-          <span><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></span>
-          <span><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></span></div>
-          <div class="act"><button class="ico ok ${reste<=0&&a.gestH?"pret":""}" data-gok="${a.id}" aria-label="Valider la gestation terminée">✔</button><button class="ico" data-gedit="${a.id}" aria-label="Modifier">✎</button><button class="ico del" data-gdel="${a.id}" aria-label="Annuler">✕</button></div></div>
-        ${tm}${a.gestH?`<div class="barre"><i style="width:${pct.toFixed(1)}%"></i></div>`:""}
-        <div class="dates"><span>Début : ${fmtDate(a.debut)}</span><span>${a.gestH?"Fin : "+fmtDate(fi):"Gestation : "+(esc(a.gestTxt)||"—")}</span></div></div>`;
-    }).join("")+`</div>`;
+    if(!A.some(a=>a.parcId===p.id))return;
+    const T=syntheseTypes(p);
+    html+=`<div class="grpPl"><span><em class="gn">${esc(p.guilde)}</em>· ${pl(A.filter(a=>a.parcId===p.id).length,"# gestation","# gestations")}</span></div>
+    <div class="cadre"><div class="tableWrap"><table class="dragos synth accT"><thead><tr><th>Type</th><th>Nom</th><th>En<br>cours</th><th>Sté-<br>riles</th><th>♂</th><th>♀</th></tr></thead><tbody>`
+    +T.map(g=>{
+      const G=gestDuType(p,g), gi=gestTypes.push({p,g})-1, D=g.items.map(x=>x.d), M=D.filter(d=>d.sexe==="M").length, noms=[...new Set(D.map(d=>d.nom||""))], z=v=>v?v:`<span class="zero">0</span>`;
+      const pretes=G.filter(a=>a.gestH&&finG(a)<=now).length, proch=G.find(a=>a.gestH&&finG(a)>now);
+      const sous=pretes?`<small class="gPret">${pl(pretes,"# prête","# prêtes")}</small>`:proch?`<small class="gProch" data-fin="${finG(proch)}">${minuteur(finG(proch)-now)}</small>`:"";
+      return `<tr class="tRow ${G.length?"":"vide"}" data-grow="${gi}"><td class="tType">${esc(g.type)}</td><td class="tNom">${noms.length>1?"<i class='muted'>Plusieurs</i>":esc(noms[0])||"—"}</td>
+        <td>${G.length?`<b class="tEtat">${G.length}</b>${sous}`:`<span class="zero">0</span>`}</td><td>${z(g.sM+g.sF)}</td><td>${z(M)}</td><td>${z(D.length-M)}</td></tr>`;}).join("")
+    +`</tbody></table></div><p class="tAide">Touche une ligne pour voir ses gestations et minuteurs.</p></div>`;
   });
   el.innerHTML=html;
+  if(gestFiche)ficheGest(gestFiche.p.id,gestFiche.g.type);
 }
+// fiche d'un type : ses gestations avec minuteurs
+function ficheGest(parcId,type){
+  const p=getParcs().find(x=>x.id===parcId); if(!p){gestFiche=null;return;}
+  const g=syntheseTypes(p).find(x=>x.type===type); if(!g){gestFiche=null;document.getElementById("modalRoot").innerHTML="";return;}
+  gestFiche={p,g}; const G=gestDuType(p,g), pretes=G.filter(a=>a.gestH&&finG(a)<=Date.now());
+  document.getElementById("modalRoot").innerHTML=`<div class="modal"><div class="box" id="gestBox"><h3>${esc(g.type)} – ${esc(p.guilde)}</h3>
+    ${pretes.length>1?`<button class="btn" id="gOkAll" style="margin-bottom:10px">Valider les ${pretes.length} prêtes</button>`:""}
+    <div class="gestListe">${G.length?cartesGest(G,p):`<p class="muted">Aucune gestation en cours pour ce type.</p>`}</div>
+    <button class="btn ghost" id="gFermer" style="margin-top:10px">Fermer</button></div></div>`;
+  document.getElementById("gFermer").onclick=()=>{gestFiche=null;document.getElementById("modalRoot").innerHTML="";renderGest();};
+  const all=document.getElementById("gOkAll"); if(all)all.onclick=()=>{const ids=new Set(pretes.map(a=>a.id));setAccs(getAccs().filter(a=>!ids.has(a.id)));renderGest();};
+  document.getElementById("gestBox").onclick=gestClick;
+}
+document.getElementById("gestList").addEventListener("click",e=>{const r=e.target.closest("[data-grow]"); if(r){const x=gestTypes[+r.dataset.grow]; ficheGest(x.p.id,x.g.type);}});
 // minuteurs : mise à jour chaque seconde
 setInterval(()=>{
-  if(location.hash!=="#accouchements"||document.querySelector("#modalRoot .modal"))return;
+  if(location.hash!=="#accouchements")return;
+  const conf=document.querySelector("#modalRoot .modal")&&!document.getElementById("gestBox");
   let fini=false;
-  document.querySelectorAll("#gestList [data-fin]").forEach(t=>{const r=+t.dataset.fin-Date.now(); if(r<=0)fini=true; else t.textContent=minuteur(r);});
-  if(fini||Date.now()%60000<1000)renderGest();
+  document.querySelectorAll("#gestList [data-fin],#gestBox [data-fin]").forEach(t=>{const r=+t.dataset.fin-Date.now(); if(r<=0)fini=true; else t.textContent=minuteur(r);});
+  if(fini&&!conf)renderGest();
 },1000);
-document.getElementById("gestList").addEventListener("click",async e=>{
+async function gestClick(e){
   const ok=e.target.closest("[data-gok]");
   if(ok){ // validation directe, sans confirmation (demande de l'utilisateur)
     const c=ok.closest(".gest"); c.style.transition="opacity .3s,transform .3s"; c.style.opacity="0"; c.style.transform="scale(.95)";
@@ -1455,11 +1498,13 @@ document.getElementById("gestList").addEventListener("click",async e=>{
   const ed=e.target.closest("[data-gedit]"), de=e.target.closest("[data-gdel]"); if(!ed&&!de)return;
   const a=getAccs().find(x=>x.id===(ed||de).dataset[ed?"gedit":"gdel"]); if(!a)return;
   curAcc=a.parcId; const p=accParc(), byId=Object.fromEntries(p.dragos.map(d=>[d.id,d]));
-  if(ed){accWindow(a);return;}
+  if(ed){gestFiche=null;accWindow(a);return;}
+  const garde=gestFiche; gestFiche=null;
   if(await confirmBox({titre:"Annuler cette gestation ?",danger:true,ok:"Annuler la gestation",
     lignes:[`La gestation de <b>${esc(byId[a.femId]?.nom)}</b> (accouplée avec <b>${esc(byId[a.maleId]?.nom)}</b>, parc <b>${esc(p.guilde)}</b>) sera supprimée.`,"L'accouplement correspondant disparaîtra aussi de la page Accouplements."],
-    avert:"Cette action est définitive."})){ setAccs(getAccs().filter(x=>x.id!==a.id)); renderGest(); }
-});
+    avert:"Cette action est définitive."})){ setAccs(getAccs().filter(x=>x.id!==a.id)); }
+  gestFiche=garde; renderGest();
+}
 document.getElementById("gestReset").onclick=async()=>{
   const n=getAccs().length;
   if(await confirmBox({titre:"Réinitialiser toutes les gestations ?",danger:true,ok:"Tout réinitialiser",
