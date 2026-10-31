@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Drago Gestion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3d24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Drago Gestion">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-maskable-192.png">
+<style>
+:root{
+  --bg:#1f3d24; --bg2:#14291a; --gold:#ffc23a; --gold2:#e8891c; --ink:#2a1a08; --txt:#fbeecb;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:"Trebuchet MS",system-ui,-apple-system,sans-serif;color:var(--txt);
+  background:radial-gradient(ellipse at 50% 25%,#3b6b3f 0%,var(--bg) 45%,var(--bg2) 100%) fixed;
+  min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+.page{display:none;min-height:100dvh;padding:20px 16px 32px;max-width:640px;margin:0 auto}
+.page.on{display:flex;flex-direction:column}
+
+/* ---- Accueil ---- */
+#home{justify-content:center;gap:10px}
+#home h1{
+  text-align:center;margin:0 0 8px;font-size:clamp(30px,9vw,46px);letter-spacing:1px;
+  color:var(--gold);text-shadow:0 3px 0 #7a3d06,0 6px 14px rgba(0,0,0,.5);
+}
+.tile{border:0;background:none;padding:0;cursor:pointer;display:block;width:100%;
+  transition:transform .12s ease,filter .12s ease}
+.tile:active{transform:scale(.95);filter:brightness(1.12)}
+.tile img{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 12px rgba(0,0,0,.45))}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+
+/* bouton provisoire en attendant les visuels */
+.plate{
+  aspect-ratio:1.5/1;border-radius:22px;display:flex;align-items:center;justify-content:center;text-align:center;
+  background:linear-gradient(#ffd45c,var(--gold2));border:4px solid #3a2208;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.55),inset 0 -5px 0 rgba(0,0,0,.18),0 8px 14px rgba(0,0,0,.45);
+}
+.plate span{background:#1a1208;color:#ffe08a;font-weight:800;font-size:clamp(11px,3.4vw,17px);max-width:92%;overflow-wrap:anywhere;
+  padding:7px 8px;border-radius:10px;border:2px solid var(--gold);letter-spacing:0;text-transform:uppercase}
+
+/* ---- Pages internes ---- */
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.back{border:3px solid #3a2208;border-radius:14px;background:linear-gradient(#ffd45c,var(--gold2));
+  color:var(--ink);font-weight:800;font-size:22px;width:48px;height:48px;cursor:pointer;flex:none}
+.back:active{transform:scale(.92)}
+.top h2{margin:0;color:var(--gold);font-size:26px;text-shadow:0 2px 0 #7a3d06}
+.card{background:rgba(251,238,203,.1);border:2px solid rgba(255,194,58,.45);border-radius:18px;padding:18px;line-height:1.45}
+.card b{color:var(--gold)}
+.muted{opacity:.75;font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- ============ ACCUEIL ============ -->
+<section id="home" class="page">
+  <h1>Drago Gestion</h1>
+  <button class="tile" data-go="parcs" aria-label="Gestion des parcs">
+    <img src="btn_parcs.webp" alt="Gestion des parcs">
+  </button>
+  <div class="row">
+    <button class="tile" data-go="accouplements" aria-label="Accouplements">
+      <div class="plate"><span>Accouplements</span></div>
+    </button>
+    <button class="tile" data-go="accouchements" aria-label="Accouchements">
+      <div class="plate"><span>Accouchements</span></div>
+    </button>
+  </div>
+</section>
+
+<!-- ============ GESTION DES PARCS ============ -->
+<section id="parcs" class="page">
+  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Gestion des parcs</h2></div>
+  <div class="card">
+    <p><b>Page en préparation.</b></p>
+    <p>C'est ici qu'on enregistrera les parcs et leurs dragodindes. Les pages Accouplements et Accouchements utiliseront ces informations.</p>
+  </div>
+</section>
+
+<!-- ============ ACCOUPLEMENTS ============ -->
+<section id="accouplements" class="page">
+  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Accouplements</h2></div>
+  <div class="card">
+    <p><b>Page en préparation.</b></p>
+    <p class="muted">Elle s'appuiera sur ce qui est saisi dans la Gestion des parcs.</p>
+  </div>
+</section>
+
+<!-- ============ ACCOUCHEMENTS ============ -->
+<section id="accouchements" class="page">
+  <div class="top"><button class="back" data-go="home" aria-label="Retour">←</button><h2>Accouchements</h2></div>
+  <div class="card">
+    <p><b>Page en préparation.</b></p>
+    <p class="muted">Elle s'appuiera sur ce qui est saisi dans la Gestion des parcs.</p>
+  </div>
+</section>
+
+<script>
+// Stockage : toutes les clés sont préfixées "drago_" pour ne jamais se mélanger
+// avec les autres applis hébergées sur la même adresse GitHub (Quiz Master Quest, belote…).
+const Store={
+  get(k,d){try{const v=localStorage.getItem("drago_"+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("drago_"+k,JSON.stringify(v))}catch(e){}}
+};
+
+// Navigation entre les pages (le bouton retour du téléphone fonctionne aussi)
+const PAGES=["home","parcs","accouplements","accouchements"];
+function show(){
+  const id=location.hash.slice(1);
+  const p=PAGES.includes(id)?id:"home";
+  document.querySelectorAll(".page").forEach(s=>s.classList.toggle("on",s.id===p));
+  scrollTo(0,0);
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-go]");if(!b)return;
+  const to=b.dataset.go;
+  if(to==="home"){ if(history.length>1&&location.hash) history.back(); else location.hash=""; }
+  else location.hash=to;
+});
+addEventListener("hashchange",show);show();
+</script>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
+</body>
+</html>

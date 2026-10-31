@@ -1,0 +1,19 @@
+{
+ "id": "/drago-gestion/app",
+ "name": "Drago Gestion",
+ "short_name": "Drago Gestion",
+ "description": "Gestion des parcs, accouplements et accouchements",
+ "start_url": "/drago-gestion/",
+ "scope": "/drago-gestion/",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#1f3d24",
+ "theme_color": "#1f3d24",
+ "lang": "fr",
+ "icons": [
+  {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+  {"src": "icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+  {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+ ]
+}
