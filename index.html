@@ -279,7 +279,7 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .stB:active{transform:scale(.95)}
 .stList{max-height:30dvh;gap:6px;padding:6px;border:2px solid #e9b23a;border-radius:12px;background:rgba(0,0,0,.2)}
 .stRow{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:12px;border:2px solid rgba(233,178,58,.75);background:linear-gradient(#1a4a20,#0f3014);cursor:pointer}
-.stRow input{display:none}
+.stRow input[type=checkbox]{display:none}
 .stCase{flex:none;width:26px;height:26px;border-radius:6px;background:#f4f4f4;border:2px solid #ccc;display:flex;align-items:center;justify-content:center;font-weight:900;color:#5a2c0c}
 .stRow:has(input:checked){background:linear-gradient(#d9a62a,#8a5a10);border-color:#ffe07a;box-shadow:0 0 10px rgba(255,210,80,.6)}
 .stRow:has(input:checked) .stCase{background:linear-gradient(#ffd45c,#e8891c);border-color:#7a3d06}
@@ -294,6 +294,18 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .stBas .stB{font-size:19px;padding:11px 6px}
 .stB.annuler{background:linear-gradient(#2a5a3a,#0f2a18)}.stB.annuler i{border:0;font-size:22px;color:#ffd96a}
 .stB.valider{background:linear-gradient(#ffd45c,#e8891c);color:#3a1a04;text-shadow:0 1px 0 rgba(255,255,255,.5)}.stB.valider i{border:0;font-size:22px;color:#3a1a04}
+.stGrp{cursor:default}
+.stGrp.on{background:linear-gradient(#d9a62a,#8a5a10);border-color:#ffe07a;box-shadow:0 0 10px rgba(255,210,80,.6)}
+.stGrp+.stGrp{margin-top:6px}
+.stStep{flex:none;gap:4px}
+.stepper.stStep button{width:34px;height:34px;border-radius:10px;border:2px solid #e9b23a;background:rgba(0,0,0,.35);color:#ffd96a;font-size:20px;font-weight:900;cursor:pointer;padding:0}
+.stepper.stStep input{width:46px;padding:4px;border-radius:8px;border:2px solid #e9b23a;background:#fff6dc;color:#3a2208;font-size:17px;font-weight:900;text-align:center}
+.stDetailBtn{display:block;width:100%;margin:8px 0 6px;background:none;border:0;color:#ffd96a;font-weight:800;font-size:14px;cursor:pointer;text-align:left;font-family:inherit}
+/* registre regroupé */
+.sterG{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px}
+.sterG .who{flex:1;min-width:0}
+.sterSub{margin:0 0 8px 18px}
+.sterSub .card.ster{padding:8px 10px;margin-bottom:6px}
 /* ---- Accouplements ---- */
 .accBtn{display:block;margin:18px auto 6px;width:min(100%,360px);border:0;background:none;padding:0;cursor:pointer}
 .accBtn:active{transform:scale(.95)}
@@ -472,6 +484,7 @@ input.cache{position:absolute;opacity:0;height:1px;width:1px;pointer-events:none
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:30,d:"31/10/2026",t:["Stérilisation : dans la fenêtre, les dragodindes sont rassemblées en deux lignes (mâles / femelles) avec un compteur − / ＋ pour choisir combien stériliser. « ▸ Choisir une par une » affiche toujours le détail.","Registre des stériles : regroupé par type et par sexe (×n), avec ▸ pour voir le détail."]},
   {v:29,d:"31/10/2026",t:["Gestion des parcs : les dragodindes d'un même type sont regroupées sur une seule ligne, une pour les mâles et une pour les femelles, avec leur quantité (×14…).","Sur chaque ligne : ▸ pour voir le détail une par une (et les modifier ou supprimer individuellement), ✏️ pour modifier tout le groupe d'un coup, 🗑 pour en retirer le nombre voulu."]},
   {v:28,d:"31/10/2026",t:["Stérilisation : nouvelle fenêtre au style illustré (pastilles mâles/femelles, lignes dorées quand elles sont cochées, boutons Tout cocher / Tout décocher, Annuler / Valider).","Bouton « ⇅ Trier » dans la fenêtre de stérilisation : par numéro, nom, mâles ou femelles d'abord, reproductrices ou non d'abord, caméléones d'abord. Les cases cochées sont gardées pendant le tri."]},
   {v:27,d:"31/10/2026",t:["Nouveaux boutons illustrés « Terminé », « Suivant » et « Parc suivant » dans les fenêtres d'accouplement et de stérilisation."]},
@@ -1138,6 +1151,7 @@ document.getElementById("gestReset").onclick=async()=>{
 
 // ================= STÉRILISATION =================
 // Registre : drago_steriles = [{...dragodinde, parcId, guilde, date}]
+const sterOuverts=new Set();
 const getSter=()=>Store.get("steriles",[]), setSter=v=>Store.set("steriles",v);
 function renderSteril(){
   const L=getParcs(), S=getSter();
@@ -1147,10 +1161,17 @@ function renderSteril(){
   const el=document.getElementById("sterList");
   if(!S.length){el.innerHTML=`<div class="card empty muted">Aucune dragodinde stérile enregistrée.</div>`;return;}
   const grp={}; S.forEach((d,i)=>{(grp[d.guilde]??=[]).push({d,i});});
-  el.innerHTML=Object.entries(grp).map(([g,arr])=>`<div class="grpPl"><img src="grp_plaque.webp" alt=""><span><em class="gn">${esc(g)}</em>· ${pl(arr.length,"# stérile","# stériles")}</span></div>`+arr.map(({d,i})=>
-    `<div class="card ster"><div class="who"><div><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span> <b>${esc(d.nom)}</b> <span class="muted">${esc(d.type)}</span></div>
+  el.innerHTML=Object.entries(grp).map(([g,arr])=>{
+    const sous=new Map(); arr.forEach(x=>{const k=((x.d.type||"").trim()||"Sans type")+"|"+x.d.sexe;(sous.get(k)||sous.set(k,[]).get(k)).push(x);});
+    return `<div class="grpPl"><img src="grp_plaque.webp" alt=""><span><em class="gn">${esc(g)}</em>· ${pl(arr.length,"# stérile","# stériles")}</span></div>`+[...sous.entries()].map(([k,L])=>{
+      const [t,sx]=k.split("|"), key=g+"|"+k, ouvert=sterOuverts.has(key);
+      return `<div class="card sterG"><span class="numB qte">×${L.length}</span><div class="who"><div><span class="tag ${sx==="M"?"m":"f"}">${sx==="M"?"♂ Mâle":"♀ Femelle"}</span> <b>${esc(t)}</b></div></div>
+        <button class="ico tog" data-stog="${esc(key)}" aria-label="Voir le détail">${ouvert?"▾":"▸"}</button></div>`
+      +(ouvert?`<div class="sterSub">`+L.map(({d,i})=>`<div class="card ster"><div class="who"><div><span class="tag ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span> <b>${esc(d.nom)}</b></div>
       <div class="muted" style="font-size:12.5px;margin-top:3px">Stérile depuis le ${fmtDate(d.date)}${d.cam==="oui"?" · caméléone":""}${d.objet?" · objet : "+esc(d.objet):""}</div></div>
-      <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></div>`).join("")).join("");
+      <div class="act"><button class="ico" data-srest="${i}" aria-label="Remettre dans le parc">↩️</button><button class="ico del" data-sdel="${i}" aria-label="Supprimer"><img src="ico_del.webp" alt="🗑"></button></div></div>`).join("")+`</div>`:"");
+    }).join("");
+  }).join("");
 }
 document.getElementById("sterParcList").addEventListener("click",e=>{const b=e.target.closest("[data-ster]");if(b)sterWizard(b.dataset.ster);});
 function sterWizard(parcId,dernier=null){
@@ -1169,7 +1190,7 @@ function sterWizard(parcId,dernier=null){
     document.getElementById("s_next").onclick=()=>form(types[0]); return;
   }
   form(types[0]);
-  function form(type,coches=[]){
+  function form(type,coches=[],detail=false){
     const liste=T[type], nM=liste.filter(x=>x.d.sexe==="M").length, nF=liste.length-nM;
     const tri=Store.get("triSter","n"), TRIS_S=[["n","Numéro"],["nom","Nom"],["M","Mâles d'abord"],["F","Femelles d'abord"],["repro","Reproductrices d'abord"],["nonrepro","Non reproductrices d'abord"],["cam","Caméléones d'abord"]];
     const cle={n:x=>x.n,nom:x=>(x.d.nom||"").toLowerCase(),M:x=>x.d.sexe==="M"?0:1,F:x=>x.d.sexe==="F"?0:1,repro:x=>x.d.repro==="oui"?0:1,nonrepro:x=>x.d.repro==="oui"?1:0,cam:x=>x.d.cam==="oui"?0:1}[tri]||(x=>x.n);
@@ -1185,25 +1206,42 @@ function sterWizard(parcId,dernier=null){
           <button type="button" class="stB vert" id="s_all"><i>✔</i>Tout cocher</button>
           <button type="button" class="stB rouge" id="s_none"><i>✖</i>Tout décocher</button>
         </div>
+        ${["M","F"].filter(x=>x==="M"?nM:nF).map(x=>`<div class="stRow stGrp ${coches.length||x?"":""}" data-sx="${x}">
+          <span class="stSexe ${x==="M"?"m":"f"}">${x==="M"?"♂":"♀"}</span>
+          <span class="stNom"><b>${x==="M"?"Mâles":"Femelles"}</b><small>sur ${x==="M"?nM:nF}</small></span>
+          <div class="stepper stStep"><button type="button" class="stMoins">−</button><input type="number" class="stNb" min="0" max="${x==="M"?nM:nF}" value="0" inputmode="numeric"><button type="button" class="stPlus">＋</button></div></div>`).join("")}
+        <button type="button" class="stDetailBtn" id="s_det">${detail?"▾ Masquer le détail":"▸ Choisir une par une"}</button>
+        <div id="s_detail" ${detail?"":"hidden"}>
         <button type="button" class="combo stCombo stTri" id="s_tri">⇅ Trier : ${TRIS_S.find(x=>x[0]===tri)?.[1]}</button>
-        <div class="chkList stList">${triee.map(({d,n})=>`<label class="stRow"><input type="checkbox" value="${d.id}" ${coches.includes(d.id)?"checked":""}><span class="stCase"></span>
+        <div class="chkList stList">${triee.map(({d,n})=>`<label class="stRow"><input type="checkbox" value="${d.id}" data-sx="${d.sexe}" ${coches.includes(d.id)?"checked":""}><span class="stCase"></span>
           <span class="stSexe ${d.sexe==="M"?"m":"f"}">${d.sexe==="M"?"♂":"♀"}</span>
           <span class="stNom"><b>${esc(d.nom)} n°${n}</b><small>${[d.repro==="oui"?"Reproductrice":"Non reproductrice",d.cam==="oui"?"Caméléone":""].filter(Boolean).join(" · ")}</small></span>
-          <img class="stFeuille" src="plume.webp" alt=""></label>`).join("")}</div></div>
+          <img class="stFeuille" src="plume.webp" alt=""></label>`).join("")}</div></div></div>
       <div class="stBas"><button type="button" class="stB annuler" id="s_cancel"><i>↩</i>Annuler</button><button type="submit" class="stB valider"><i>✔</i>Valider</button></div>
     </form></div></div>`;
     const cochees=()=>[...root.querySelectorAll(".stList input:checked")].map(b=>b.value);
     document.getElementById("s_tri").onclick=async()=>{
       const c=cochees(), v=await pickList({titre:"Trier les dragodindes",current:tri,options:TRIS_S.map(([k,l])=>({value:k,label:l}))});
-      if(v){Store.set("triSter",v);} form(type,c);
+      if(v){Store.set("triSter",v);} form(type,c,true);
     };
     document.getElementById("s_type").onclick=async()=>{
       const v=await pickList({titre:"Type de dragodinde",current:type,options:types.map(t=>{const m=T[t].filter(x=>x.d.sexe==="M").length;return {value:t,label:esc(t),sub:`♂ ${pl(m,"# mâle","# mâles")} · ♀ ${pl(T[t].length-m,"# femelle","# femelles")}`};})});
       if(v)form(v);
     };
     const boxes=()=>[...root.querySelectorAll(".stList input")];
-    document.getElementById("s_all").onclick=()=>boxes().forEach(b=>b.checked=true);
-    document.getElementById("s_none").onclick=()=>boxes().forEach(b=>b.checked=false);
+    // synchronisation compteurs ⇄ cases
+    const sync=()=>root.querySelectorAll(".stGrp").forEach(g=>{const x=g.dataset.sx;g.querySelector(".stNb").value=boxes().filter(b=>b.dataset.sx===x&&b.checked).length;
+      g.classList.toggle("on",+g.querySelector(".stNb").value>0);});
+    const fixer=(x,n)=>{let k=0;boxes().filter(b=>b.dataset.sx===x).forEach(b=>{b.checked=k<n;k++;});sync();};
+    root.querySelectorAll(".stGrp").forEach(g=>{const x=g.dataset.sx,inp=g.querySelector(".stNb"),max=+inp.max;
+      g.querySelector(".stMoins").onclick=()=>fixer(x,Math.max(0,(+inp.value||0)-1));
+      g.querySelector(".stPlus").onclick=()=>fixer(x,Math.min(max,(+inp.value||0)+1));
+      inp.onchange=()=>fixer(x,Math.max(0,Math.min(max,parseInt(inp.value)||0)));});
+    root.querySelector(".stList").addEventListener("change",sync);
+    document.getElementById("s_det").onclick=()=>form(type,cochees(),!detail);
+    sync();
+    document.getElementById("s_all").onclick=()=>{boxes().forEach(b=>b.checked=true);sync();};
+    document.getElementById("s_none").onclick=()=>{boxes().forEach(b=>b.checked=false);sync();};
     document.getElementById("s_cancel").onclick=()=>{root.innerHTML="";renderSteril();};
     document.getElementById("sForm").onsubmit=async e=>{
       e.preventDefault();
@@ -1225,6 +1263,7 @@ function sterWizard(parcId,dernier=null){
   }
 }
 document.getElementById("sterList").addEventListener("click",async e=>{
+  const tg=e.target.closest("[data-stog]"); if(tg){const k=tg.dataset.stog;sterOuverts.has(k)?sterOuverts.delete(k):sterOuverts.add(k);renderSteril();return;}
   const r=e.target.closest("[data-srest]"), d=e.target.closest("[data-sdel]"); if(!r&&!d)return;
   const S=getSter(), i=+(r||d).dataset[r?"srest":"sdel"], x=S[i]; if(!x)return;
   if(r){
