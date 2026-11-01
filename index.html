@@ -722,6 +722,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:47,d:"01/11/2026",t:["Accoupler : la zone de fin d'accouplement s'appelle maintenant « Stériles après cet accouplement »."]},
   {v:46,d:"01/11/2026",t:["Accoupler : après chaque accouplement validé, une zone « Stérilisés après cet accouplement » permet d'indiquer le nombre de mâles et de femelles devenus stériles pour ce type, avant de passer au type ou au parc suivant. Les parents qui viennent d'être accouplés sont choisis en premier et leurs gestations sont conservées."]},
   {v:45,d:"01/11/2026",t:["Ajouter des dragodindes à un parc : nom, type, puis des cases pour le nombre de mâles, de femelles, de reproductrices et de caméléones, et le temps de gestation."]},
   {v:44,d:"01/11/2026",t:["« Ajouter un parc » ne demande plus que le nom de la guilde. Le parc vide s'ouvre directement : on y ajoute ensuite les dragodindes et leurs caractéristiques avec « ＋ Ajouter »."]},
@@ -1364,7 +1365,7 @@ function accWizard(faits=[],dernier=null){
   const p=accParc(), root=document.getElementById("modalRoot"), T=typesDispo(p);
   const possibles=T.filter(t=>t.max>0), reste=possibles.filter(t=>!faits.includes(t.type));
   const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# accouplement","# accouplements")} de type <b>${esc(dernier.type)}</b> ${pl(dernier.n,"enregistré","enregistrés")}.</p>`:"";
-  const blocSter=dernier?`<div class="sterApres"><div class="tySec">Stérilisés après cet accouplement (${esc(dernier.type)})</div>
+  const blocSter=dernier?`<div class="sterApres"><div class="tySec">Stériles après cet accouplement (${esc(dernier.type)})</div>
     <div class="tyGrid">${["M","F"].map(x=>`<div class="f"><span>${x==="M"?"♂ Mâles":"♀ Femelles"}</span><div class="stepper stStep tyStep"><button type="button" data-sm="${x}">−</button><input type="number" id="ws_${x}" min="0" value="0" inputmode="numeric"><button type="button" data-sp="${x}">＋</button></div></div>`).join("")}</div>
     <button type="button" class="btn ghost" id="ws_ok">Enregistrer les stériles</button><p class="tyAide" id="ws_info"></p></div>`:"";
   if(!reste.length){
