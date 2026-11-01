@@ -94,7 +94,7 @@ body{
 .oldParcBtn{display:flex;justify-content:space-between;align-items:center;text-align:left;font-size:20px;
   background:linear-gradient(#2b1d0c,#1a1208);color:#ffe08a;border:3px solid var(--gold)}
 .parcBtn small{font-size:13px;font-weight:600;color:var(--txt);opacity:.8}
-form.card{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+form.card{display:flex;flex-direction:column;gap:12px;margin-top:0}
 .f label.t{display:block;font-weight:700;color:var(--gold);margin-bottom:5px;font-size:15px}
 .f input[type=text],.f input[type=number]{width:100%;padding:11px 12px;border-radius:10px;border:2px solid rgba(255,194,58,.5);
   background:rgba(255,248,225,.95);color:#2a1a08;font-size:16px;font-family:inherit}
@@ -643,8 +643,9 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <!-- ============ GESTION DES PARCS ============ -->
 <section id="parcs" class="page">
   <button class="back imgBack shine" data-go="home" aria-label="Retour – Gestion des parcs"><span class="arr">←</span><span class="hdrTxt">Gestion des parcs</span></button>
+  <div class="parcList" id="parcList" style="margin:0 0 14px"></div>
   <div class="duo" id="parcActions">
-    <button class="imgBtn shine" id="newParcBtn" aria-label="Créer un parc">＋ Créer un parc</button>
+    <button class="imgBtn shine" id="newParcBtn" aria-label="Créer un parc">＋ Ajouter un parc</button>
   </div>
 
   <form id="parcForm" class="card" hidden autocomplete="off">
@@ -663,7 +664,6 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
     <div class="formBtns"><button type="button" class="btn ghost" id="cancelParc">Annuler</button><button type="submit" class="btn">Valider</button></div>
   </form>
 
-  <div class="parcList" id="parcList"></div>
   <button class="imgBtn shine" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs">Réinitialiser tous les parcs</button>
 </section>
 
@@ -730,6 +730,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:43,d:"01/11/2026",t:["Gestion des parcs : les parcs déjà créés s'affichent en premier, en haut de la page, avec le bouton « Ajouter un parc » juste en dessous ; le formulaire de création s'ouvre sous ce bouton."]},
   {v:42,d:"01/11/2026",t:["La ligne « Objet obtenu à la vente » est retirée de toute l'appli (création, ajout, modification, tri et récapitulatifs)."]},
   {v:41,d:"01/11/2026",t:["Bouton « Partager l'appli » en bas de l'accueil : il ouvre le menu de partage du téléphone (SMS, WhatsApp, Messenger…) avec le lien de Drago Gestion, ou copie le lien si le partage n'est pas disponible."]},
   {v:40,d:"01/11/2026",t:["Compatibilité iPhone / iPad : icône adaptée à l'écran d'accueil d'iOS, pas de zoom automatique en touchant un champ, respect de l'encoche et de la barre du bas, affichage paysage du tableau qui fonctionne aussi sur iPhone, prise en charge des iPhone plus anciens."]},
