@@ -139,8 +139,6 @@ table.dragos{border-collapse:separate;border-spacing:0;width:100%;font-size:14px
 .cadre .tableWrap{cursor:zoom-in}
 /* vue agrandie */
 #grandRoot .grandVue{position:fixed;inset:0;z-index:45;background:rgba(5,15,6,.94);overflow:auto;padding:calc(10px + env(safe-area-inset-top)) 6px 20px;container-type:inline-size}
-#grandRoot .grandVue.pivot{inset:auto;top:0;left:100vw;width:100vh;height:100vw;transform-origin:top left;transform:rotate(90deg);
-  padding:10px calc(10px + env(safe-area-inset-top)) 16px}
 .grandTop{display:flex;align-items:center;justify-content:space-between;margin:0 6px 6px;color:#ffd96a;font-size:18px}
 .grandFermer{width:40px;height:40px;border-radius:12px;border:2px solid #e9b23a;background:linear-gradient(#e2473a,#8a1410);color:#fff;font-size:20px;font-weight:900;cursor:pointer}
 .cadre.grand .tableWrap{overflow:visible;cursor:default}
@@ -619,6 +617,19 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 .sterApres{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin:10px 0;display:flex;flex-direction:column;gap:8px;text-align:left}
 .sterApres .f>span{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:4px}
 #ws_info{color:var(--acc)!important}
+
+/* ===== Vue agrandie (corrigée) ===== */
+#grandRoot .grandVue{position:fixed;top:0;right:0;bottom:0;left:0;z-index:45;overflow:hidden;padding:0!important;container-type:normal}
+#grandRoot .grandIn{position:absolute;top:0;left:0;width:100%;height:100%;overflow:auto;-webkit-overflow-scrolling:touch;transform-origin:0 0;
+  padding:calc(12px + env(safe-area-inset-top)) 10px calc(16px + env(safe-area-inset-bottom));box-sizing:border-box;container-type:inline-size}
+#grandRoot .grandVue.pivot .grandIn{padding:12px calc(10px + env(safe-area-inset-bottom)) 16px calc(10px + env(safe-area-inset-top));overscroll-behavior:contain;touch-action:none}
+#grandRoot .grandFermer{position:fixed!important;z-index:47;top:calc(10px + env(safe-area-inset-top));right:12px;width:44px!important;height:44px!important;display:flex;align-items:center;justify-content:center;
+  border-radius:12px!important;font-size:20px!important;box-shadow:0 2px 10px rgba(0,0,0,.2)!important}
+#grandRoot .grandTop{margin:0 56px 8px 4px!important}
+#grandRoot .grandVue.pivot .grandTop{margin:0 4px 8px 56px!important}
+.cadre.grand .tableWrap{overflow:visible!important}
+.cadre.grand table.synth{width:100%;table-layout:fixed;white-space:normal}
+.cadre.grand .dragos.synth td,.cadre.grand .dragos.synth th{padding:7px 2px!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("drago_sombre")))document.documentElement.classList.add("dark")}catch(e){}</script>
 </head>
@@ -722,6 +733,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:51,d:"01/11/2026",t:["Correction : dans la fiche d'un type, « Valider » ne se bloque plus quand on rend des dragodindes stériles (reproductrices et caméléones s'ajustent automatiquement au total).","Les dragodindes remises dans le parc reprennent le nom actuel du type ; renommer un type renomme aussi ses stériles ; supprimer un parc efface aussi ses stériles.","Correction de la vue agrandie (surtout sur iPhone) : le bouton ✕ est toujours visible et fonctionne, la ligne entière tient en largeur (le texte se réduit si besoin), et on peut faire glisser le tableau du doigt quand il est tourné.","Corrections diverses : les fenêtres et la vue agrandie se ferment quand on change de page (bouton retour du téléphone)."]},
   {v:50,d:"01/11/2026",t:["Correction : le bouton « Valider » de la fiche d'un type (Gestion des parcs) fonctionne de nouveau : nom, type, nombres, gestation… sont modifiables à volonté.","Plus de limite au nombre que l'on peut entrer dans les cases (mâles, femelles, reproductrices, caméléones…)."]},
   {v:49,d:"01/11/2026",t:["Accouchements : dans l'écran de modification d'un type, les nombres de mâles et de femelles ne sont plus modifiables (type, nom, accouchements en cours et stériles le restent)."]},
   {v:48,d:"01/11/2026",t:["Accouplements : le mâle et la femelle de chaque couple sont indisponibles pendant tout le temps de gestation. Exemple : 80 mâles et 52 femelles, 52 accouplements lancés → 52 couples indisponibles, il reste 28 mâles disponibles et aucune femelle. Ils redeviennent disponibles à la fin du minuteur."]},
@@ -804,6 +816,8 @@ document.addEventListener("click",e=>{
   else { depth++; location.hash=to; }
 });
 addEventListener("hashchange",show);
+// en changeant de page : on ferme les fenêtres ouvertes et la vue agrandie
+addEventListener("hashchange",()=>{document.getElementById("modalRoot").innerHTML="";document.getElementById("pickRoot").innerHTML="";if(grandOuvert)fermerGrandVraiment();});
 
 // ================= GESTION DES PARCS =================
 // Données : drago_parcs = [{id, guilde, dragos:[{nom,type,sexe,repro,cam,objet,gest}]}]
@@ -872,31 +886,69 @@ function tableauParc(p,grand){
     <p class="tAide">${grand?"Touche une ligne pour modifier ce type.":"Touche le tableau pour l'agrandir en paysage."}</p></div>`;
 }
 function ouvrirGrandGest(parcId){ curParc=parcId; ouvrirGrand(tableauGest(getParcs().find(x=>x.id===parcId),true)); }
+// ===== Vue agrandie (plein écran, paysage) =====
+// Structure : .grandVue (plein écran, jamais tournée) > .grandIn (contenu, tourné de 90° si le téléphone reste en portrait)
+// Le bouton ✕ est en dehors du contenu tourné : toujours visible et toujours cliquable.
+let grandOuvert=false, grandForce=false;
 function ouvrirGrand(contenu){
-  const p=parcCourant(), o=document.getElementById("grandRoot");
-  o.innerHTML=`<div class="grandVue"><div class="grandTop"><b>${esc(p.guilde)}</b><button class="grandFermer" id="grandFermer" aria-label="Fermer">✕</button></div>${typeof contenu==="string"?contenu:tableauParc(p,true)}</div>`;
-  const vue=o.querySelector(".grandVue");
+  const p=parcCourant(), o=document.getElementById("grandRoot"), garderScroll=o.querySelector(".grandIn");
+  const sx=garderScroll?garderScroll.scrollLeft:0, sy=garderScroll?garderScroll.scrollTop:0;
+  o.innerHTML=`<div class="grandVue"><div class="grandIn"><div class="grandTop"><b>${esc(p.guilde)}</b></div>${typeof contenu==="string"?contenu:tableauParc(p,true)}</div></div>
+    <button class="grandFermer" id="grandFermer" aria-label="Fermer">✕</button>`;
   document.getElementById("grandFermer").onclick=fermerGrand;
-  if(!dejaPaysage){ // premier affichage : on bascule en paysage
-    dejaPaysage=true;
-    const pivoter=()=>{if(innerHeight>innerWidth){vue.classList.add("pivot");vue.style.width=innerHeight+"px";vue.style.height=innerWidth+"px";vue.style.left=innerWidth+"px";}};
+  const inn=o.querySelector(".grandIn");
+  if(!grandOuvert){ // première ouverture : on essaie le vrai mode paysage (Android), sinon on fait pivoter l'affichage
+    grandOuvert=true; grandForce=false;
+    try{history.pushState({grand:1},"");}catch(e){}  // le bouton retour du téléphone fermera la vue agrandie
     const fs=document.documentElement.requestFullscreen?.bind(document.documentElement);
     (fs?fs({navigationUI:"hide"}):Promise.reject())
       .then(()=>screen.orientation?.lock?screen.orientation.lock("landscape"):Promise.reject())
-      .catch(()=>pivoter());
-    setTimeout(pivoter,700); // si le téléphone est resté en portrait, on fait pivoter l'affichage
-  } else if(document.querySelector(".grandVue")&&grandPivot) vue.classList.add("pivot");
-  grandPivot=vue.classList.contains("pivot");
-  setTimeout(()=>{grandPivot=vue.classList.contains("pivot");},400);
+      .catch(()=>{});
+    setTimeout(()=>{grandForce=true;placerGrand();},650);
+  }
+  placerGrand();
+  inn.scrollLeft=sx; inn.scrollTop=sy;
+  brancherGlisser(inn);
 }
-let dejaPaysage=false, grandPivot=false;
+// calcule la rotation selon l'écran réel
+function placerGrand(){
+  const v=document.querySelector("#grandRoot .grandVue"), inn=v&&v.querySelector(".grandIn"); if(!inn)return;
+  const W=v.clientWidth, H=v.clientHeight, pivot=grandForce&&H>W;
+  v.classList.toggle("pivot",pivot);
+  if(pivot){inn.style.width=H+"px";inn.style.height=W+"px";inn.style.transform=`translateX(${W}px) rotate(90deg)`;}
+  else{inn.style.width=inn.style.height=inn.style.transform="";}
+  ajusterTable(inn);
+}
+// réduit la taille du texte jusqu'à ce que la ligne entière tienne en largeur
+function ajusterTable(inn){
+  const t=inn.querySelector("table"); if(!t)return;
+  let f=15; t.style.fontSize=f+"px";
+  while(t.scrollWidth>inn.clientWidth-8&&f>8){f-=.5;t.style.fontSize=f+"px";}
+}
+// glisser du doigt dans la vue tournée (les axes sont inversés par la rotation)
+function brancherGlisser(inn){
+  let x0=0,y0=0,bouge=false;
+  inn.addEventListener("touchstart",e=>{const t=e.touches[0];x0=t.clientX;y0=t.clientY;bouge=false;},{passive:true});
+  inn.addEventListener("touchmove",e=>{
+    if(!document.querySelector(".grandVue.pivot"))return;      // sans rotation : défilement normal
+    const t=e.touches[0], dx=t.clientX-x0, dy=t.clientY-y0; x0=t.clientX; y0=t.clientY;
+    inn.scrollTop+=dx; inn.scrollLeft-=dy; bouge=true; e.preventDefault();
+  },{passive:false});
+  inn.addEventListener("click",e=>{if(bouge){e.stopPropagation();e.preventDefault();bouge=false;}},true);
+}
 function fermerGrand(){
-  document.getElementById("grandRoot").innerHTML=""; dejaPaysage=false; grandPivot=false;
+  if(history.state&&history.state.grand){history.back();return;}   // popstate fermera la vue
+  fermerGrandVraiment();
+}
+addEventListener("popstate",()=>{if(grandOuvert)fermerGrandVraiment();});
+function fermerGrandVraiment(){
+  document.getElementById("grandRoot").innerHTML=""; grandOuvert=false; grandForce=false;
   try{screen.orientation?.unlock?.();}catch(e){}
   if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});
 }
-// si l'utilisateur tourne lui-même le téléphone, on retire la rotation forcée
-addEventListener("resize",()=>{const v=document.querySelector(".grandVue");if(v&&innerWidth>innerHeight){v.classList.remove("pivot");v.style.width=v.style.height=v.style.left="";grandPivot=false;}});
+addEventListener("resize",()=>setTimeout(placerGrand,60));
+addEventListener("orientationchange",()=>setTimeout(placerGrand,300));
+let dejaPaysage=false, grandPivot=false; // (compatibilité)
 // Fiche d'un type : tout se règle par des nombres (pas de liste numérotée)
 function editType(g,mode){
   const acc=mode==="acc", root=document.getElementById("modalRoot"), p=parcCourant(), D=g.items.map(x=>x.d);
@@ -927,8 +979,11 @@ function editType(g,mode){
   const lien={sM:"M",sF:"F"}, regler=(k,val)=>{
     if(lien[k]){const o=lien[k], d=val-v(k); if(d>0&&v(o)<d)val=v(k)+v(o); if(val<0)val=0;
       document.getElementById("t_"+o).value=v(o)-(val-v(k));}
-    document.getElementById("t_"+k).value=Math.max(0,val);};
+    document.getElementById("t_"+k).value=Math.max(0,val);
+    // reproductrices et caméléones ne peuvent pas dépasser le total : on les ajuste automatiquement
+    const tot=v("M")+v("F"); ["repro","cam"].forEach(x=>{const el=document.getElementById("t_"+x); if(el&&v(x)>tot)el.value=tot;});};
   root.querySelectorAll("[data-m],[data-p]").forEach(b=>b.onclick=()=>{const k=b.dataset.m||b.dataset.p;regler(k,v(k)+(b.dataset.m?-1:1));});
+  ["M","F","repro","cam"].forEach(k=>{const i=document.getElementById("t_"+k); if(i)i.addEventListener("change",()=>regler(k,v(k)));});
   ["sM","sF"].forEach(k=>{const i=document.getElementById("t_"+k);let avant=v(k);i.onfocus=()=>avant=v(k);i.onchange=()=>{const val=v(k);i.value=avant;regler(k,val);avant=v(k);};});
   const apres=id=>{ if(acc){renderGest(); if(document.querySelector("#grandRoot .grandVue"))ouvrirGrandGest(id);} else renderParc(id); };
   document.getElementById("t_cancel").onclick=()=>root.innerHTML="";
@@ -941,8 +996,7 @@ function editType(g,mode){
   document.getElementById("tForm").onsubmit=async e=>{
     e.preventDefault();
     const n={M:v("M"),F:v("F"),repro:v("repro"),cam:v("cam"),sM:v("sM"),sF:v("sF"),enc:v("enc")}, tot=n.M+n.F;
-    if(acc){n.repro=Math.min(n.repro,tot);n.cam=Math.min(n.cam,tot);}
-    if(n.repro>tot||n.cam>tot){alertBox(`Reproductrices et caméléones ne peuvent pas dépasser le total (${tot}).`);return;}
+    n.repro=Math.min(n.repro,tot); n.cam=Math.min(n.cam,tot);
     const t={}; ["nom","objet","gest"].forEach(k=>{const x=document.getElementById("t_"+k).value.trim(); if(c(k)===null?x!=="":x!==(c(k)||""))t[k]=x;});
     const nt=document.getElementById("t_type").value.trim(); if(nt&&nt!==g.type)t.type=nt;
     const lignes=[];
@@ -966,7 +1020,11 @@ function editType(g,mode){
     const q=parcCourant(), ids=new Set([...retirer,...steriliser].map(d=>d.id)), now=Date.now();
     if(steriliser.length)setSter([...getSter(),...q.dragos.filter(d=>stIds.has(d.id)).map(d=>({...d,parcId:q.id,guilde:q.guilde,date:now}))]);
     q.dragos=q.dragos.filter(d=>!ids.has(d.id));
-    if(remettre.length){const rIds=new Set(remettre.map(x=>x.id)); remettre.forEach(x=>{const {parcId,guilde,date,...dr}=x;q.dragos.push(dr);}); setSter(getSter().filter(x=>!rIds.has(x.id)));}
+    if(remettre.length){const rIds=new Set(remettre.map(x=>x.id)); remettre.forEach(x=>{const {parcId,guilde,date,...dr}=x;
+      // une dragodinde remise dans le parc reprend le nom et la gestation actuels du type
+      ["nom","gest"].forEach(k=>{const cv=t[k]!==undefined?t[k]:c(k); if(cv!==null&&cv!==undefined)dr[k]=cv;}); q.dragos.push(dr);}); setSter(getSter().filter(x=>!rIds.has(x.id)));}
+    // renommage du type : les stériles de ce type suivent
+    if(t.type||t.nom!==undefined){const S2=getSter(); S2.forEach(x=>{if(x.parcId===q.id&&((x.type||"").trim()||"Sans type").toLowerCase()===g.type.toLowerCase()){if(t.type)x.type=t.type;if(t.nom!==undefined)x.nom=t.nom;}}); setSter(S2);}
     let reste=q.dragos.filter(d=>((d.type||"").trim()||"Sans type").toLowerCase()===g.type.toLowerCase());
     const modele={nom:c("nom")??g.type,type:g.type,objet:c("objet")??"",gest:c("gest")??"",repro:"non",cam:"non"};
     ["M","F"].forEach(sx=>{for(let k=reste.filter(d=>d.sexe===sx).length;k<n[sx];k++){const d={...modele,sexe:sx,id:uid()};q.dragos.push(d);reste.push(d);}});
@@ -1001,7 +1059,7 @@ function renderParc(id){
   const oui=v=>`<span class="tag ${v}">${v==="oui"?"✔ Oui":"✖ Non"}</span>`;
   const nM=p.dragos.filter(d=>d.sexe==="M").length;
   document.getElementById("parcBody").innerHTML=tableauParc(p,false);
-  if(document.querySelector("#grandRoot .grandVue")){grandPivot=document.querySelector(".grandVue").classList.contains("pivot");ouvrirGrand();}
+  if(document.querySelector("#grandRoot .grandVue"))ouvrirGrand();
   ;
   return true;
 }
@@ -1251,7 +1309,7 @@ document.getElementById("delParc").onclick=async()=>{
   if(await confirmBox({titre:"Supprimer ce parc ?",danger:true,ok:"Supprimer",
     lignes:[`Le parc <b>${esc(p.guilde)}</b> disparaîtra de la Gestion des parcs.`,p.dragos.length?`${pl(p.dragos.length,"Sa dragodinde sera supprimée","Ses # dragodindes seront supprimées")} avec lui.`:"Il est déjà vide.",...noteAccs(accsDe(a=>a.parcId===p.id).length)],
     avert:"Cette action est définitive."})){
-    Store.set("parcs",getParcs().filter(x=>x.id!==p.id)); setAccs(getAccs().filter(a=>a.parcId!==p.id)); depth=Math.max(0,depth-1); location.replace("#parcs");
+    Store.set("parcs",getParcs().filter(x=>x.id!==p.id)); setAccs(getAccs().filter(a=>a.parcId!==p.id)); setSter(getSter().filter(x=>x.parcId!==p.id)); depth=Math.max(0,depth-1); location.replace("#parcs");
   }
 };
 // Tout réinitialiser
@@ -1260,7 +1318,7 @@ document.getElementById("resetAll").onclick=async()=>{
   if(await confirmBox({titre:"Réinitialiser tous les parcs ?",danger:true,ok:"Tout réinitialiser",
     lignes:[`${pl(L.length,"Le parc sera supprimé","Les # parcs seront supprimés")} : ${L.map(p=>"<b>"+esc(p.guilde)+"</b>").join(", ")}.`,`Au total, ${pl(n,"# dragodinde sera effacée","# dragodindes seront effacées")}.`,"La Gestion des parcs repartira de zéro.",...noteAccs(getAccs().length)],
     avert:"Cette action est définitive."})){
-    Store.set("parcs",[]); setAccs([]); renderParcs();
+    Store.set("parcs",[]); setAccs([]); setSter([]); renderParcs();
   }
 };
 
@@ -1301,14 +1359,14 @@ function renderAcc(id){
   document.getElementById("accStats").innerHTML=`<div class="stats">
     <div class="statImg m"><div class="sv"><b>♂ ${mDisp}</b><span>${pl(mDisp,"mâle disponible","mâles disponibles")}</span></div></div>
     <div class="statImg f"><div class="sv"><b>♀ ${fDisp}</b><span>${pl(fDisp,"femelle disponible","femelles disponibles")}</span></div></div></div>`;
-  const byId=Object.fromEntries(p.dragos.map((d,i)=>[d.id,{...d,n:i+1}]));
+  const byId=Object.fromEntries([...getSter().filter(x=>x.parcId===p.id).map(d=>[d.id,{...d,n:"stérile"}]),...p.dragos.map((d,i)=>[d.id,{...d,n:i+1}])]);
   const A=getAccs().filter(a=>a.parcId===p.id).sort((a,b)=>a.debut-b.debut);
   document.getElementById("accResetParc").hidden=!A.length;
   document.getElementById("accList").innerHTML=A.length?A.map(a=>{
     const m=byId[a.maleId], f=byId[a.femId], fin=a.gestH?a.debut+a.gestH*3600000:null, r=fin?reste(fin-Date.now()):null;
     return `<div class="card pair"><div class="who">
-      <div><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">n°${m?.n} · ${esc(m?.type)}</span></div>
-      <div style="margin-top:4px"><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">n°${f?.n} · ${esc(f?.type)}</span></div>
+      <div><span class="tag m">♂</span> <b>${esc(m?.nom)}</b> <span class="muted">${typeof m?.n==="number"?"n°"+m.n:"stérile"} · ${esc(m?.type)}</span></div>
+      <div style="margin-top:4px"><span class="tag f">♀</span> <b>${esc(f?.nom)}</b> <span class="muted">${typeof f?.n==="number"?"n°"+f.n:"stérile"} · ${esc(f?.type)}</span></div>
       <div class="when">Accouplés le ${fmtDate(a.debut)}<br>${fin?(r?`Naissance prévue le ${fmtDate(fin)} · encore ${r}`:`<span class="ready">Prête à accoucher !</span>`):`Gestation : ${esc(a.gestTxt)||"non renseignée"}`}</div></div>
       <div class="act" style="flex-direction:column"><button class="ico" data-aedit="${a.id}" aria-label="Modifier">✎</button><button class="ico del" data-adel="${a.id}" aria-label="Annuler">✕</button></div></div>`}).join("")
     :`<div class="card empty muted">Aucun accouplement en cours dans ce parc.</div>`;
