@@ -719,6 +719,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:45,d:"01/11/2026",t:["Ajouter des dragodindes à un parc : nom, type, puis des cases pour le nombre de mâles, de femelles, de reproductrices et de caméléones, et le temps de gestation."]},
   {v:44,d:"01/11/2026",t:["« Ajouter un parc » ne demande plus que le nom de la guilde. Le parc vide s'ouvre directement : on y ajoute ensuite les dragodindes et leurs caractéristiques avec « ＋ Ajouter »."]},
   {v:43,d:"01/11/2026",t:["Gestion des parcs : les parcs déjà créés s'affichent en premier, en haut de la page, avec le bouton « Ajouter un parc » juste en dessous ; le formulaire de création s'ouvre sous ce bouton."]},
   {v:42,d:"01/11/2026",t:["La ligne « Objet obtenu à la vente » est retirée de toute l'appli (création, ajout, modification, tri et récapitulatifs)."]},
@@ -1117,31 +1118,36 @@ const labT=t=>`<span style="display:block;font-weight:700;color:var(--gold);marg
 const radio2=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name="${n}" value="${a}" required> ${la}</label><label><input type="radio" name="${n}" value="${b}"> ${lb}</label></div>`;
 document.getElementById("addDrago").onclick=()=>{
   const p=parcCourant(), root=document.getElementById("modalRoot");
+  const num=(id,t)=>`<div class="f">${labT(t)}<div class="stepper stStep tyStep"><button type="button" data-am="${id}">−</button><input type="number" id="${id}" min="0" max="500" value="0" inputmode="numeric"><button type="button" data-ap="${id}">＋</button></div></div>`;
   root.innerHTML=`<div class="modal"><div class="box"><h3>＋ Ajouter au parc ${esc(p.guilde)}</h3><form id="addForm" autocomplete="off">
     <div class="f">${labT("Nom de la dragodinde")}<input type="text" id="n_nom" data-dl="nom" required></div>
     <div class="f">${labT("Type de la dragodinde")}<input type="text" id="n_type" data-dl="type" required></div>
-    <div class="f">${labT("Sexe")}${radio2("n_sexe","M","F","Mâle","Femelle")}</div>
-    <div class="f">${labT("Reproductrice")}${radio2("n_repro","oui","non","Oui","Non")}</div>
-    <div class="f">${labT("Caméléone")}${radio2("n_cam","oui","non","Oui","Non")}</div>
-    <div class="f">${labT("Nombre de dragodindes à ajouter")}<input type="number" id="n_nb" min="1" max="200" value="1" inputmode="numeric" required></div>
-    <div class="f" hidden>${labT("Objet obtenu à la vente")}<input type="text" id="n_objet" data-dl="objet"></div>
+    <div class="tyGrid">${num("n_M","♂ Mâles")}${num("n_F","♀ Femelles")}${num("n_repro","Reproductrices")}${num("n_cam","Caméléones")}</div>
     <div class="f">${labT("Temps de gestation")}<input type="text" id="n_gest" data-dl="gest" placeholder="ex. 48 h"></div>
     <div class="formBtns"><button type="button" class="btn ghost" id="n_cancel">Annuler</button><button type="submit" class="btn">Ajouter</button></div>
   </form></div></div>`;
   menus(root);
+  const val=id=>Math.max(0,parseInt(document.getElementById(id).value)||0);
+  root.querySelectorAll("[data-am],[data-ap]").forEach(b=>b.onclick=()=>{const id=b.dataset.am||b.dataset.ap;document.getElementById(id).value=Math.max(0,val(id)+(b.dataset.am?-1:1));});
   document.getElementById("n_cancel").onclick=()=>root.innerHTML="";
   document.getElementById("addForm").onsubmit=async e=>{
     e.preventDefault();
-    const f=e.target, v=id=>f.querySelector("#"+id).value.trim(), r=n=>f.querySelector(`[name=${n}]:checked`).value;
-    const d={nom:v("n_nom"),type:v("n_type"),sexe:r("n_sexe"),repro:r("n_repro"),cam:r("n_cam"),objet:v("n_objet"),gest:v("n_gest")};
-    const nb=Math.max(1,Math.min(200,parseInt(v("n_nb"))||1)), saisie=root.innerHTML;
+    const f=e.target, v=id=>f.querySelector("#"+id).value.trim();
+    const nM=val("n_M"), nF=val("n_F"), tot=nM+nF, nR=val("n_repro"), nC=val("n_cam");
+    if(!tot){alertBox("Indique au moins un mâle ou une femelle.");return;}
+    if(nR>tot||nC>tot){alertBox(`Reproductrices et caméléones ne peuvent pas dépasser le total (${tot}).`);return;}
+    const base={nom:v("n_nom"),type:v("n_type"),objet:"",gest:v("n_gest")};
     const ok=await confirmBox({titre:"Confirmer l'ajout",ok:"Ajouter",lignes:[
-      `${pl(nb,"# dragodinde sera ajoutée","# dragodindes seront ajoutées")} au parc <b>${esc(p.guilde)}</b> :`,
-      `<b>${esc(d.nom)}</b> · ${esc(d.type)} · ${lib.sexe(d.sexe)} · Reproductrice : ${lib.repro(d.repro)} · Caméléone : ${lib.cam(d.cam)}`,
-      `Gestation : ${esc(d.gest)||"—"}`,
-      `Le parc passera de ${p.dragos.length} à ${pl(p.dragos.length+nb,"# dragodinde","# dragodindes")}.`]});
-    if(ok){const q=parcCourant();for(let i=0;i<nb;i++)q.dragos.push({...d,id:uid()});saveParc(q);renderParc(q.id);}
-    else document.getElementById("addDrago").click();
+      `${pl(tot,"# dragodinde sera ajoutée","# dragodindes seront ajoutées")} au parc <b>${esc(p.guilde)}</b> :`,
+      `<b>${esc(base.nom)}</b> · ${esc(base.type)} · ♂ ${nM} · ♀ ${nF}`,
+      `Reproductrices : ${nR} · Caméléones : ${nC} · Gestation : ${esc(base.gest)||"—"}`,
+      `Le parc passera de ${p.dragos.length} à ${pl(p.dragos.length+tot,"# dragodinde","# dragodindes")}.`]});
+    if(!ok){root.innerHTML="";return;}
+    // mâles et femelles alternés pour répartir reproductrices et caméléones entre les deux sexes
+    const M=Array.from({length:nM},()=>({...base,sexe:"M",repro:"non",cam:"non",id:uid()})), F=Array.from({length:nF},()=>({...base,sexe:"F",repro:"non",cam:"non",id:uid()}));
+    const alt=[]; for(let k=0;k<Math.max(nM,nF);k++){if(F[k])alt.push(F[k]);if(M[k])alt.push(M[k]);}
+    alt.slice(0,nR).forEach(d=>d.repro="oui"); alt.slice(0,nC).forEach(d=>d.cam="oui");
+    const q=parcCourant(); q.dragos.push(...M,...F); saveParc(q); renderParc(q.id);
   };
 };
 // ---- Trier ----
