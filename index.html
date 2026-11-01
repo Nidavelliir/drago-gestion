@@ -6,10 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f5f4f0">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-title" content="Drago Gestion">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png?v=19">
-<link rel="apple-touch-icon" href="icon-maskable-192.png?v=19">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=40">
 <style>
 :root{
   --bg:#1f3d24; --bg2:#14291a; --gold:#ffc23a; --gold2:#e8891c; --ink:#2a1a08; --txt:#fbeecb;
@@ -584,6 +587,31 @@ html.dark .modal .warn{background:#3a1f1c!important}
 html.dark .barre{background:#2a2f2c!important}
 html.dark .stCase{background:var(--card)!important}
 html.dark .f input,html.dark .f select{color-scheme:dark}
+
+/* ===== Compatibilité iPhone / iPad ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overscroll-behavior-y:none;-webkit-user-select:none;user-select:none}
+input,textarea,select{-webkit-user-select:text;user-select:text}
+button,a,.tRow,.tile,label{touch-action:manipulation;-webkit-touch-callout:none}
+input,select,textarea,button.combo{font-size:16px!important}  /* évite le zoom automatique de Safari */
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46px;display:block}
+.page{padding-top:calc(16px + env(safe-area-inset-top))!important;padding-bottom:calc(40px + env(safe-area-inset-bottom))!important}
+#home{padding-top:calc(84px + env(safe-area-inset-top))!important}
+.modal{padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))!important}
+.modal .box{-webkit-overflow-scrolling:touch}
+/* anciens iPhone (iOS < 16) : remplacements des unités récentes */
+@supports not (width:1cqw){
+  .cadre{padding:6vw 4.4vw 6vw!important}
+  .cadreTitre{height:auto!important}
+  .cadre.grand table.synth{font-size:13px}
+}
+@supports not (height:1dvh){
+  .page{min-height:100vh}
+  .modal .box,#gestBox{max-height:85vh!important}
+  .stList{max-height:30vh!important}
+}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("drago_sombre")))document.documentElement.classList.add("dark")}catch(e){}</script>
 </head>
@@ -697,6 +725,7 @@ html.dark .f input,html.dark .f select{color-scheme:dark}
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:40,d:"01/11/2026",t:["Compatibilité iPhone / iPad : icône adaptée à l'écran d'accueil d'iOS, pas de zoom automatique en touchant un champ, respect de l'encoche et de la barre du bas, affichage paysage du tableau qui fonctionne aussi sur iPhone, prise en charge des iPhone plus anciens."]},
   {v:39,d:"31/10/2026",t:["Accouchements : un tableau par parc, une ligne par type (type, nom, accouchements en cours, stériles, mâles, femelles), sans détail un par un.","Touche le tableau pour l'agrandir en paysage, puis une ligne pour ouvrir le même écran de modification que la Gestion des parcs, avec ces entrées."]},
   {v:38,d:"31/10/2026",t:["Correction : la page Accouplements reprend son affichage précédent.","Accouchements : un tableau par parc, une ligne par type (type, nom, gestations en cours avec le prochain minuteur ou le nombre de prêtes, stériles, mâles, femelles).","Touche une ligne pour voir les gestations de ce type avec leurs minuteurs, les valider (✔) une par une ou toutes les prêtes d'un coup."]},
   {v:36,d:"31/10/2026",t:["Mode sombre : bouton ☾ en haut de l'accueil (☀ pour revenir au mode clair). Il s'applique à toute l'appli et ton choix est retenu."]},
@@ -843,7 +872,7 @@ function ouvrirGrand(contenu){
   document.getElementById("grandFermer").onclick=fermerGrand;
   if(!dejaPaysage){ // premier affichage : on bascule en paysage
     dejaPaysage=true;
-    const pivoter=()=>{if(innerHeight>innerWidth)vue.classList.add("pivot");};
+    const pivoter=()=>{if(innerHeight>innerWidth){vue.classList.add("pivot");vue.style.width=innerHeight+"px";vue.style.height=innerWidth+"px";vue.style.left=innerWidth+"px";}};
     const fs=document.documentElement.requestFullscreen?.bind(document.documentElement);
     (fs?fs({navigationUI:"hide"}):Promise.reject())
       .then(()=>screen.orientation?.lock?screen.orientation.lock("landscape"):Promise.reject())
@@ -860,7 +889,7 @@ function fermerGrand(){
   if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});
 }
 // si l'utilisateur tourne lui-même le téléphone, on retire la rotation forcée
-addEventListener("resize",()=>{const v=document.querySelector(".grandVue");if(v&&innerWidth>innerHeight){v.classList.remove("pivot");grandPivot=false;}});
+addEventListener("resize",()=>{const v=document.querySelector(".grandVue");if(v&&innerWidth>innerHeight){v.classList.remove("pivot");v.style.width=v.style.height=v.style.left="";grandPivot=false;}});
 // Fiche d'un type : tout se règle par des nombres (pas de liste numérotée)
 function editType(g,mode){
   const acc=mode==="acc", root=document.getElementById("modalRoot"), p=parcCourant(), D=g.items.map(x=>x.d);
@@ -1320,7 +1349,7 @@ function alertBox(t){const root=document.createElement("div");root.innerHTML=`<d
 // Assistant : accouplement par type, avec quantité, puis « Suivant » ou « Terminé »
 function typesDispo(p){
   const E=etat(p), T={};
-  E.forEach(e=>{const t=(e.d.type||"").trim()||"Sans type";T[t]??={type:t,M:[],F:[]};if(!e.raison)T[t][e.d.sexe==="M"?"M":"F"].push(e.d);});
+  E.forEach(e=>{const t=(e.d.type||"").trim()||"Sans type";T[t]=T[t]||{type:t,M:[],F:[]};if(!e.raison)T[t][e.d.sexe==="M"?"M":"F"].push(e.d);});
   const occ=new Set(getAccs().filter(a=>a.parcId===p.id).flatMap(a=>[a.maleId,a.femId])), libre=(a,b)=>(occ.has(a.id)?1:0)-(occ.has(b.id)?1:0);
   Object.values(T).forEach(t=>{t.M.sort(libre);t.F.sort(libre);});
   return Object.values(T).map(t=>({...t,max:Math.min(t.M.length,t.F.length)})).sort((a,b)=>a.type.localeCompare(b.type,"fr"));
@@ -1533,7 +1562,7 @@ function renderSteril(){
   document.getElementById("sterReset").hidden=!S.length;
   const el=document.getElementById("sterList");
   if(!S.length){el.innerHTML=`<div class="card empty muted">Aucune dragodinde stérile enregistrée.</div>`;return;}
-  const grp={}; S.forEach((d,i)=>{(grp[d.guilde]??=[]).push({d,i});});
+  const grp={}; S.forEach((d,i)=>{(grp[d.guilde]=grp[d.guilde]||[]).push({d,i});});
   el.innerHTML=Object.entries(grp).map(([g,arr])=>{
     const sous=new Map(); arr.forEach(x=>{const k=((x.d.type||"").trim()||"Sans type")+"|"+x.d.sexe;(sous.get(k)||sous.set(k,[]).get(k)).push(x);});
     return `<div class="grpPl"><span><em class="gn">${esc(g)}</em>· ${pl(arr.length,"# stérile","# stériles")}</span></div>`+[...sous.entries()].map(([k,L])=>{
@@ -1549,7 +1578,7 @@ function renderSteril(){
 document.getElementById("sterParcList").addEventListener("click",e=>{const b=e.target.closest("[data-ster]");if(b)sterWizard(b.dataset.ster);});
 function sterWizard(parcId,dernier=null){
   const root=document.getElementById("modalRoot"), p=getParcs().find(x=>x.id===parcId);
-  const T={}; p.dragos.forEach((d,i)=>{const t=(d.type||"").trim()||"Sans type";(T[t]??=[]).push({d,n:i+1});});
+  const T={}; p.dragos.forEach((d,i)=>{const t=(d.type||"").trim()||"Sans type";(T[t]=T[t]||[]).push({d,n:i+1});});
   const types=Object.keys(T).sort((a,b)=>a.localeCompare(b,"fr"));
   const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# dragodinde classée stérile","# dragodindes classées stériles")} (${esc(dernier.type)}).</p>`:"";
   if(!types.length){
