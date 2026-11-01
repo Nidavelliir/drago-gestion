@@ -650,18 +650,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 
   <form id="parcForm" class="card" hidden autocomplete="off">
     <div class="f"><label class="t" for="fGuilde">Nom de la guilde</label><input type="text" id="fGuilde" required></div>
-    <div class="f"><label class="t" for="fNom">Nom de la dragodinde</label><input type="text" id="fNom" data-dl="nom" required></div>
-    <div class="f"><label class="t" for="fType">Type de la dragodinde</label><input type="text" id="fType" data-dl="type" required></div>
-    <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Sexe</span>
-      <div class="choice"><label><input type="radio" name="sexe" value="M" required> Mâle</label><label><input type="radio" name="sexe" value="F"> Femelle</label></div></div>
-    <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Reproductrice</span>
-      <div class="choice"><label><input type="radio" name="repro" value="oui" required> Oui</label><label><input type="radio" name="repro" value="non"> Non</label></div></div>
-    <div class="f"><span class="t" style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">Caméléone</span>
-      <div class="choice"><label><input type="radio" name="cam" value="oui" required> Oui</label><label><input type="radio" name="cam" value="non"> Non</label></div></div>
-    <div class="f"><label class="t" for="fNb">Nombre de dragodindes à ajouter</label><input type="number" id="fNb" min="1" max="200" value="1" inputmode="numeric" required></div>
-    <div class="f" hidden><label class="t" for="fObjet">Objet obtenu à la vente</label><input type="text" id="fObjet" data-dl="objet"></div>
-    <div class="f"><label class="t" for="fGest">Temps de gestation</label><input type="text" id="fGest" data-dl="gest" placeholder="ex. 48 h"></div>
-    <div class="formBtns"><button type="button" class="btn ghost" id="cancelParc">Annuler</button><button type="submit" class="btn">Valider</button></div>
+    <div class="formBtns"><button type="button" class="btn ghost" id="cancelParc">Annuler</button><button type="submit" class="btn">Créer le parc</button></div>
   </form>
 
   <button class="imgBtn shine" id="resetAll" style="margin-top:22px" hidden aria-label="Réinitialiser tous les parcs">Réinitialiser tous les parcs</button>
@@ -730,6 +719,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:44,d:"01/11/2026",t:["« Ajouter un parc » ne demande plus que le nom de la guilde. Le parc vide s'ouvre directement : on y ajoute ensuite les dragodindes et leurs caractéristiques avec « ＋ Ajouter »."]},
   {v:43,d:"01/11/2026",t:["Gestion des parcs : les parcs déjà créés s'affichent en premier, en haut de la page, avec le bouton « Ajouter un parc » juste en dessous ; le formulaire de création s'ouvre sous ce bouton."]},
   {v:42,d:"01/11/2026",t:["La ligne « Objet obtenu à la vente » est retirée de toute l'appli (création, ajout, modification, tri et récapitulatifs)."]},
   {v:41,d:"01/11/2026",t:["Bouton « Partager l'appli » en bas de l'accueil : il ouvre le menu de partage du téléphone (SMS, WhatsApp, Messenger…) avec le lien de Drago Gestion, ou copie le lien si le partage n'est pas disponible."]},
@@ -1009,15 +999,13 @@ function closeForm(){form.hidden=true;document.getElementById("parcActions").hid
 document.getElementById("cancelParc").onclick=closeForm;
 form.addEventListener("submit",e=>{
   e.preventDefault();
-  const v=id=>document.getElementById(id).value.trim(), r=n=>form.querySelector(`input[name=${n}]:checked`).value;
-  const guilde=v("fGuilde"), nb=Math.max(1,Math.min(200,parseInt(v("fNb"))||1));
-  const d={nom:v("fNom"),type:v("fType"),sexe:r("sexe"),repro:r("repro"),cam:r("cam"),objet:v("fObjet"),gest:v("fGest")};
-  const L=getParcs();
-  // même nom de guilde → on ajoute au parc existant
-  let p=L.find(x=>x.guilde.toLowerCase()===guilde.toLowerCase());
-  if(!p){p={id:Date.now().toString(36),guilde,dragos:[]};L.push(p);}
-  for(let i=0;i<nb;i++)p.dragos.push({...d,id:uid()});
+  const guilde=document.getElementById("fGuilde").value.trim(); if(!guilde)return;
+  const L=getParcs(), existe=L.find(x=>x.guilde.toLowerCase()===guilde.toLowerCase());
+  if(existe){alertBox(`Le parc <b>${esc(existe.guilde)}</b> existe déjà.`);return;}
+  const p={id:Date.now().toString(36),guilde,dragos:[]}; L.push(p);
   Store.set("parcs",L); closeForm();
+  // on ouvre directement le nouveau parc pour y ajouter les dragodindes
+  depth++; location.hash="parc-"+p.id;
 });
 
 // ================= MENUS DÉROULANTS =================
