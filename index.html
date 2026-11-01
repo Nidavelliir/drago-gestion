@@ -616,6 +616,9 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 #home{min-height:100dvh}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:90;opacity:0;transition:opacity .2s}
 .toast.on{opacity:1}
+.sterApres{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin:10px 0;display:flex;flex-direction:column;gap:8px;text-align:left}
+.sterApres .f>span{display:block;font-size:12px;font-weight:600;color:var(--mut);margin-bottom:4px}
+#ws_info{color:var(--acc)!important}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("drago_sombre")))document.documentElement.classList.add("dark")}catch(e){}</script>
 </head>
@@ -719,6 +722,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:46,d:"01/11/2026",t:["Accoupler : après chaque accouplement validé, une zone « Stérilisés après cet accouplement » permet d'indiquer le nombre de mâles et de femelles devenus stériles pour ce type, avant de passer au type ou au parc suivant. Les parents qui viennent d'être accouplés sont choisis en premier et leurs gestations sont conservées."]},
   {v:45,d:"01/11/2026",t:["Ajouter des dragodindes à un parc : nom, type, puis des cases pour le nombre de mâles, de femelles, de reproductrices et de caméléones, et le temps de gestation."]},
   {v:44,d:"01/11/2026",t:["« Ajouter un parc » ne demande plus que le nom de la guilde. Le parc vide s'ouvre directement : on y ajoute ensuite les dragodindes et leurs caractéristiques avec « ＋ Ajouter »."]},
   {v:43,d:"01/11/2026",t:["Gestion des parcs : les parcs déjà créés s'affichent en premier, en haut de la page, avec le bouton « Ajouter un parc » juste en dessous ; le formulaire de création s'ouvre sous ce bouton."]},
@@ -840,7 +844,7 @@ function groupes(p){
 let typesCache=[];
 function syntheseTypes(p){
   const ordre=[], T=new Map(), S=getSter().filter(x=>x.parcId===p.id), A=getAccs().filter(a=>a.parcId===p.id);
-  const byId=Object.fromEntries(p.dragos.map(d=>[d.id,d]));
+  const byId=Object.fromEntries([...S,...p.dragos].map(d=>[d.id,d]));
   const get=t=>{const k=t.toLowerCase(); if(!T.has(k)){T.set(k,{type:t,items:[],sM:0,sF:0,etat:0});ordre.push(k);} return T.get(k);};
   trier(p.dragos).forEach(x=>get((x.d.type||"").trim()||"Sans type").items.push(x));
   S.forEach(x=>{const g=get((x.type||"").trim()||"Sans type"); x.sexe==="M"?g.sM++:g.sF++;});
@@ -892,7 +896,7 @@ addEventListener("resize",()=>{const v=document.querySelector(".grandVue");if(v&
 // Fiche d'un type : tout se règle par des nombres (pas de liste numérotée)
 function editType(g,mode){
   const acc=mode==="acc", root=document.getElementById("modalRoot"), p=parcCourant(), D=g.items.map(x=>x.d);
-  const gIds=new Set(D.map(d=>d.id)), gestT=()=>getAccs().filter(a=>a.parcId===p.id&&(gIds.has(a.femId)||gIds.has(a.maleId)));
+  const gIds=new Set([...D.map(d=>d.id),...getSter().filter(x=>x.parcId===p.id&&((x.type||"").trim()||"Sans type").toLowerCase()===g.type.toLowerCase()).map(x=>x.id)]), gestT=()=>getAccs().filter(a=>a.parcId===p.id&&(gIds.has(a.femId)||gIds.has(a.maleId)));
   const cnt=f=>D.filter(f).length, c=k=>{const v=[...new Set(D.map(d=>d[k]||""))];return v.length===1?v[0]:null;};
   const cur={M:cnt(d=>d.sexe==="M"),F:cnt(d=>d.sexe==="F"),repro:cnt(d=>d.repro==="oui"),cam:cnt(d=>d.cam==="oui"),sM:g.sM||0,sF:g.sF||0,enc:gestT().length};
   const lab=t=>`<span style="display:block;font-weight:700;color:var(--gold);margin-bottom:5px">${t}</span>`;
@@ -1360,6 +1364,9 @@ function accWizard(faits=[],dernier=null){
   const p=accParc(), root=document.getElementById("modalRoot"), T=typesDispo(p);
   const possibles=T.filter(t=>t.max>0), reste=possibles.filter(t=>!faits.includes(t.type));
   const fin=dernier?`<p class="done">✅ ${pl(dernier.n,"# accouplement","# accouplements")} de type <b>${esc(dernier.type)}</b> ${pl(dernier.n,"enregistré","enregistrés")}.</p>`:"";
+  const blocSter=dernier?`<div class="sterApres"><div class="tySec">Stérilisés après cet accouplement (${esc(dernier.type)})</div>
+    <div class="tyGrid">${["M","F"].map(x=>`<div class="f"><span>${x==="M"?"♂ Mâles":"♀ Femelles"}</span><div class="stepper stStep tyStep"><button type="button" data-sm="${x}">−</button><input type="number" id="ws_${x}" min="0" value="0" inputmode="numeric"><button type="button" data-sp="${x}">＋</button></div></div>`).join("")}</div>
+    <button type="button" class="btn ghost" id="ws_ok">Enregistrer les stériles</button><p class="tyAide" id="ws_info"></p></div>`:"";
   if(!reste.length){
     // parc suivant dans la liste (on revient au premier après le dernier)
     const L=getParcs(), k=L.findIndex(x=>x.id===p.id), suiv=L.length>1?L[(k+1)%L.length]:null;
@@ -1372,12 +1379,13 @@ function accWizard(faits=[],dernier=null){
         <p class="finTxt">Toutes les dragodindes du parc <b>« ${esc(p.guilde)} »</b> ont été accouplées !</p>
         <div class="finSep"><i></i><i></i></div>
         <p class="finTxt">Tu as sûrement les pieds qui collent, mais passe au suivant : l'argent ne tombe pas du ciel !</p>
-        
+        ${blocSter}
         ${suiv?`<button class="imgBtn finSuiv" id="w_suiv" aria-label="Parc suivant">Parc suivant →</button><p class="finProchain">Prochain parc : <b>${esc(suiv.guilde)}</b></p>`:""}
         <button class="imgBtn finFin" id="w_end" aria-label="Terminé">Terminé</button>
       </div></div>`;
       document.getElementById("w_end").onclick=()=>root.innerHTML="";
       if(suiv)document.getElementById("w_suiv").onclick=allerSuivant;
+      brancherSter();
       return;
     }
     root.innerHTML=`<div class="modal"><div class="box"><h3>Accouplement – ${esc(p.guilde)}</h3>
@@ -1389,11 +1397,30 @@ function accWizard(faits=[],dernier=null){
   }
   if(dernier){
     root.innerHTML=`<div class="modal"><div class="box"><h3>Accouplement – ${esc(p.guilde)}</h3>${fin}
+      ${blocSter}
       <p class="muted" style="text-align:center">Encore ${pl(reste.length,"# type disponible","# types disponibles")} : ${reste.map(t=>esc(t.type)).join(", ")}</p>
       <div class="formBtns imgDuo"><button class="imgBtn" id="w_end" aria-label="Terminé">Terminé</button><button class="imgBtn" id="w_next" aria-label="Suivant">Suivant →</button></div></div></div>`;
     document.getElementById("w_end").onclick=()=>root.innerHTML="";
     document.getElementById("w_next").onclick=()=>formType(reste[0].type);
+    brancherSter();
     return;
+  }
+  // stériliser les dragodindes du type qui vient d'être accouplé (les parents d'abord, leurs gestations sont conservées)
+  function brancherSter(){
+    const ok=document.getElementById("ws_ok"); if(!ok)return;
+    const q=()=>getParcs().find(x=>x.id===p.id), duType=()=>q().dragos.filter(d=>((d.type||"").trim()||"Sans type").toLowerCase()===dernier.type.toLowerCase());
+    const val=x=>Math.max(0,parseInt(document.getElementById("ws_"+x).value)||0);
+    const maxi=x=>duType().filter(d=>d.sexe===x).length;
+    root.querySelectorAll("[data-sm],[data-sp]").forEach(b=>b.onclick=()=>{const x=b.dataset.sm||b.dataset.sp;document.getElementById("ws_"+x).value=Math.min(maxi(x),Math.max(0,val(x)+(b.dataset.sm?-1:1)));});
+    ok.onclick=()=>{
+      const nM=Math.min(val("M"),maxi("M")), nF=Math.min(val("F"),maxi("F")); if(!nM&&!nF)return;
+      const parc=q(), par=new Set(dernier.parents||[]), ordre=L=>[...L].sort((a,b)=>(par.has(b.id)?1:0)-(par.has(a.id)?1:0)||parc.dragos.indexOf(b)-parc.dragos.indexOf(a));
+      const choisis=[...ordre(duType().filter(d=>d.sexe==="M")).slice(0,nM),...ordre(duType().filter(d=>d.sexe==="F")).slice(0,nF)], ids=new Set(choisis.map(d=>d.id)), now=Date.now();
+      setSter([...getSter(),...choisis.map(d=>({...d,parcId:parc.id,guilde:parc.guilde,date:now}))]);
+      parc.dragos=parc.dragos.filter(d=>!ids.has(d.id)); saveParc(parc); renderAcc(parc.id);
+      ["M","F"].forEach(x=>document.getElementById("ws_"+x).value=0);
+      document.getElementById("ws_info").textContent=`✔ ${pl(nM+nF,"# dragodinde classée stérile","# dragodindes classées stériles")} (♂ ${nM} · ♀ ${nF}). Leurs gestations en cours sont conservées.`;
+    };
   }
   formType(reste[0].type);
   function formType(typeChoisi){
@@ -1435,9 +1462,9 @@ function accWizard(faits=[],dernier=null){
       const html=root.innerHTML;
       if(await confirmBox({titre:"Confirmer l'accouplement",lignes,ok:"Accoupler"})){
         const A=getAccs();
-        for(let i=0;i<n;i++)A.push({id:uid(),parcId:p.id,maleId:males[i].id,femId:fems[i].id,debut,gestH:gestHeures(fems[i].gest),gestTxt:fems[i].gest});
+        const nouveaux=[]; for(let i=0;i<n;i++){const a={id:uid(),parcId:p.id,maleId:males[i].id,femId:fems[i].id,debut,gestH:gestHeures(fems[i].gest),gestTxt:fems[i].gest};A.push(a);nouveaux.push(a);}
         setAccs(A); renderAcc(p.id);
-        accWizard([...faits,t.type],{type:t.type,n});
+        accWizard([...faits,t.type],{type:t.type,n,parents:nouveaux.flatMap(a=>[a.maleId,a.femId])});
       } else formType(t.type);
     };
   }
@@ -1500,7 +1527,7 @@ function cartesGest(G,p){
   }).join("");
 }
 let gestTypes=[], gestFiche=null;
-const gestDuType=(p,g)=>{const ids=new Set(g.items.map(x=>x.d.id));return getAccs().filter(a=>a.parcId===p.id&&(ids.has(a.femId)||ids.has(a.maleId))).sort((a,b)=>finG(a)-finG(b));};
+const gestDuType=(p,g)=>{const ids=new Set([...g.items.map(x=>x.d.id),...getSter().filter(x=>x.parcId===p.id&&((x.type||"").trim()||"Sans type").toLowerCase()===g.type.toLowerCase()).map(x=>x.id)]);return getAccs().filter(a=>a.parcId===p.id&&(ids.has(a.femId)||ids.has(a.maleId))).sort((a,b)=>finG(a)-finG(b));};
 function tableauGest(p,grand){
   const A=getAccs(), T=syntheseTypes(p), now=Date.now(), z=v=>v?v:`<span class="zero">0</span>`;
   const rows=T.map(g=>{
