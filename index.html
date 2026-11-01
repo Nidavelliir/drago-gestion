@@ -610,7 +610,12 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
   .modal .box,#gestBox{max-height:85vh!important}
   .stList{max-height:30vh!important}
 }
-#partager{margin-top:auto!important;margin-bottom:8px}
+#partager{margin-top:0!important;margin-bottom:8px}
+/* accueil : bloc titre + 3 boutons centré dans l'écran, texte des boutons centré */
+#home::before{margin-top:auto!important;text-align:center;align-self:center}
+#home .row{margin-bottom:auto!important}
+#home .tile,#home .row .tile{align-items:center!important;justify-content:center!important;text-align:center!important}
+#home{padding-bottom:calc(16px + env(safe-area-inset-bottom))!important}
 #home{min-height:100dvh}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:90;opacity:0;transition:opacity .2s}
 .toast.on{opacity:1}
@@ -733,6 +738,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:52,d:"01/11/2026",t:["Accueil : les trois boutons (et le titre) sont centrés dans l'écran."]},
   {v:51,d:"01/11/2026",t:["Correction : dans la fiche d'un type, « Valider » ne se bloque plus quand on rend des dragodindes stériles (reproductrices et caméléones s'ajustent automatiquement au total).","Les dragodindes remises dans le parc reprennent le nom actuel du type ; renommer un type renomme aussi ses stériles ; supprimer un parc efface aussi ses stériles.","Correction de la vue agrandie (surtout sur iPhone) : le bouton ✕ est toujours visible et fonctionne, la ligne entière tient en largeur (le texte se réduit si besoin), et on peut faire glisser le tableau du doigt quand il est tourné.","Corrections diverses : les fenêtres et la vue agrandie se ferment quand on change de page (bouton retour du téléphone)."]},
   {v:50,d:"01/11/2026",t:["Correction : le bouton « Valider » de la fiche d'un type (Gestion des parcs) fonctionne de nouveau : nom, type, nombres, gestation… sont modifiables à volonté.","Plus de limite au nombre que l'on peut entrer dans les cases (mâles, femelles, reproductrices, caméléones…)."]},
   {v:49,d:"01/11/2026",t:["Accouchements : dans l'écran de modification d'un type, les nombres de mâles et de femelles ne sont plus modifiables (type, nom, accouchements en cours et stériles le restent)."]},
