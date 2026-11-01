@@ -612,6 +612,10 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
   .modal .box,#gestBox{max-height:85vh!important}
   .stList{max-height:30vh!important}
 }
+#partager{margin-top:auto!important;margin-bottom:8px}
+#home{min-height:100dvh}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:90;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
 </style>
 <script>try{if(JSON.parse(localStorage.getItem("drago_sombre")))document.documentElement.classList.add("dark")}catch(e){}</script>
 </head>
@@ -633,6 +637,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
       <span class="tileT">Accouchements</span>
     </button>
   </div>
+  <button class="btn ghost" id="partager" style="margin-top:auto">Partager l'appli</button>
 </section>
 
 <!-- ============ GESTION DES PARCS ============ -->
@@ -725,6 +730,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:41,d:"01/11/2026",t:["Bouton « Partager l'appli » en bas de l'accueil : il ouvre le menu de partage du téléphone (SMS, WhatsApp, Messenger…) avec le lien de Drago Gestion, ou copie le lien si le partage n'est pas disponible."]},
   {v:40,d:"01/11/2026",t:["Compatibilité iPhone / iPad : icône adaptée à l'écran d'accueil d'iOS, pas de zoom automatique en touchant un champ, respect de l'encoche et de la barre du bas, affichage paysage du tableau qui fonctionne aussi sur iPhone, prise en charge des iPhone plus anciens."]},
   {v:39,d:"31/10/2026",t:["Accouchements : un tableau par parc, une ligne par type (type, nom, accouchements en cours, stériles, mâles, femelles), sans détail un par un.","Touche le tableau pour l'agrandir en paysage, puis une ligne pour ouvrir le même écran de modification que la Gestion des parcs, avec ces entrées."]},
   {v:38,d:"31/10/2026",t:["Correction : la page Accouplements reprend son affichage précédent.","Accouchements : un tableau par parc, une ligne par type (type, nom, gestations en cours avec le prochain minuteur ou le nombre de prêtes, stériles, mâles, femelles).","Touche une ligne pour voir les gestations de ce type avec leurs minuteurs, les valider (✔) une par une ou toutes les prêtes d'un coup."]},
@@ -1725,6 +1731,15 @@ function appliquerTheme(){const d=Store.get("sombre",false);document.documentEle
   document.querySelector('meta[name="theme-color"]').content=d?"#141716":"#f5f4f0";}
 document.getElementById("themeBtn").onclick=()=>{Store.set("sombre",!Store.get("sombre",false));appliquerTheme();};
 appliquerTheme();
+
+// Partager le lien de l'appli
+function toast(t){const e=document.createElement("div");e.className="toast";e.textContent=t;document.body.appendChild(e);requestAnimationFrame(()=>e.classList.add("on"));setTimeout(()=>{e.classList.remove("on");setTimeout(()=>e.remove(),300);},2200);}
+document.getElementById("partager").onclick=async()=>{
+  const url="https://nidavelliir.github.io/drago-gestion/", data={title:"Drago Gestion",text:"Drago Gestion – gestion des parcs, accouplements et accouchements de dragodindes",url};
+  if(navigator.share){try{await navigator.share(data);}catch(e){} return;}
+  try{await navigator.clipboard.writeText(url);toast("Lien copié !");}
+  catch(e){prompt("Copie ce lien :",url);}
+};
 
 show(); // affichage de la page de départ, une fois tout le reste prêt
 </script>
