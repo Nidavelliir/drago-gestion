@@ -722,6 +722,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:49,d:"01/11/2026",t:["Accouchements : dans l'écran de modification d'un type, les nombres de mâles et de femelles ne sont plus modifiables (type, nom, accouchements en cours et stériles le restent)."]},
   {v:48,d:"01/11/2026",t:["Accouplements : le mâle et la femelle de chaque couple sont indisponibles pendant tout le temps de gestation. Exemple : 80 mâles et 52 femelles, 52 accouplements lancés → 52 couples indisponibles, il reste 28 mâles disponibles et aucune femelle. Ils redeviennent disponibles à la fin du minuteur."]},
   {v:47,d:"01/11/2026",t:["Accoupler : la zone de fin d'accouplement s'appelle maintenant « Stériles après cet accouplement »."]},
   {v:46,d:"01/11/2026",t:["Accoupler : après chaque accouplement validé, une zone « Stérilisés après cet accouplement » permet d'indiquer le nombre de mâles et de femelles devenus stériles pour ce type, avant de passer au type ou au parc suivant. Les parents qui viennent d'être accouplés sont choisis en premier et leurs gestations sont conservées."]},
@@ -907,7 +908,8 @@ function editType(g,mode){
   root.innerHTML=`<div class="modal"><div class="box stBox"><form id="tForm" autocomplete="off" style="display:flex;flex-direction:column;gap:10px">
     <div class="stTitre">${esc(g.type)} – ${esc(p.guilde)}</div>
     ${acc?`${txt("type","Type")}${txt("nom","Nom")}
-    <div class="tyGrid">${num("enc","Accouchements en cours")}<div></div>${num("sM","Stériles ♂")}${num("sF","Stériles ♀")}${num("M","♂ Mâles")}${num("F","♀ Femelles")}</div>
+    <div class="tyGrid">${num("enc","Accouchements en cours")}<div></div>${num("sM","Stériles ♂")}${num("sF","Stériles ♀")}</div>
+    <div hidden>${num("M","")}${num("F","")}</div>
     <p class="tyAide">En cours : augmenter forme de nouveaux couples, diminuer valide les accouchements (les prêts d'abord). Stériles : augmenter retire du parc, diminuer y remet.</p>
     <div hidden>${num("repro","")}${num("cam","")}${txt("objet","")}${txt("gest","")}</div>`
     :`<div class="tyGrid">${num("M","♂ Mâles")}${num("F","♀ Femelles")}${num("repro","Reproductrices")}${num("cam","Caméléones")}</div>
