@@ -722,6 +722,7 @@ input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:46
 <script>
 // Journal des mises à jour : la plus récente en premier.
 const MAJ=[
+  {v:50,d:"01/11/2026",t:["Correction : le bouton « Valider » de la fiche d'un type (Gestion des parcs) fonctionne de nouveau : nom, type, nombres, gestation… sont modifiables à volonté.","Plus de limite au nombre que l'on peut entrer dans les cases (mâles, femelles, reproductrices, caméléones…)."]},
   {v:49,d:"01/11/2026",t:["Accouchements : dans l'écran de modification d'un type, les nombres de mâles et de femelles ne sont plus modifiables (type, nom, accouchements en cours et stériles le restent)."]},
   {v:48,d:"01/11/2026",t:["Accouplements : le mâle et la femelle de chaque couple sont indisponibles pendant tout le temps de gestation. Exemple : 80 mâles et 52 femelles, 52 accouplements lancés → 52 couples indisponibles, il reste 28 mâles disponibles et aucune femelle. Ils redeviennent disponibles à la fin du minuteur."]},
   {v:47,d:"01/11/2026",t:["Accoupler : la zone de fin d'accouplement s'appelle maintenant « Stériles après cet accouplement »."]},
@@ -921,7 +922,7 @@ function editType(g,mode){
     <div class="stBas"><button type="button" class="stB annuler" id="t_cancel"><i>↩</i>Annuler</button><button type="submit" class="stB valider"><i>✔</i>Valider</button></div>
   </form></div></div>`;
   menus(root);
-  const v=k=>Math.max(0,parseInt(document.getElementById("t_"+k).value)||0);
+  const v=k=>{const el=document.getElementById("t_"+k); return el?Math.max(0,parseInt(el.value)||0):(cur[k]||0);};
   // les compteurs de stériles sont liés aux mâles / femelles présents
   const lien={sM:"M",sF:"F"}, regler=(k,val)=>{
     if(lien[k]){const o=lien[k], d=val-v(k); if(d>0&&v(o)<d)val=v(k)+v(o); if(val<0)val=0;
@@ -1127,7 +1128,7 @@ const labT=t=>`<span style="display:block;font-weight:700;color:var(--gold);marg
 const radio2=(n,a,b,la,lb)=>`<div class="choice"><label><input type="radio" name="${n}" value="${a}" required> ${la}</label><label><input type="radio" name="${n}" value="${b}"> ${lb}</label></div>`;
 document.getElementById("addDrago").onclick=()=>{
   const p=parcCourant(), root=document.getElementById("modalRoot");
-  const num=(id,t)=>`<div class="f">${labT(t)}<div class="stepper stStep tyStep"><button type="button" data-am="${id}">−</button><input type="number" id="${id}" min="0" max="500" value="0" inputmode="numeric"><button type="button" data-ap="${id}">＋</button></div></div>`;
+  const num=(id,t)=>`<div class="f">${labT(t)}<div class="stepper stStep tyStep"><button type="button" data-am="${id}">−</button><input type="number" id="${id}" min="0" value="0" inputmode="numeric"><button type="button" data-ap="${id}">＋</button></div></div>`;
   root.innerHTML=`<div class="modal"><div class="box"><h3>＋ Ajouter au parc ${esc(p.guilde)}</h3><form id="addForm" autocomplete="off">
     <div class="f">${labT("Nom de la dragodinde")}<input type="text" id="n_nom" data-dl="nom" required></div>
     <div class="f">${labT("Type de la dragodinde")}<input type="text" id="n_type" data-dl="type" required></div>
